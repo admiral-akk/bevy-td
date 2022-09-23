@@ -7,6 +7,9 @@ mod events;
 
 use crate::components::Coordinates;
 use crate::components::Uncover;
+use crate::events::BoardCompletedEvent;
+use crate::events::BombExplosionEvent;
+use crate::events::TileMarkEvent;
 use crate::events::TileTriggerEvent;
 use crate::resources::board::Board;
 use crate::resources::board_options::BoardPosition;
@@ -44,12 +47,16 @@ impl<T: StateData> Plugin for BoardPlugin<T> {
         // We handle uncovering even if the state is inactive
         .add_system_set(
             SystemSet::on_in_stack_update(self.running_state.clone())
-                .with_system(systems::uncover::uncover_tiles),
+                .with_system(systems::uncover::uncover_tiles)
+                .with_system(systems::flag::flag_tile),
         )
         .add_system_set(
             SystemSet::on_exit(self.running_state.clone()).with_system(Self::cleanup_board),
         )
-        .add_event::<TileTriggerEvent>();
+        .add_event::<TileTriggerEvent>()
+        .add_event::<TileMarkEvent>()
+        .add_event::<BoardCompletedEvent>()
+        .add_event::<BombExplosionEvent>();
         log::info!("Loaded Board Plugin");
         #[cfg(feature = "debug")]
         {
@@ -272,6 +279,7 @@ impl<T: StateData> BoardPlugin<T> {
             },
             tile_size,
             covered_tiles,
+            flagged_tiles: HashMap::new(),
             entity: board_entity,
         });
     }

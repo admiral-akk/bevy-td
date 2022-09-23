@@ -1,5 +1,6 @@
 use crate::resources::bounds::Bounds2;
 use crate::{Coordinates, TileMap};
+use bevy::log;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 
@@ -9,6 +10,7 @@ pub struct Board {
     pub bounds: Bounds2,
     pub tile_size: f32,
     pub covered_tiles: HashMap<Coordinates, Entity>,
+    pub flagged_tiles: HashMap<Coordinates, Entity>,
     pub entity: Entity,
 }
 
@@ -30,14 +32,47 @@ impl Board {
             y: (coordinates.y / self.tile_size) as u16,
         })
     }
+
     /// Retrieves a covered tile entity
     pub fn tile_to_uncover(&self, coords: &Coordinates) -> Option<&Entity> {
-        self.covered_tiles.get(coords)
+        if self.flagged_tiles.contains_key(coords) {
+            None
+        } else {
+            self.covered_tiles.get(coords)
+        }
+    }
+    fn unmark_tile(&mut self, coords: &Coordinates) -> Option<Coordinates> {
+        if self.covered_tiles.contains_key(coords) {
+            self.covered_tiles.remove(coords);
+            Some(coords.clone())
+        } else {
+            log::error!("Failed to unmark tile at {}", coords);
+            None
+        }
     }
 
     /// We try to uncover a tile, returning the entity
     pub fn try_uncover_tile(&mut self, coords: &Coordinates) -> Option<Entity> {
+        if self.flagged_tiles.contains_key(coords) {
+            self.unmark_tile(coords)?;
+        }
         self.covered_tiles.remove(coords)
+    }
+
+    pub fn try_toggle_flag(&mut self, coords: &Coordinates) -> Option<(Entity, bool)> {
+        let entity = *self.covered_tiles.get(coords)?;
+        let mark = if self.flagged_tiles.contains_key(coords) {
+            self.unmark_tile(coords)?;
+            false
+        } else {
+            self.flagged_tiles.insert(*coords, entity);
+            true
+        };
+        Some((entity, mark))
+    }
+
+    pub fn is_completed(&self) -> bool {
+        self.tile_map.bomb_count() as usize == self.covered_tiles.len()
     }
 
     /// We retrieve the adjacent covered tile entities of `coord`
