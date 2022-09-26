@@ -19,7 +19,7 @@ fn main() {
     app.insert_resource(WindowDescriptor {
         title: "Mine Sweeper!".to_string(),
         width: 700.,
-        height: 800.,
+        height: 900.,
         ..Default::default()
     })
     // Bevy default plugins

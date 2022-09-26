@@ -20,6 +20,7 @@ use bevy::ecs::schedule::StateData;
 use bevy::log;
 use bevy::math::Vec3Swizzles;
 use bevy::prelude::*;
+use bevy::sprite::Rect;
 use bevy::utils::HashMap;
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
@@ -48,7 +49,8 @@ impl<T: StateData> Plugin for BoardPlugin<T> {
         .add_system_set(
             SystemSet::on_in_stack_update(self.running_state.clone())
                 .with_system(systems::uncover::uncover_tiles)
-                .with_system(systems::flag::flag_tile),
+                .with_system(systems::flag::flag_tile)
+                .with_system(systems::button::button_color_system),
         )
         .add_system_set(
             SystemSet::on_exit(self.running_state.clone()).with_system(Self::cleanup_board),
@@ -70,6 +72,67 @@ impl<T: StateData> Plugin for BoardPlugin<T> {
 }
 
 impl<T: StateData> BoardPlugin<T> {
+    fn spawn_buttons(commands: &mut Commands, board_assets: Res<BoardAssets>) {
+        commands
+            .spawn()
+            .insert_bundle(NodeBundle {
+                style: Style {
+                    size: Size::new(Val::Percent(50.), Val::Percent(50.)),
+                    display: Display::Flex,
+                    flex_direction: FlexDirection::Column,
+                    align_items: AlignItems::FlexStart,
+                    justify_content: JustifyContent::FlexStart,
+                    ..Default::default()
+                },
+                color: UiColor(Color::Rgba {
+                    red: 0.,
+                    green: 0.,
+                    blue: 0.,
+                    alpha: 0.,
+                }),
+                ..Default::default()
+            })
+            .with_children(|parent| {
+                parent
+                    .spawn_bundle(ButtonBundle {
+                        style: Style {
+                            size: Size::new(Val::Px(350.0), Val::Px(65.0)),
+                            margin: UiRect::all(Val::Auto),
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..Default::default()
+                        },
+                        color: UiColor(Color::Rgba {
+                            red: 0.,
+                            green: 0.,
+                            blue: 0.,
+                            alpha: 1.,
+                        }),
+                        ..Default::default()
+                    })
+                    .with_children(|parent| {
+                        parent.spawn_bundle(TextBundle {
+                            text: Text {
+                                sections: vec![TextSection {
+                                    value: "Play".to_string(),
+                                    style: TextStyle {
+                                        font_size: 20.0,
+                                        color: Color::rgb(1.0, 0.0, 0.0),
+                                        font: board_assets.bomb_counter_font.clone(),
+                                        ..Default::default()
+                                    },
+                                }],
+                                alignment: TextAlignment {
+                                    vertical: VerticalAlign::Center,
+                                    horizontal: HorizontalAlign::Center,
+                                },
+                            },
+                            ..Default::default()
+                        });
+                    });
+            });
+    }
+
     fn spawn_tiles(
         parent: &mut ChildBuilder,
         tile_map: &TileMap,
@@ -282,5 +345,6 @@ impl<T: StateData> BoardPlugin<T> {
             flagged_tiles: HashMap::new(),
             entity: board_entity,
         });
+        Self::spawn_buttons(&mut commands, board_assets);
     }
 }
