@@ -7,6 +7,7 @@ use board_plugin::resources::board_assets::BoardAssets;
 use board_plugin::resources::board_assets::SpriteMaterial;
 use board_plugin::resources::board_options::BoardOptions;
 use board_plugin::BoardPlugin;
+use tower_defense_plugin::TowerDefensePlugin;
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
     InGame,
@@ -31,20 +32,17 @@ fn main() {
 
     // Startup system (cameras)
     app.add_startup_system(camera_setup);
-    app.add_state(AppState::Out)
-        .add_plugin(BoardPlugin {
-            running_state: AppState::InGame,
-        })
-        .add_system(state_handler);
+    app.add_plugin(TowerDefensePlugin {});
+    // app.add_state(AppState::Out)
+    //     .add_plugin(BoardPlugin {
+    //         running_state: AppState::InGame,
+    //     })
+    //     .add_system(state_handler);
     // Run the app
     app.run();
 }
 
-fn setup_board(
-    mut commands: Commands,
-    mut state: ResMut<State<AppState>>,
-    asset_server: Res<AssetServer>,
-) {
+fn setup_board(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.insert_resource(BoardOptions {
         map_size: (20, 20),
         bomb_count: 40,
@@ -77,7 +75,6 @@ fn setup_board(
             color: Color::WHITE,
         },
     });
-    state.overwrite_set(AppState::InGame).unwrap();
 }
 
 fn camera_setup(mut commands: Commands) {
