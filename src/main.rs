@@ -62,7 +62,14 @@ fn load_resources(
     asset_server: Res<AssetServer>,
 ) {
     let texture_handle = asset_server.load("spritesheets/rts_medival/tilemap_packed.png");
-    let path_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 23, 9);
+    let path_atlas = TextureAtlas::from_grid_with_padding(
+        texture_handle,
+        Vec2::new(15.0, 15.0),
+        23,
+        9,
+        Vec2::new(1., 1.),
+        Vec2::new(1., 1.),
+    );
     path_sprites.path_atlas_handle = Some(texture_atlases.add(path_atlas));
 }
 

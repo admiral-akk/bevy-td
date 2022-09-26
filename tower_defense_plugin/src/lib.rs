@@ -57,6 +57,11 @@ impl<T> TowerDefensePlugin<T> {
                         if board.is_path(&coordinate) {
                             parent.spawn().insert(Name::new("Road")).insert_bundle(
                                 SpriteSheetBundle {
+                                    sprite: TextureAtlasSprite {
+                                        index: spritesheets.get_path_index(&coordinate, board),
+                                        custom_size: Some(Vec2::new(size, size)),
+                                        ..Default::default()
+                                    },
                                     texture_atlas: spritesheets
                                         .path_atlas_handle
                                         .as_ref()
