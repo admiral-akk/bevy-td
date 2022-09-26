@@ -1,4 +1,5 @@
 use bevy::prelude::Component;
+use std::fmt::{self, Display, Formatter};
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
 #[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
@@ -10,5 +11,11 @@ pub struct Coordinates {
 impl Coordinates {
     pub fn new(x: u16, y: u16) -> Self {
         Coordinates { x, y }
+    }
+}
+
+impl Display for Coordinates {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
     }
 }
