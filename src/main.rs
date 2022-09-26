@@ -1,3 +1,5 @@
+use bevy::asset::LoadState;
+use bevy::ecs::schedule::StateData;
 use bevy::log;
 use bevy::prelude::*;
 
@@ -7,12 +9,19 @@ use board_plugin::resources::board_assets::BoardAssets;
 use board_plugin::resources::board_assets::SpriteMaterial;
 use board_plugin::resources::board_options::BoardOptions;
 use board_plugin::BoardPlugin;
+use tower_defense_plugin::resources::path_sprites;
+use tower_defense_plugin::resources::path_sprites::PathSprites;
 use tower_defense_plugin::TowerDefensePlugin;
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
     InGame,
     Out,
     Paused,
+}
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum GameState {
+    Loading,
+    Loaded,
 }
 fn main() {
     let mut app = App::new();
@@ -28,18 +37,33 @@ fn main() {
     #[cfg(feature = "debug")]
     // Debug hierarchy inspector
     app.add_plugin(WorldInspectorPlugin::new());
-    app.add_startup_system(setup_board);
 
     // Startup system (cameras)
     app.add_startup_system(camera_setup);
-    app.add_plugin(TowerDefensePlugin {});
+    app.add_plugin(TowerDefensePlugin {
+        active_state: GameState::Loaded,
+    })
+    .insert_resource(PathSprites {
+        path_atlas_handle: None,
+    })
+    .add_startup_system(load_resources)
+    .add_state(GameState::Loaded)
+    .run();
     // app.add_state(AppState::Out)
     //     .add_plugin(BoardPlugin {
     //         running_state: AppState::InGame,
     //     })
     //     .add_system(state_handler);
     // Run the app
-    app.run();
+}
+fn load_resources(
+    mut path_sprites: ResMut<PathSprites>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    asset_server: Res<AssetServer>,
+) {
+    let texture_handle = asset_server.load("spritesheets/rts_medival/tilemap_packed.png");
+    let path_atlas = TextureAtlas::from_grid(texture_handle, Vec2::new(16.0, 16.0), 23, 9);
+    path_sprites.path_atlas_handle = Some(texture_atlases.add(path_atlas));
 }
 
 fn setup_board(mut commands: Commands, asset_server: Res<AssetServer>) {
