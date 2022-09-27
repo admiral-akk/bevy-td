@@ -9,7 +9,10 @@ use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
 use events::{EnterBuildTarget, HideBuildTarget, Move, Spawn, TryBuild};
 use resources::{
-    board::Board, build_tracker::BuildTracker, game_sprites::GameSprites, spawn_timer::SpawnTimer,
+    board::Board,
+    build_tracker::BuildTracker,
+    game_sprites::GameSprites,
+    spawn_timer::{MoveTimer, SpawnTimer},
 };
 use systems::{
     blueprint::{enter_target, hide_blueprint},
@@ -133,5 +136,6 @@ impl<T> TowerDefensePlugin<T> {
             .insert_bundle(spritesheets.peasant(board.tile_size));
         commands.insert_resource(board);
         commands.insert_resource(SpawnTimer(Timer::from_seconds(4., true)));
+        commands.insert_resource(MoveTimer(Timer::from_seconds(1., true)));
     }
 }
