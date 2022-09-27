@@ -1,56 +1,57 @@
 use bevy::{
     input::{mouse::MouseButtonInput, ButtonState},
     log,
-    prelude::{EventReader, MouseButton, Res, ResMut, Vec2},
+    prelude::{EventReader, EventWriter, MouseButton, Res, ResMut, Vec2},
     window::{CursorMoved, Windows},
 };
 
 use crate::{
     components::coordinates::Coordinates,
-    resources::{
-        board::Board,
-        hover_coordinate::{self, HoverCoordinate},
-    },
+    events::{EnterBuildTarget, ExitBuildTarget, TryBuild},
+    resources::{board::Board, build_tracker::BuildTracker},
 };
 
-pub fn handle_mouse(
+pub fn mouse_move_on_board(
     windows: Res<Windows>,
     board: Res<Board>,
-    mut hover_coordinate: ResMut<HoverCoordinate>,
-    mut click_evr: EventReader<MouseButtonInput>,
+    mut build_tracker: ResMut<BuildTracker>,
     mut cursor_evr: EventReader<CursorMoved>,
+    mut set_target_ewr: EventWriter<EnterBuildTarget>,
+    mut clear_target_ewr: EventWriter<ExitBuildTarget>,
 ) {
     let window = windows.get_primary().unwrap();
     for event in cursor_evr.iter() {
         let pos = event.position;
         let pos = pos - Vec2::new(window.width(), window.height()) / 2. + board.board_size() / 2.;
         if pos.x < 0. || pos.y < 0. {
-            hover_coordinate.0 = None;
-            break;
+            build_tracker.clear_target(&mut clear_target_ewr);
+            continue;
         }
         let coord = Coordinates::new(
             (pos.x / board.tile_size) as u16,
             (pos.y / board.tile_size) as u16,
         );
         if coord.x >= board.size.0 || coord.y >= board.size.1 {
-            hover_coordinate.0 = None;
-            break;
+            build_tracker.clear_target(&mut clear_target_ewr);
+            continue;
         }
-        if hover_coordinate.0.is_none() || !hover_coordinate.0.unwrap().eq(&coord) {
-            hover_coordinate.0 = Some(coord);
+        if build_tracker.target.is_some() && build_tracker.target.unwrap().eq(&coord) {
+            continue;
         }
+        build_tracker.set_target(coord, &mut set_target_ewr, &mut clear_target_ewr);
     }
-    if hover_coordinate.0.is_none() {
-        return;
-    }
+}
+
+pub fn mouse_click_on_board(
+    mut click_evr: EventReader<MouseButtonInput>,
+    mut try_build_ewr: EventWriter<TryBuild>,
+) {
     for event in click_evr.iter() {
-        if let ButtonState::Pressed = event.state {
-            match event.button {
-                MouseButton::Left => {
-                    log::info!("Clicked on {}", hover_coordinate.0.unwrap());
-                }
-                _ => (),
+        match event.button {
+            MouseButton::Left => {
+                try_build_ewr.send(TryBuild);
             }
+            _ => (),
         }
     }
 }

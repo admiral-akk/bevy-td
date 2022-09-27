@@ -1,5 +1,6 @@
 mod board;
 mod components;
+mod events;
 pub mod resources;
 mod systems;
 
@@ -8,8 +9,12 @@ use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 use bevy_inspector_egui::RegisterInspectable;
 use board::game_map::GameMap;
 use components::coordinates::Coordinates;
-use resources::{board::Board, game_sprites::GameSprites, hover_coordinate::HoverCoordinate};
-use systems::input::handle_mouse;
+use events::{EnterBuildTarget, ExitBuildTarget, TryBuild};
+use resources::{board::Board, build_tracker::BuildTracker, game_sprites::GameSprites};
+use systems::{
+    blueprint::{enter_target, exit_target},
+    input::{mouse_click_on_board, mouse_move_on_board},
+};
 
 pub struct TowerDefensePlugin<T> {
     pub active_state: T,
@@ -17,13 +22,23 @@ pub struct TowerDefensePlugin<T> {
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
-        app.insert_resource(HoverCoordinate(None));
-        app.add_system_set(
+        app.insert_resource(BuildTracker {
+            target: None,
+            blueprint: None,
+        })
+        .add_system_set(
             SystemSet::on_enter(self.active_state.clone()).with_system(Self::create_board),
-        );
-        app.add_system_set(
-            SystemSet::on_update(self.active_state.clone()).with_system(handle_mouse),
-        );
+        )
+        .add_system_set(
+            SystemSet::on_update(self.active_state.clone())
+                .with_system(mouse_move_on_board)
+                .with_system(mouse_click_on_board)
+                .with_system(exit_target)
+                .with_system(enter_target),
+        )
+        .add_event::<EnterBuildTarget>()
+        .add_event::<ExitBuildTarget>()
+        .add_event::<TryBuild>();
         #[cfg(feature = "debug")]
         {
             app.register_inspectable::<Coordinates>();
