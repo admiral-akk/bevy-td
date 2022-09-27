@@ -3,6 +3,7 @@ use bevy::ecs::schedule::StateData;
 use bevy::log;
 use bevy::prelude::*;
 
+use bevy::render::texture::ImageSettings;
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::WorldInspectorPlugin;
 use board_plugin::resources::board_assets::BoardAssets;
@@ -26,14 +27,15 @@ pub enum GameState {
 fn main() {
     let mut app = App::new();
     // Window setup
-    app.insert_resource(WindowDescriptor {
-        title: "Mine Sweeper!".to_string(),
-        width: 700.,
-        height: 900.,
-        ..Default::default()
-    })
-    // Bevy default plugins
-    .add_plugins(DefaultPlugins);
+    app.insert_resource(ImageSettings::default_nearest())
+        .insert_resource(WindowDescriptor {
+            title: "Mine Sweeper!".to_string(),
+            width: 700.,
+            height: 900.,
+            ..Default::default()
+        })
+        // Bevy default plugins
+        .add_plugins(DefaultPlugins);
     #[cfg(feature = "debug")]
     // Debug hierarchy inspector
     app.add_plugin(WorldInspectorPlugin::new());

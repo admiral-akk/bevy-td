@@ -40,12 +40,13 @@ impl<T> TowerDefensePlugin<T> {
                     .spawn()
                     .insert(Name::new(format!("Tile {}, {}", x, y)))
                     .insert(coordinate.clone())
-                    .insert_bundle(SpriteBundle {
-                        sprite: Sprite {
-                            color: Color::rgb(0., 0., 1.),
-                            custom_size: Some(Vec2::new(size - 1., size - 1.)),
+                    .insert_bundle(SpriteSheetBundle {
+                        sprite: TextureAtlasSprite {
+                            index: PathSprites::get_grass_index(&coordinate),
+                            custom_size: Some(Vec2::new(size, size)),
                             ..Default::default()
                         },
+                        texture_atlas: spritesheets.path_atlas_handle.as_ref().unwrap().clone(),
                         transform: Transform::from_xyz(
                             x as f32 * size + size / 2.,
                             y as f32 * size + size / 2.,
@@ -58,7 +59,7 @@ impl<T> TowerDefensePlugin<T> {
                             parent.spawn().insert(Name::new("Road")).insert_bundle(
                                 SpriteSheetBundle {
                                     sprite: TextureAtlasSprite {
-                                        index: spritesheets.get_path_index(&coordinate, board),
+                                        index: PathSprites::get_path_index(&coordinate, board),
                                         custom_size: Some(Vec2::new(size, size)),
                                         ..Default::default()
                                     },
@@ -68,6 +69,42 @@ impl<T> TowerDefensePlugin<T> {
                                         .unwrap()
                                         .clone(),
                                     transform: Transform::from_xyz(0., 0., 1.),
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                        if board.is_start(&coordinate) {
+                            parent.spawn().insert(Name::new("Start")).insert_bundle(
+                                SpriteSheetBundle {
+                                    sprite: TextureAtlasSprite {
+                                        index: PathSprites::get_spawn_index(),
+                                        custom_size: Some(Vec2::new(size, size)),
+                                        ..Default::default()
+                                    },
+                                    texture_atlas: spritesheets
+                                        .path_atlas_handle
+                                        .as_ref()
+                                        .unwrap()
+                                        .clone(),
+                                    transform: Transform::from_xyz(0., 12., 2.),
+                                    ..Default::default()
+                                },
+                            );
+                        }
+                        if board.is_end(&coordinate) {
+                            parent.spawn().insert(Name::new("Target")).insert_bundle(
+                                SpriteSheetBundle {
+                                    sprite: TextureAtlasSprite {
+                                        index: PathSprites::get_end_index(),
+                                        custom_size: Some(Vec2::new(size, size)),
+                                        ..Default::default()
+                                    },
+                                    texture_atlas: spritesheets
+                                        .path_atlas_handle
+                                        .as_ref()
+                                        .unwrap()
+                                        .clone(),
+                                    transform: Transform::from_xyz(0., 0., 2.),
                                     ..Default::default()
                                 },
                             );
