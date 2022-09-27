@@ -105,11 +105,7 @@ impl GameSprites {
                 ..Default::default()
             },
             texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(
-                coord.x as f32 * tile_size + tile_size / 2.,
-                coord.y as f32 * tile_size + tile_size / 2.,
-                1.,
-            ),
+            transform: Transform::from_xyz(0., 0., 1.),
             ..Default::default()
         }
     }

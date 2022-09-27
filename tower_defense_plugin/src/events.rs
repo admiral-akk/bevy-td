@@ -11,3 +11,6 @@ pub struct TryBuild;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Spawn;
+
+#[derive(Debug, Copy, Clone)]
+pub struct Move;

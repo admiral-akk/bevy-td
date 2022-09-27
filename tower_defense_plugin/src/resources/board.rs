@@ -1,5 +1,5 @@
 use bevy::{
-    prelude::{Entity, Vec2, Vec3},
+    prelude::{Entity, Transform, Vec2, Vec3},
     utils::HashMap,
 };
 
@@ -12,6 +12,7 @@ pub struct Board {
     pub end: Coordinates,
     pub path: Vec<Coordinates>,
     pub tile_size: f32,
+    pub board: Option<Entity>,
 }
 
 impl Board {
@@ -44,6 +45,7 @@ impl Board {
             end,
             path,
             tile_size,
+            board: None,
         }
     }
     pub fn width(&self) -> u16 {
@@ -57,6 +59,23 @@ impl Board {
     pub fn board_offset(&self) -> Vec3 {
         let offset = -self.board_size() / 2.;
         Vec3::new(offset.x, offset.y, 0.)
+    }
+
+    pub fn next(&self, coord: &Coordinates) -> Coordinates {
+        let index = self.path.iter().position(|c| c.eq(&coord));
+        if let Some(index) = index {
+            self.path[index + 1]
+        } else {
+            self.start
+        }
+    }
+
+    pub fn transform(&self, coord: &Coordinates, z: f32) -> Transform {
+        Transform::from_xyz(
+            (coord.x as f32 + 0.5) * self.tile_size,
+            (coord.y as f32 + 0.5) * self.tile_size,
+            z,
+        )
     }
 
     pub fn board_size(&self) -> Vec2 {

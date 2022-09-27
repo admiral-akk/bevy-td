@@ -7,14 +7,15 @@ use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
-use events::{EnterBuildTarget, HideBuildTarget, Spawn, TryBuild};
+use events::{EnterBuildTarget, HideBuildTarget, Move, Spawn, TryBuild};
 use resources::{
     board::Board, build_tracker::BuildTracker, game_sprites::GameSprites, spawn_timer::SpawnTimer,
 };
 use systems::{
     blueprint::{enter_target, hide_blueprint},
     input::{mouse_click_on_board, mouse_move_on_board},
-    spawn::{spawn, spawn_tick},
+    monster::monster_move,
+    spawn::{monster_tick, spawn},
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -32,7 +33,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         )
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
-                .with_system(spawn_tick)
+                .with_system(monster_tick)
+                .with_system(monster_move)
                 .with_system(mouse_move_on_board)
                 .with_system(mouse_click_on_board)
                 .with_system(hide_blueprint)
@@ -42,7 +44,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_event::<EnterBuildTarget>()
         .add_event::<HideBuildTarget>()
         .add_event::<TryBuild>()
-        .add_event::<Spawn>();
+        .add_event::<Spawn>()
+        .add_event::<Move>();
         #[cfg(feature = "debug")]
         {
             app.register_inspectable::<Coordinates>();
@@ -65,8 +68,14 @@ impl<T> TowerDefensePlugin<T> {
                     .insert(Name::new(format!("Tile {}, {}", x, y)))
                     .insert(Tile)
                     .insert(coordinate.clone())
-                    .insert_bundle(spritesheets.grass(&coordinate, board.tile_size))
+                    .insert(GlobalTransform::default())
+                    .insert(board.transform(&coordinate, 1.))
+                    .insert_bundle(VisibilityBundle::default())
                     .with_children(|parent| {
+                        parent
+                            .spawn()
+                            .insert(Name::new("Grass"))
+                            .insert_bundle(spritesheets.grass(&coordinate, board.tile_size));
                         if board.is_path(&coordinate) {
                             parent.spawn().insert(Name::new("Road")).insert_bundle(
                                 spritesheets.path(&coordinate, board, board.tile_size),
@@ -100,7 +109,7 @@ impl<T> TowerDefensePlugin<T> {
         let mut board = Board::new((16, 16), 32.);
         let _map_size = board.board_size();
         let board_position = board.board_offset();
-        let _board_entity = commands
+        let board_entity = commands
             .spawn()
             .insert(Name::new("Game Map"))
             .insert(Transform::from_translation(board_position))
@@ -114,6 +123,7 @@ impl<T> TowerDefensePlugin<T> {
                 Self::spawn_ground(parent, &mut board, &spritesheets);
             })
             .id();
+        board.board = Some(board_entity);
         commands
             .spawn()
             .insert(Name::new("Blueprint"))
