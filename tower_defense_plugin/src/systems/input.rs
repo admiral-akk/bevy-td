@@ -7,7 +7,7 @@ use bevy::{
 
 use crate::{
     components::coordinates::Coordinates,
-    events::{EnterBuildTarget, ExitBuildTarget, TryBuild},
+    events::{EnterBuildTarget, HideBuildTarget, TryBuild},
     resources::{board::Board, build_tracker::BuildTracker},
 };
 
@@ -17,7 +17,7 @@ pub fn mouse_move_on_board(
     mut build_tracker: ResMut<BuildTracker>,
     mut cursor_evr: EventReader<CursorMoved>,
     mut set_target_ewr: EventWriter<EnterBuildTarget>,
-    mut clear_target_ewr: EventWriter<ExitBuildTarget>,
+    mut clear_target_ewr: EventWriter<HideBuildTarget>,
 ) {
     let window = windows.get_primary().unwrap();
     for event in cursor_evr.iter() {
@@ -38,7 +38,7 @@ pub fn mouse_move_on_board(
         if build_tracker.target.is_some() && build_tracker.target.unwrap().eq(&coord) {
             continue;
         }
-        build_tracker.set_target(coord, &mut set_target_ewr, &mut clear_target_ewr);
+        build_tracker.set_target(coord, &mut set_target_ewr);
     }
 }
 

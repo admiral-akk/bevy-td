@@ -2,7 +2,7 @@ use bevy::prelude::{Entity, EventWriter};
 
 use crate::{
     components::coordinates::Coordinates,
-    events::{EnterBuildTarget, ExitBuildTarget},
+    events::{EnterBuildTarget, HideBuildTarget},
 };
 
 pub struct BuildTracker {
@@ -11,9 +11,9 @@ pub struct BuildTracker {
 }
 
 impl BuildTracker {
-    pub fn clear_target(&mut self, clear_target_ewr: &mut EventWriter<ExitBuildTarget>) {
+    pub fn clear_target(&mut self, clear_target_ewr: &mut EventWriter<HideBuildTarget>) {
         if let Some(target) = self.target {
-            clear_target_ewr.send(ExitBuildTarget(target));
+            clear_target_ewr.send(HideBuildTarget);
         }
         self.target = None;
     }
@@ -21,11 +21,7 @@ impl BuildTracker {
         &mut self,
         target: Coordinates,
         set_target_ewr: &mut EventWriter<EnterBuildTarget>,
-        clear_target_ewr: &mut EventWriter<ExitBuildTarget>,
     ) {
-        if let Some(target) = self.target {
-            clear_target_ewr.send(ExitBuildTarget(target));
-        }
         self.target = Some(target);
         set_target_ewr.send(EnterBuildTarget(target));
     }

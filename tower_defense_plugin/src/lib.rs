@@ -8,11 +8,11 @@ use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use board::game_map::GameMap;
-use components::coordinates::Coordinates;
-use events::{EnterBuildTarget, ExitBuildTarget, TryBuild};
+use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
+use events::{EnterBuildTarget, HideBuildTarget, TryBuild};
 use resources::{board::Board, build_tracker::BuildTracker, game_sprites::GameSprites};
 use systems::{
-    blueprint::{enter_target, exit_target},
+    blueprint::{enter_target, hide_blueprint},
     input::{mouse_click_on_board, mouse_move_on_board},
 };
 
@@ -33,11 +33,11 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             SystemSet::on_update(self.active_state.clone())
                 .with_system(mouse_move_on_board)
                 .with_system(mouse_click_on_board)
-                .with_system(exit_target)
+                .with_system(hide_blueprint)
                 .with_system(enter_target),
         )
         .add_event::<EnterBuildTarget>()
-        .add_event::<ExitBuildTarget>()
+        .add_event::<HideBuildTarget>()
         .add_event::<TryBuild>();
         #[cfg(feature = "debug")]
         {
@@ -51,7 +51,7 @@ impl<T> TowerDefensePlugin<T> {
     fn spawn_ground(
         background: &mut ChildBuilder,
         board: &mut Board,
-        spritesheets: Res<GameSprites>,
+        spritesheets: &Res<GameSprites>,
     ) {
         for y in 0..board.height() {
             for x in 0..board.width() {
@@ -59,6 +59,7 @@ impl<T> TowerDefensePlugin<T> {
                 let tile = background
                     .spawn()
                     .insert(Name::new(format!("Tile {}, {}", x, y)))
+                    .insert(Tile)
                     .insert(coordinate.clone())
                     .insert_bundle(spritesheets.grass(&coordinate, board.tile_size))
                     .with_children(|parent| {
@@ -108,9 +109,16 @@ impl<T> TowerDefensePlugin<T> {
                     .spawn()
                     // .insert(Transform::from_xyz(map_size.x / 2., map_size.y / 2., 0.))
                     .insert(Name::new("Background"));
-                Self::spawn_ground(parent, &mut board, spritesheets);
+                Self::spawn_ground(parent, &mut board, &spritesheets);
             })
             .id();
+        commands
+            .spawn()
+            .insert(Name::new("Blueprint"))
+            .insert(Blueprint)
+            .insert_bundle(TransformBundle::default())
+            .insert(Coordinates::default())
+            .insert_bundle(spritesheets.peasant(board.tile_size));
         commands.insert_resource(board);
     }
 }
