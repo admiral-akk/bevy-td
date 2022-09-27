@@ -8,8 +8,8 @@ use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 use bevy_inspector_egui::RegisterInspectable;
 use board::game_map::GameMap;
 use components::coordinates::Coordinates;
-use resources::{board::Board, game_sprites::GameSprites};
-use systems::input::handle_mouse_click;
+use resources::{board::Board, game_sprites::GameSprites, hover_coordinate::HoverCoordinate};
+use systems::input::handle_mouse;
 
 pub struct TowerDefensePlugin<T> {
     pub active_state: T,
@@ -17,11 +17,12 @@ pub struct TowerDefensePlugin<T> {
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
+        app.insert_resource(HoverCoordinate(None));
         app.add_system_set(
             SystemSet::on_enter(self.active_state.clone()).with_system(Self::create_board),
         );
         app.add_system_set(
-            SystemSet::on_update(self.active_state.clone()).with_system(handle_mouse_click),
+            SystemSet::on_update(self.active_state.clone()).with_system(handle_mouse),
         );
         #[cfg(feature = "debug")]
         {
