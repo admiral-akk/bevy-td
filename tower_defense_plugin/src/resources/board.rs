@@ -12,32 +12,33 @@ pub struct Board {
 
 impl Board {
     pub fn new() -> Self {
+        let start = Coordinates::new(2, 8);
+        let end = Coordinates::new(10, 12);
+        let mut path = Vec::new();
+        let mut path_coord = start.clone();
+        while path_coord.x != end.x {
+            path.push(path_coord);
+            if path_coord.x > end.x {
+                path_coord.x -= 1;
+            } else {
+                path_coord.x += 1;
+            }
+        }
+        while path_coord.y != end.y {
+            path.push(path_coord);
+            if path_coord.y > end.y {
+                path_coord.y -= 1;
+            } else {
+                path_coord.y += 1;
+            }
+        }
+        path.push(path_coord);
         Board {
             size: (16, 16),
             tiles: HashMap::new(),
-            start: Coordinates::new(2, 8),
-            end: Coordinates::new(5, 8),
-            path: vec![
-                Coordinates::new(2, 8),
-                Coordinates::new(3, 8),
-                Coordinates::new(4, 8),
-                Coordinates::new(4, 9),
-                Coordinates::new(4, 7),
-                Coordinates::new(5, 8),
-                Coordinates::new(6, 8),
-                Coordinates::new(7, 8),
-                Coordinates::new(8, 8),
-                Coordinates::new(8, 9),
-                Coordinates::new(9, 9),
-                Coordinates::new(10, 9),
-                Coordinates::new(10, 8),
-                Coordinates::new(10, 7),
-                Coordinates::new(10, 6),
-                Coordinates::new(10, 5),
-                Coordinates::new(9, 5),
-                Coordinates::new(8, 5),
-                Coordinates::new(8, 6),
-            ],
+            start,
+            end,
+            path,
         }
     }
     pub fn width(&self) -> u16 {
