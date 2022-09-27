@@ -1,4 +1,3 @@
-mod board;
 mod components;
 mod events;
 pub mod resources;
@@ -7,7 +6,6 @@ mod systems;
 use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
-use board::game_map::GameMap;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
 use events::{EnterBuildTarget, HideBuildTarget, TryBuild};
 use resources::{board::Board, build_tracker::BuildTracker, game_sprites::GameSprites};
@@ -93,8 +91,6 @@ impl<T> TowerDefensePlugin<T> {
         _window: Res<WindowDescriptor>,
         spritesheets: Res<GameSprites>,
     ) {
-        let _map = GameMap::empty(16, 16, Coordinates::new(2, 8), Coordinates::new(12, 8));
-
         let mut board = Board::new((16, 16), 32.);
         let _map_size = board.board_size();
         let board_position = board.board_offset();
