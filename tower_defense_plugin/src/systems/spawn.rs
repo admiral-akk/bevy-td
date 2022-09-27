@@ -31,27 +31,3 @@ pub fn monster_tick(
         move_ewr.send(Move);
     }
 }
-
-pub fn spawn(
-    mut commands: Commands,
-    board: Res<Board>,
-    spritesheet: Res<GameSprites>,
-    mut spawn_evr: EventReader<Spawn>,
-) {
-    for _ in spawn_evr.iter() {
-        commands
-            .entity(board.board.unwrap())
-            .with_children(|parent| {
-                parent
-                    .spawn()
-                    .insert(Name::new("Monster"))
-                    .insert(Monster)
-                    .insert(board.start.clone())
-                    .insert_bundle(spritesheet.monster(board.tile_size))
-                    .insert_bundle(TransformBundle {
-                        local: board.transform(&board.start, 4.),
-                        ..Default::default()
-                    });
-            });
-    }
-}

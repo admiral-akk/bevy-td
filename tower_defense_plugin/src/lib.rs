@@ -17,8 +17,8 @@ use resources::{
 use systems::{
     blueprint::{enter_target, hide_blueprint},
     input::{mouse_click_on_board, mouse_move_on_board},
-    monster::monster_move,
-    spawn::{monster_tick, spawn},
+    monster::{monster_despawn, monster_move, monster_spawn},
+    spawn::monster_tick,
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -42,7 +42,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(mouse_click_on_board)
                 .with_system(hide_blueprint)
                 .with_system(enter_target)
-                .with_system(spawn),
+                .with_system(monster_spawn)
+                .with_system(monster_despawn),
         )
         .add_event::<EnterBuildTarget>()
         .add_event::<HideBuildTarget>()
