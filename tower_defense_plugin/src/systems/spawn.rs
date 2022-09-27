@@ -1,19 +1,11 @@
 use bevy::{
-    prelude::{
-        BuildChildren, Commands, Entity, EventReader, EventWriter, Name, Query, Res, ResMut,
-    },
+    prelude::{EventWriter, Res, ResMut},
     time::Time,
-    transform::TransformBundle,
 };
 
 use crate::{
-    components::monster::Monster,
     events::{Move, Spawn},
-    resources::{
-        board::Board,
-        game_sprites::GameSprites,
-        spawn_timer::{MoveTimer, SpawnTimer},
-    },
+    resources::spawn_timer::{MoveTimer, SpawnTimer},
 };
 pub fn monster_tick(
     time: Res<Time>,

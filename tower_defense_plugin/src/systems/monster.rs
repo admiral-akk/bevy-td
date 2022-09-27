@@ -1,13 +1,13 @@
 use bevy::{
     prelude::{
-        BuildChildren, Commands, Entity, EventReader, Name, Query, Res, Transform, Vec3, With,
+        BuildChildren, Commands, Entity, EventReader, Name, Query, Res, Transform, With,
     },
     transform::TransformBundle,
 };
 
 use crate::{
     components::{
-        coordinates::{self, Coordinates},
+        coordinates::{Coordinates},
         monster::Monster,
     },
     events::{Move, Spawn},
