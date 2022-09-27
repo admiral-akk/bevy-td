@@ -8,3 +8,6 @@ pub struct HideBuildTarget;
 
 #[derive(Debug, Copy, Clone)]
 pub struct TryBuild;
+
+#[derive(Debug, Copy, Clone)]
+pub struct Spawn;

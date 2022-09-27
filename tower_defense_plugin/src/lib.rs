@@ -7,11 +7,14 @@ use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
-use events::{EnterBuildTarget, HideBuildTarget, TryBuild};
-use resources::{board::Board, build_tracker::BuildTracker, game_sprites::GameSprites};
+use events::{EnterBuildTarget, HideBuildTarget, Spawn, TryBuild};
+use resources::{
+    board::Board, build_tracker::BuildTracker, game_sprites::GameSprites, spawn_timer::SpawnTimer,
+};
 use systems::{
     blueprint::{enter_target, hide_blueprint},
     input::{mouse_click_on_board, mouse_move_on_board},
+    spawn::{spawn, spawn_tick},
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -29,14 +32,17 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         )
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
+                .with_system(spawn_tick)
                 .with_system(mouse_move_on_board)
                 .with_system(mouse_click_on_board)
                 .with_system(hide_blueprint)
-                .with_system(enter_target),
+                .with_system(enter_target)
+                .with_system(spawn),
         )
         .add_event::<EnterBuildTarget>()
         .add_event::<HideBuildTarget>()
-        .add_event::<TryBuild>();
+        .add_event::<TryBuild>()
+        .add_event::<Spawn>();
         #[cfg(feature = "debug")]
         {
             app.register_inspectable::<Coordinates>();
@@ -116,5 +122,6 @@ impl<T> TowerDefensePlugin<T> {
             .insert(Coordinates::default())
             .insert_bundle(spritesheets.peasant(board.tile_size));
         commands.insert_resource(board);
+        commands.insert_resource(SpawnTimer(Timer::from_seconds(4., true)));
     }
 }

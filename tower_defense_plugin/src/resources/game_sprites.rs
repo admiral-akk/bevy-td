@@ -84,6 +84,18 @@ impl GameSprites {
             ..Default::default()
         }
     }
+    pub fn monster(&self, tile_size: f32) -> SpriteSheetBundle {
+        SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: 18 + 3 * 23,
+                custom_size: Some(Vec2::new(tile_size, tile_size)),
+                ..Default::default()
+            },
+            texture_atlas: self.get_handle(),
+            transform: Transform::from_xyz(0., 0., 4.),
+            ..Default::default()
+        }
+    }
 
     pub fn grass(&self, coord: &Coordinates, tile_size: f32) -> SpriteSheetBundle {
         SpriteSheetBundle {
