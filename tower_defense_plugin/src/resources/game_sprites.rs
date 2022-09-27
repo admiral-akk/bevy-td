@@ -1,4 +1,7 @@
-use bevy::{prelude::Handle, sprite::TextureAtlas};
+use bevy::{
+    prelude::{Handle, Transform, Vec2},
+    sprite::{SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
+};
 
 use crate::components::coordinates::Coordinates;
 
@@ -51,8 +54,21 @@ impl GameSprites {
         13 + 8 * 23
     }
 
-    pub fn get_grass_index(coord: &Coordinates) -> usize {
-        (coord.x * 3 / 2 + coord.y * 5 / 2) as usize % 2
+    pub fn grass(&self, coord: &Coordinates, tile_size: f32) -> SpriteSheetBundle {
+        SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: (coord.x * 3 / 2 + coord.y * 5 / 2) as usize % 2,
+                custom_size: Some(Vec2::new(tile_size, tile_size)),
+                ..Default::default()
+            },
+            texture_atlas: self.get_handle(),
+            transform: Transform::from_xyz(
+                coord.x as f32 * tile_size + tile_size / 2.,
+                coord.y as f32 * tile_size + tile_size / 2.,
+                1.,
+            ),
+            ..Default::default()
+        }
     }
 
     pub fn get_path_index(coord: &Coordinates, board: &Board) -> usize {

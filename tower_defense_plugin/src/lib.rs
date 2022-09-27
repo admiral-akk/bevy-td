@@ -40,20 +40,7 @@ impl<T> TowerDefensePlugin<T> {
                     .spawn()
                     .insert(Name::new(format!("Tile {}, {}", x, y)))
                     .insert(coordinate.clone())
-                    .insert_bundle(SpriteSheetBundle {
-                        sprite: TextureAtlasSprite {
-                            index: GameSprites::get_grass_index(&coordinate),
-                            custom_size: Some(Vec2::new(size, size)),
-                            ..Default::default()
-                        },
-                        texture_atlas: spritesheets.get_handle(),
-                        transform: Transform::from_xyz(
-                            x as f32 * size + size / 2.,
-                            y as f32 * size + size / 2.,
-                            1.,
-                        ),
-                        ..Default::default()
-                    })
+                    .insert_bundle(spritesheets.grass(&coordinate, size))
                     .with_children(|parent| {
                         if board.is_path(&coordinate) {
                             parent.spawn().insert(Name::new("Road")).insert_bundle(
