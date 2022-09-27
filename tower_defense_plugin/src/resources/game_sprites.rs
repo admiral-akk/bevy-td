@@ -43,15 +43,33 @@ impl GameSprites {
         self.game_sprite_handle = Some(handle);
     }
 
-    pub fn get_handle(&self) -> Handle<TextureAtlas> {
+    fn get_handle(&self) -> Handle<TextureAtlas> {
         self.game_sprite_handle.as_ref().unwrap().clone()
     }
 
-    pub fn get_spawn_index() -> usize {
-        11 + 8 * 23
+    pub fn spawn(&self, tile_size: f32) -> SpriteSheetBundle {
+        SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: 11 + 8 * 23,
+                custom_size: Some(Vec2::new(tile_size, tile_size)),
+                ..Default::default()
+            },
+            texture_atlas: self.get_handle(),
+            transform: Transform::from_xyz(0., 0.75 * tile_size, 2.),
+            ..Default::default()
+        }
     }
-    pub fn get_end_index() -> usize {
-        13 + 8 * 23
+    pub fn end(&self, tile_size: f32) -> SpriteSheetBundle {
+        SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: 13 + 8 * 23,
+                custom_size: Some(Vec2::new(tile_size, tile_size)),
+                ..Default::default()
+            },
+            texture_atlas: self.get_handle(),
+            transform: Transform::from_xyz(0., 0., 2.),
+            ..Default::default()
+        }
     }
 
     pub fn grass(&self, coord: &Coordinates, tile_size: f32) -> SpriteSheetBundle {
@@ -71,7 +89,7 @@ impl GameSprites {
         }
     }
 
-    pub fn get_path_index(coord: &Coordinates, board: &Board) -> usize {
+    pub fn path(&self, coord: &Coordinates, board: &Board, tile_size: f32) -> SpriteSheetBundle {
         let mut index = 0;
         let coord = coord.clone();
         if board.is_path(&(coord + Coordinates::new(0, 1))) {
@@ -89,6 +107,15 @@ impl GameSprites {
             index = index + 8;
         }
 
-        PATH_INDEX[index]
+        SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: PATH_INDEX[index],
+                custom_size: Some(Vec2::new(tile_size, tile_size)),
+                ..Default::default()
+            },
+            texture_atlas: self.get_handle(),
+            transform: Transform::from_xyz(0., 0., 1.),
+            ..Default::default()
+        }
     }
 }

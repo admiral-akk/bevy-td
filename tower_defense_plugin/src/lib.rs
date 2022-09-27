@@ -43,46 +43,22 @@ impl<T> TowerDefensePlugin<T> {
                     .insert_bundle(spritesheets.grass(&coordinate, size))
                     .with_children(|parent| {
                         if board.is_path(&coordinate) {
-                            parent.spawn().insert(Name::new("Road")).insert_bundle(
-                                SpriteSheetBundle {
-                                    sprite: TextureAtlasSprite {
-                                        index: GameSprites::get_path_index(&coordinate, board),
-                                        custom_size: Some(Vec2::new(size, size)),
-                                        ..Default::default()
-                                    },
-                                    texture_atlas: spritesheets.get_handle(),
-                                    transform: Transform::from_xyz(0., 0., 1.),
-                                    ..Default::default()
-                                },
-                            );
+                            parent
+                                .spawn()
+                                .insert(Name::new("Road"))
+                                .insert_bundle(spritesheets.path(&coordinate, board, size));
                         }
                         if board.is_start(&coordinate) {
-                            parent.spawn().insert(Name::new("Start")).insert_bundle(
-                                SpriteSheetBundle {
-                                    sprite: TextureAtlasSprite {
-                                        index: GameSprites::get_spawn_index(),
-                                        custom_size: Some(Vec2::new(size, size)),
-                                        ..Default::default()
-                                    },
-                                    texture_atlas: spritesheets.get_handle(),
-                                    transform: Transform::from_xyz(0., 12., 2.),
-                                    ..Default::default()
-                                },
-                            );
+                            parent
+                                .spawn()
+                                .insert(Name::new("Start"))
+                                .insert_bundle(spritesheets.spawn(size));
                         }
                         if board.is_end(&coordinate) {
-                            parent.spawn().insert(Name::new("Target")).insert_bundle(
-                                SpriteSheetBundle {
-                                    sprite: TextureAtlasSprite {
-                                        index: GameSprites::get_end_index(),
-                                        custom_size: Some(Vec2::new(size, size)),
-                                        ..Default::default()
-                                    },
-                                    texture_atlas: spritesheets.get_handle(),
-                                    transform: Transform::from_xyz(0., 0., 2.),
-                                    ..Default::default()
-                                },
-                            );
+                            parent
+                                .spawn()
+                                .insert(Name::new("Target"))
+                                .insert_bundle(spritesheets.end(size));
                         }
                     })
                     .id();
