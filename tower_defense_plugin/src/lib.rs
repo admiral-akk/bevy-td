@@ -19,6 +19,7 @@ use systems::{
     input::{mouse_click_on_board, mouse_move_on_board},
     monster::{monster_despawn, monster_move, monster_spawn},
     spawn::monster_tick,
+    tower::try_build,
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -43,7 +44,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(hide_blueprint)
                 .with_system(enter_target)
                 .with_system(monster_spawn)
-                .with_system(monster_despawn),
+                .with_system(monster_despawn)
+                .with_system(try_build),
         )
         .add_event::<EnterBuildTarget>()
         .add_event::<HideBuildTarget>()

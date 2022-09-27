@@ -1,5 +1,5 @@
 use bevy::{
-    input::mouse::MouseButtonInput,
+    input::{mouse::MouseButtonInput, ButtonState},
     prelude::{EventReader, EventWriter, MouseButton, Res, ResMut, Vec2},
     window::{CursorMoved, Windows},
 };
@@ -34,6 +34,10 @@ pub fn mouse_move_on_board(
             build_tracker.clear_target(&mut clear_target_ewr);
             continue;
         }
+        if board.towers.contains_key(&coord) {
+            build_tracker.clear_target(&mut clear_target_ewr);
+            continue;
+        }
         if build_tracker.target.is_some() && build_tracker.target.unwrap().eq(&coord) {
             continue;
         }
@@ -42,15 +46,22 @@ pub fn mouse_move_on_board(
 }
 
 pub fn mouse_click_on_board(
+    build_tracker: Res<BuildTracker>,
     mut click_evr: EventReader<MouseButtonInput>,
     mut try_build_ewr: EventWriter<TryBuild>,
 ) {
     for event in click_evr.iter() {
-        match event.button {
-            MouseButton::Left => {
-                try_build_ewr.send(TryBuild);
-            }
-            _ => (),
+        if build_tracker.target.is_none() {
+            continue;
+        }
+        match event.state {
+            ButtonState::Pressed => match event.button {
+                MouseButton::Left => {
+                    try_build_ewr.send(TryBuild);
+                }
+                _ => (),
+            },
+            _ => {}
         }
     }
 }

@@ -1,15 +1,10 @@
 use bevy::{
-    prelude::{
-        BuildChildren, Commands, Entity, EventReader, Name, Query, Res, Transform, With,
-    },
+    prelude::{BuildChildren, Commands, Entity, EventReader, Name, Query, Res, Transform, With},
     transform::TransformBundle,
 };
 
 use crate::{
-    components::{
-        coordinates::{Coordinates},
-        monster::Monster,
-    },
+    components::{coordinates::Coordinates, monster::Monster},
     events::{Move, Spawn},
     resources::{board::Board, game_sprites::GameSprites},
 };
