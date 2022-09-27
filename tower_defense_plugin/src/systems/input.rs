@@ -1,6 +1,5 @@
 use bevy::{
-    input::{mouse::MouseButtonInput, ButtonState},
-    log,
+    input::{mouse::MouseButtonInput},
     prelude::{EventReader, EventWriter, MouseButton, Res, ResMut, Vec2},
     window::{CursorMoved, Windows},
 };

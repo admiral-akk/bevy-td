@@ -90,15 +90,15 @@ impl<T> TowerDefensePlugin<T> {
 
     fn create_board(
         mut commands: Commands,
-        window: Res<WindowDescriptor>,
+        _window: Res<WindowDescriptor>,
         spritesheets: Res<GameSprites>,
     ) {
-        let mut map = GameMap::empty(16, 16, Coordinates::new(2, 8), Coordinates::new(12, 8));
+        let _map = GameMap::empty(16, 16, Coordinates::new(2, 8), Coordinates::new(12, 8));
 
         let mut board = Board::new((16, 16), 32.);
-        let map_size = board.board_size();
+        let _map_size = board.board_size();
         let board_position = board.board_offset();
-        let board_entity = commands
+        let _board_entity = commands
             .spawn()
             .insert(Name::new("Game Map"))
             .insert(Transform::from_translation(board_position))

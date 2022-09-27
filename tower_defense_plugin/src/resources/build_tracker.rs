@@ -12,7 +12,7 @@ pub struct BuildTracker {
 
 impl BuildTracker {
     pub fn clear_target(&mut self, clear_target_ewr: &mut EventWriter<HideBuildTarget>) {
-        if let Some(target) = self.target {
+        if let Some(_target) = self.target {
             clear_target_ewr.send(HideBuildTarget);
         }
         self.target = None;

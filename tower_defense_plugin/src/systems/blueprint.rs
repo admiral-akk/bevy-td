@@ -13,9 +13,9 @@ pub fn enter_target(
     board: Res<Board>,
     mut blueprint: Query<
         (&mut TextureAtlasSprite, &mut Transform, &mut Coordinates),
-        (With<Blueprint>),
+        With<Blueprint>,
     >,
-    tiles: Query<(&GlobalTransform), (With<GlobalTransform>, With<Tile>)>,
+    tiles: Query<&GlobalTransform, (With<GlobalTransform>, With<Tile>)>,
     mut enter_target_evr: EventReader<EnterBuildTarget>,
 ) {
     for event in enter_target_evr.iter() {
@@ -32,7 +32,7 @@ pub fn enter_target(
 pub fn hide_blueprint(
     mut blueprint: Query<
         (&mut TextureAtlasSprite, &mut Transform, &mut Coordinates),
-        (With<Blueprint>),
+        With<Blueprint>,
     >,
     mut exit_target_evr: EventReader<HideBuildTarget>,
 ) {

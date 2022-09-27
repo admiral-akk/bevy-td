@@ -1,5 +1,5 @@
 use bevy::{
-    prelude::{Entity, GlobalTransform, Vec2, Vec3},
+    prelude::{Entity, Vec2, Vec3},
     utils::HashMap,
 };
 
