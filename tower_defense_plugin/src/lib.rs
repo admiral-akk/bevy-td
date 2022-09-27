@@ -12,7 +12,7 @@ use resources::{
     board::Board,
     build_tracker::BuildTracker,
     game_sprites::GameSprites,
-    spawn_timer::{MoveTimer, SpawnTimer},
+    spawn_timer::{AttackTimer, MoveTimer, SpawnTimer},
 };
 use systems::{
     blueprint::{enter_target, hide_blueprint},
@@ -140,5 +140,6 @@ impl<T> TowerDefensePlugin<T> {
         commands.insert_resource(board);
         commands.insert_resource(SpawnTimer(Timer::from_seconds(4., true)));
         commands.insert_resource(MoveTimer(Timer::from_seconds(1., true)));
+        commands.insert_resource(AttackTimer(Timer::from_seconds(1., true)));
     }
 }

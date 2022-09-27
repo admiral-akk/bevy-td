@@ -10,6 +10,8 @@ use crate::{
     resources::{board::Board, build_tracker::BuildTracker, game_sprites::GameSprites},
 };
 
+pub fn attack() {}
+
 pub fn try_build(
     mut commands: Commands,
     mut board: ResMut<Board>,
@@ -19,7 +21,6 @@ pub fn try_build(
 ) {
     for _ in build_evr.iter() {
         if let Some(coord) = build_tracker.target {
-            log::debug!("Adding tower!");
             commands
                 .entity(board.board.unwrap())
                 .with_children(|parent| {
