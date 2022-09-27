@@ -25,11 +25,25 @@ const PATH_INDEX: [usize; 16] = [
     12,          //NWSE
 ];
 
-pub struct PathSprites {
-    pub path_atlas_handle: Option<Handle<TextureAtlas>>,
+pub struct GameSprites {
+    game_sprite_handle: Option<Handle<TextureAtlas>>,
 }
 
-impl PathSprites {
+impl GameSprites {
+    pub fn init() -> Self {
+        GameSprites {
+            game_sprite_handle: None,
+        }
+    }
+
+    pub fn update_handle(&mut self, handle: Handle<TextureAtlas>) {
+        self.game_sprite_handle = Some(handle);
+    }
+
+    pub fn get_handle(&self) -> Handle<TextureAtlas> {
+        self.game_sprite_handle.as_ref().unwrap().clone()
+    }
+
     pub fn get_spawn_index() -> usize {
         11 + 8 * 23
     }

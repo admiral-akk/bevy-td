@@ -5,9 +5,9 @@ pub mod resources;
 use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
-use board::game_map::{self, GameMap};
+use board::game_map::GameMap;
 use components::coordinates::Coordinates;
-use resources::{board::Board, path_sprites::PathSprites};
+use resources::{board::Board, game_sprites::GameSprites};
 
 pub struct TowerDefensePlugin<T> {
     pub active_state: T,
@@ -31,7 +31,7 @@ impl<T> TowerDefensePlugin<T> {
         background: &mut ChildBuilder,
         board: &mut Board,
         size: f32,
-        spritesheets: Res<PathSprites>,
+        spritesheets: Res<GameSprites>,
     ) {
         for y in 0..board.height() {
             for x in 0..board.width() {
@@ -42,11 +42,11 @@ impl<T> TowerDefensePlugin<T> {
                     .insert(coordinate.clone())
                     .insert_bundle(SpriteSheetBundle {
                         sprite: TextureAtlasSprite {
-                            index: PathSprites::get_grass_index(&coordinate),
+                            index: GameSprites::get_grass_index(&coordinate),
                             custom_size: Some(Vec2::new(size, size)),
                             ..Default::default()
                         },
-                        texture_atlas: spritesheets.path_atlas_handle.as_ref().unwrap().clone(),
+                        texture_atlas: spritesheets.get_handle(),
                         transform: Transform::from_xyz(
                             x as f32 * size + size / 2.,
                             y as f32 * size + size / 2.,
@@ -59,15 +59,11 @@ impl<T> TowerDefensePlugin<T> {
                             parent.spawn().insert(Name::new("Road")).insert_bundle(
                                 SpriteSheetBundle {
                                     sprite: TextureAtlasSprite {
-                                        index: PathSprites::get_path_index(&coordinate, board),
+                                        index: GameSprites::get_path_index(&coordinate, board),
                                         custom_size: Some(Vec2::new(size, size)),
                                         ..Default::default()
                                     },
-                                    texture_atlas: spritesheets
-                                        .path_atlas_handle
-                                        .as_ref()
-                                        .unwrap()
-                                        .clone(),
+                                    texture_atlas: spritesheets.get_handle(),
                                     transform: Transform::from_xyz(0., 0., 1.),
                                     ..Default::default()
                                 },
@@ -77,15 +73,11 @@ impl<T> TowerDefensePlugin<T> {
                             parent.spawn().insert(Name::new("Start")).insert_bundle(
                                 SpriteSheetBundle {
                                     sprite: TextureAtlasSprite {
-                                        index: PathSprites::get_spawn_index(),
+                                        index: GameSprites::get_spawn_index(),
                                         custom_size: Some(Vec2::new(size, size)),
                                         ..Default::default()
                                     },
-                                    texture_atlas: spritesheets
-                                        .path_atlas_handle
-                                        .as_ref()
-                                        .unwrap()
-                                        .clone(),
+                                    texture_atlas: spritesheets.get_handle(),
                                     transform: Transform::from_xyz(0., 12., 2.),
                                     ..Default::default()
                                 },
@@ -95,15 +87,11 @@ impl<T> TowerDefensePlugin<T> {
                             parent.spawn().insert(Name::new("Target")).insert_bundle(
                                 SpriteSheetBundle {
                                     sprite: TextureAtlasSprite {
-                                        index: PathSprites::get_end_index(),
+                                        index: GameSprites::get_end_index(),
                                         custom_size: Some(Vec2::new(size, size)),
                                         ..Default::default()
                                     },
-                                    texture_atlas: spritesheets
-                                        .path_atlas_handle
-                                        .as_ref()
-                                        .unwrap()
-                                        .clone(),
+                                    texture_atlas: spritesheets.get_handle(),
                                     transform: Transform::from_xyz(0., 0., 2.),
                                     ..Default::default()
                                 },
@@ -120,7 +108,7 @@ impl<T> TowerDefensePlugin<T> {
     fn create_board(
         mut commands: Commands,
         window: Res<WindowDescriptor>,
-        spritesheets: Res<PathSprites>,
+        spritesheets: Res<GameSprites>,
     ) {
         let mut map = GameMap::empty(16, 16, Coordinates::new(2, 8), Coordinates::new(12, 8));
         let tile_size = 32.;

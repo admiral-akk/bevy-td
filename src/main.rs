@@ -9,9 +9,7 @@ use bevy_inspector_egui::WorldInspectorPlugin;
 use board_plugin::resources::board_assets::BoardAssets;
 use board_plugin::resources::board_assets::SpriteMaterial;
 use board_plugin::resources::board_options::BoardOptions;
-use board_plugin::BoardPlugin;
-use tower_defense_plugin::resources::path_sprites;
-use tower_defense_plugin::resources::path_sprites::PathSprites;
+use tower_defense_plugin::resources::game_sprites::GameSprites;
 use tower_defense_plugin::TowerDefensePlugin;
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum AppState {
@@ -45,9 +43,7 @@ fn main() {
     app.add_plugin(TowerDefensePlugin {
         active_state: GameState::Loaded,
     })
-    .insert_resource(PathSprites {
-        path_atlas_handle: None,
-    })
+    .insert_resource(GameSprites::init())
     .add_startup_system(load_resources)
     .add_state(GameState::Loaded)
     .run();
@@ -59,7 +55,7 @@ fn main() {
     // Run the app
 }
 fn load_resources(
-    mut path_sprites: ResMut<PathSprites>,
+    mut path_sprites: ResMut<GameSprites>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
     asset_server: Res<AssetServer>,
 ) {
@@ -72,7 +68,7 @@ fn load_resources(
         Vec2::new(1., 1.),
         Vec2::new(1., 1.),
     );
-    path_sprites.path_atlas_handle = Some(texture_atlases.add(path_atlas));
+    path_sprites.update_handle(texture_atlases.add(path_atlas));
 }
 
 fn setup_board(mut commands: Commands, asset_server: Res<AssetServer>) {

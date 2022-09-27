@@ -1,2 +1,2 @@
 pub(crate) mod board;
-pub mod path_sprites;
+pub mod game_sprites;
