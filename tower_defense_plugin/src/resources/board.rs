@@ -8,6 +8,7 @@ use crate::components::coordinates::Coordinates;
 pub struct Board {
     pub size: (u16, u16),
     pub tiles: HashMap<Coordinates, Entity>,
+    pub towers: HashMap<Coordinates, Entity>,
     pub start: Coordinates,
     pub end: Coordinates,
     pub path: Vec<Coordinates>,
@@ -41,6 +42,7 @@ impl Board {
         Board {
             size,
             tiles: HashMap::new(),
+            towers: HashMap::new(),
             start,
             end,
             path,

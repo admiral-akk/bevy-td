@@ -125,16 +125,16 @@ impl<T> TowerDefensePlugin<T> {
                     // .insert(Transform::from_xyz(map_size.x / 2., map_size.y / 2., 0.))
                     .insert(Name::new("Background"));
                 Self::spawn_ground(parent, &mut board, &spritesheets);
+                parent
+                    .spawn()
+                    .insert(Name::new("Blueprint"))
+                    .insert(Blueprint)
+                    .insert_bundle(TransformBundle::default())
+                    .insert(Coordinates::default())
+                    .insert_bundle(spritesheets.peasant(board.tile_size));
             })
             .id();
         board.board = Some(board_entity);
-        commands
-            .spawn()
-            .insert(Name::new("Blueprint"))
-            .insert(Blueprint)
-            .insert_bundle(TransformBundle::default())
-            .insert(Coordinates::default())
-            .insert_bundle(spritesheets.peasant(board.tile_size));
         commands.insert_resource(board);
         commands.insert_resource(SpawnTimer(Timer::from_seconds(4., true)));
         commands.insert_resource(MoveTimer(Timer::from_seconds(1., true)));

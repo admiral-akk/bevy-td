@@ -1,10 +1,10 @@
 use bevy::{
-    prelude::{Color, EventReader, GlobalTransform, Query, Res, Transform, Vec3, With},
+    prelude::{Color, EventReader, Query, Res, Transform, With},
     sprite::TextureAtlasSprite,
 };
 
 use crate::{
-    components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile},
+    components::{blueprint::Blueprint, coordinates::Coordinates},
     events::{EnterBuildTarget, HideBuildTarget},
     resources::board::Board,
 };
@@ -15,17 +15,14 @@ pub fn enter_target(
         (&mut TextureAtlasSprite, &mut Transform, &mut Coordinates),
         With<Blueprint>,
     >,
-    tiles: Query<&GlobalTransform, (With<GlobalTransform>, With<Tile>)>,
     mut enter_target_evr: EventReader<EnterBuildTarget>,
 ) {
     for event in enter_target_evr.iter() {
-        if let Ok(global_transform) = tiles.get_component::<GlobalTransform>(board.tiles[&event.0])
-        {
-            let mut blueprint = blueprint.single_mut();
-            blueprint.0.color = Color::rgba(1., 1., 1., 0.5);
-            blueprint.1.translation = global_transform.translation() + 3. * Vec3::Z;
-            *blueprint.2 = event.0.clone();
-        }
+        let mut blueprint = blueprint.single_mut();
+        let coordinates = event.0.clone();
+        blueprint.0.color = Color::rgba(1., 1., 1., 0.5);
+        *blueprint.1 = board.transform(&coordinates, 3.);
+        *blueprint.2 = coordinates;
     }
 }
 
