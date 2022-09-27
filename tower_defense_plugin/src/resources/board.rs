@@ -1,4 +1,7 @@
-use bevy::{prelude::Entity, utils::HashMap};
+use bevy::{
+    prelude::{Entity, Vec2, Vec3},
+    utils::HashMap,
+};
 
 use crate::components::coordinates::Coordinates;
 
@@ -8,10 +11,11 @@ pub struct Board {
     pub start: Coordinates,
     pub end: Coordinates,
     pub path: Vec<Coordinates>,
+    pub tile_size: f32,
 }
 
 impl Board {
-    pub fn new() -> Self {
+    pub fn new(size: (u16, u16), tile_size: f32) -> Self {
         let start = Coordinates::new(2, 8);
         let end = Coordinates::new(10, 12);
         let mut path = Vec::new();
@@ -34,11 +38,12 @@ impl Board {
         }
         path.push(path_coord);
         Board {
-            size: (16, 16),
+            size,
             tiles: HashMap::new(),
             start,
             end,
             path,
+            tile_size,
         }
     }
     pub fn width(&self) -> u16 {
@@ -47,6 +52,18 @@ impl Board {
 
     pub fn height(&self) -> u16 {
         self.size.1
+    }
+
+    pub fn board_offset(&self) -> Vec3 {
+        let offset = -self.board_size() / 2.;
+        Vec3::new(offset.x, offset.y, 0.)
+    }
+
+    pub fn board_size(&self) -> Vec2 {
+        Vec2::new(
+            self.tile_size * self.width() as f32,
+            self.tile_size * self.height() as f32,
+        )
     }
 
     pub fn is_start(&self, coord: &Coordinates) -> bool {

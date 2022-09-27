@@ -55,7 +55,7 @@ impl GameSprites {
                 ..Default::default()
             },
             texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(0., 0.75 * tile_size, 2.),
+            transform: Transform::from_xyz(0., 0.5 * tile_size, 2.),
             ..Default::default()
         }
     }
@@ -68,6 +68,19 @@ impl GameSprites {
             },
             texture_atlas: self.get_handle(),
             transform: Transform::from_xyz(0., 0., 2.),
+            ..Default::default()
+        }
+    }
+
+    pub fn peasant(&self, tile_size: f32) -> SpriteSheetBundle {
+        SpriteSheetBundle {
+            sprite: TextureAtlasSprite {
+                index: 16 + 6 * 23,
+                custom_size: Some(Vec2::new(tile_size, tile_size)),
+                ..Default::default()
+            },
+            texture_atlas: self.get_handle(),
+            transform: Transform::from_xyz(0., 0., 1.),
             ..Default::default()
         }
     }
