@@ -7,7 +7,7 @@ use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
-use events::{EnterBuildTarget, HideBuildTarget, Move, Spawn, TryBuild};
+use events::{Attack, EnterBuildTarget, HideBuildTarget, Move, Spawn, TryBuild};
 use resources::{
     board::Board,
     build_tracker::BuildTracker,
@@ -51,6 +51,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_event::<HideBuildTarget>()
         .add_event::<TryBuild>()
         .add_event::<Spawn>()
+        .add_event::<Attack>()
         .add_event::<Move>();
         #[cfg(feature = "debug")]
         {

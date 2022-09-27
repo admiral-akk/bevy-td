@@ -1,16 +1,21 @@
 use bevy::{
     log,
-    prelude::{BuildChildren, Commands, EventReader, Name, Res, ResMut},
+    prelude::{BuildChildren, Commands, EventReader, EventWriter, Name, Query, Res, ResMut, With},
     transform::TransformBundle,
 };
 
 use crate::{
-    components::tower::Tower,
-    events::TryBuild,
+    components::{coordinates::Coordinates, tower::Tower},
+    events::{Attack, TryBuild},
     resources::{board::Board, build_tracker::BuildTracker, game_sprites::GameSprites},
 };
 
-pub fn attack() {}
+pub fn attack(
+    board: Res<Board>,
+    towers: Query<(&Coordinates), (With<Tower>)>,
+    mut attack_ewr: EventWriter<Attack>,
+) {
+}
 
 pub fn try_build(
     mut commands: Commands,

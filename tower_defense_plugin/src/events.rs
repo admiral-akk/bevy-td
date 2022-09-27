@@ -1,3 +1,5 @@
+use bevy::prelude::Entity;
+
 use crate::components::coordinates::Coordinates;
 
 #[derive(Debug, Copy, Clone)]
@@ -14,3 +16,6 @@ pub struct Spawn;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Move;
+
+#[derive(Debug, Copy, Clone)]
+pub struct Attack(pub Entity, pub u32);
