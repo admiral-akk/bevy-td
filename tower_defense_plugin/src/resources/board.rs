@@ -100,6 +100,14 @@ impl Board {
         self.path.contains(coord)
     }
 
+    pub fn neighbouring_monsters(&self, coord: &Coordinates) -> Vec<Coordinates> {
+        return coord
+            .orthogonal_neighbours()
+            .into_iter()
+            .filter(|coord| self.monsters.contains_key(coord))
+            .collect();
+    }
+
     pub fn neighbouring_paths(&self, coord: &Coordinates) -> Vec<Coordinates> {
         return coord
             .orthogonal_neighbours()

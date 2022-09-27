@@ -6,7 +6,7 @@ use bevy::{
 };
 
 use crate::{
-    components::{coordinates::Coordinates, monster::Monster},
+    components::{coordinates::Coordinates, health::Health, monster::Monster},
     events::{Move, Spawn},
     resources::{board::Board, game_sprites::GameSprites},
 };
@@ -54,6 +54,7 @@ pub fn monster_spawn(
                     .spawn()
                     .insert(Name::new("Monster"))
                     .insert(Monster)
+                    .insert(Health(3))
                     .insert(coord)
                     .insert_bundle(spritesheet.monster(board.tile_size))
                     .insert_bundle(TransformBundle {
