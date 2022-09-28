@@ -19,3 +19,6 @@ pub struct Move;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Attack(pub Entity, pub u32);
+
+#[derive(Debug, Copy, Clone)]
+pub struct GameOver;

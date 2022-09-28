@@ -7,7 +7,7 @@ use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
-use events::{Attack, EnterBuildTarget, HideBuildTarget, Move, Spawn, TryBuild};
+use events::{Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, TryBuild};
 use resources::{
     board::Board,
     build_tracker::BuildTracker,
@@ -19,6 +19,7 @@ use systems::{
     blueprint::{enter_target, hide_blueprint},
     health::{damage, death},
     input::{mouse_click_on_board, mouse_move_on_board},
+    life::check_lives,
     monster::{monster_despawn, monster_move, monster_spawn},
     spawn::monster_tick,
     tower::{attack, try_build},
@@ -26,7 +27,10 @@ use systems::{
 
 pub struct TowerDefensePlugin<T> {
     pub active_state: T,
+    pub end_menu_state: T,
 }
+
+pub struct EndMenuState<T>(pub T);
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
@@ -34,6 +38,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             target: None,
             blueprint: None,
         })
+        .insert_resource(EndMenuState(self.end_menu_state.clone()))
         .add_system_set(
             SystemSet::on_enter(self.active_state.clone()).with_system(Self::create_board),
         )
@@ -50,14 +55,17 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(monster_despawn)
                 .with_system(try_build)
                 .with_system(damage)
-                .with_system(death),
+                .with_system(death)
+                .with_system(check_lives)
+                .with_system(Self::game_over),
         )
         .add_event::<EnterBuildTarget>()
         .add_event::<HideBuildTarget>()
         .add_event::<TryBuild>()
         .add_event::<Spawn>()
         .add_event::<Attack>()
-        .add_event::<Move>();
+        .add_event::<Move>()
+        .add_event::<GameOver>();
         #[cfg(feature = "debug")]
         {
             app.register_inspectable::<Coordinates>();
@@ -66,7 +74,17 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     }
 }
 
-impl<T> TowerDefensePlugin<T> {
+impl<T: StateData> TowerDefensePlugin<T> {
+    fn game_over(
+        mut state: ResMut<State<T>>,
+        mut game_over_evr: EventReader<GameOver>,
+        game_over_state: Res<EndMenuState<T>>,
+    ) {
+        for _ in game_over_evr.iter() {
+            state.push(game_over_state.0.clone()).unwrap();
+        }
+    }
+
     fn spawn_ground(
         background: &mut ChildBuilder,
         board: &mut Board,
@@ -142,6 +160,6 @@ impl<T> TowerDefensePlugin<T> {
         commands.insert_resource(SpawnTimer(Timer::from_seconds(4., true)));
         commands.insert_resource(MoveTimer(Timer::from_seconds(1., true)));
         commands.insert_resource(AttackTimer(Timer::from_seconds(1., true)));
-        commands.insert_resource(LifeTracker(10));
+        commands.insert_resource(LifeTracker(2));
     }
 }

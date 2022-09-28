@@ -41,6 +41,7 @@ fn main() {
     app.add_startup_system(camera_setup);
     app.add_plugin(TowerDefensePlugin {
         active_state: GameState::InGame,
+        end_menu_state: GameState::GameOver,
     })
     .add_plugin(StartMenuPlugin {
         active_state: GameState::Start,

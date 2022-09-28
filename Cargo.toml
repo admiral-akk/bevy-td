@@ -1,7 +1,6 @@
 [workspace]
 resolver = "2" # Important! wgpu/Bevy needs this!
 members = [
-    "board_plugin",
     "tower_defense_plugin",
     "start_menu_plugin",
     "end_menu_plugin"
@@ -15,7 +14,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-board_plugin = { path = "board_plugin" }
 tower_defense_plugin = { path = "tower_defense_plugin" }
 start_menu_plugin = { path = "start_menu_plugin" }
 end_menu_plugin = { path = "end_menu_plugin" }
@@ -31,7 +29,7 @@ opt-level = 3
 
 [features]
 default = []
-debug = ["board_plugin/debug", "bevy-inspector-egui"]
+debug = ["bevy-inspector-egui","tower_defense_plugin/debug", "start_menu_plugin/debug", "end_menu_plugin/debug"]
 
 # Hierarchy inspector debug
 
