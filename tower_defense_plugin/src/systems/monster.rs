@@ -8,7 +8,7 @@ use bevy::{
 use crate::{
     components::{coordinates::Coordinates, health::Health, monster::Monster},
     events::{Move, Spawn},
-    resources::{board::Board, game_sprites::GameSprites},
+    resources::{board::Board, game_sprites::GameSprites, life_tracker::LifeTracker},
 };
 
 pub fn monster_move(
@@ -29,12 +29,14 @@ pub fn monster_move(
 pub fn monster_despawn(
     mut commands: Commands,
     mut board: ResMut<Board>,
+    mut life: ResMut<LifeTracker>,
     monsters: Query<(Entity, &Coordinates), With<Monster>>,
 ) {
     for (monster, coordinates) in monsters.iter() {
         if board.is_end(coordinates) {
             board.monsters.remove(&coordinates);
             commands.entity(monster).despawn();
+            life.0 -= 1;
         }
     }
 }
