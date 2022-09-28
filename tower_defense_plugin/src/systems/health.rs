@@ -1,4 +1,4 @@
-use bevy::log;
+
 use bevy::prelude::{Commands, Entity, EventReader, Query, ResMut, With};
 
 use crate::{
@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub fn damage(
-    mut monsters: Query<(&mut Health), (With<Monster>)>,
+    mut monsters: Query<&mut Health, With<Monster>>,
     mut attack_evr: EventReader<Attack>,
 ) {
     for attack in attack_evr.iter() {
@@ -21,7 +21,7 @@ pub fn damage(
 pub fn death(
     mut commands: Commands,
     mut board: ResMut<Board>,
-    monsters: Query<(Entity, &Health, &Coordinates), (With<Monster>)>,
+    monsters: Query<(Entity, &Health, &Coordinates), With<Monster>>,
 ) {
     for (monster, health, coord) in monsters.iter() {
         if health.0 <= 0 {

@@ -1,5 +1,4 @@
 use bevy::{
-    log,
     prelude::{BuildChildren, Commands, EventReader, EventWriter, Name, Query, Res, ResMut, With},
     time::Time,
     transform::TransformBundle,
@@ -16,7 +15,7 @@ use crate::{
 
 pub fn attack(
     board: Res<Board>,
-    towers: Query<(&Coordinates), (With<Tower>)>,
+    towers: Query<&Coordinates, With<Tower>>,
     mut attack_ewr: EventWriter<Attack>,
     mut attack_timer: ResMut<AttackTimer>,
     time: Res<Time>,
