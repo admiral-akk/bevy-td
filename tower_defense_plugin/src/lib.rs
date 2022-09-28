@@ -38,6 +38,7 @@ pub struct EndMenuState<T>(pub T);
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameState {
+    None,
     Building,
     Fighting,
 }
@@ -50,7 +51,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             target: None,
             blueprint: None,
         })
-        .add_state(GameState::Building)
+        .add_state(GameState::None)
         .insert_resource(EndMenuState(self.end_menu_state.clone()))
         .add_system_set(
             SystemSet::on_enter(self.active_state.clone())
@@ -60,14 +61,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
                 .with_run_criteria(
-                    move |game_state: Res<State<GameState>>, app_state: Res<State<T>>| {
-                        if !app_state.current().eq(&active) {
-                            return ShouldRun::No;
-                        }
-                        match game_state.current() {
-                            GameState::Building => ShouldRun::Yes,
-                            _ => ShouldRun::No,
-                        }
+                    |game_state: Res<State<GameState>>| match game_state.current() {
+                        GameState::Building => ShouldRun::Yes,
+                        _ => ShouldRun::No,
                     },
                 )
                 .with_system(mouse_move_on_board)
@@ -79,14 +75,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
                 .with_run_criteria(
-                    move |game_state: Res<State<GameState>>, app_state: Res<State<T>>| {
-                        if !app_state.current().eq(&active2) {
-                            return ShouldRun::No;
-                        }
-                        match game_state.current() {
-                            GameState::Fighting => ShouldRun::Yes,
-                            _ => ShouldRun::No,
-                        }
+                    |game_state: Res<State<GameState>>| match game_state.current() {
+                        GameState::Fighting => ShouldRun::Yes,
+                        _ => ShouldRun::No,
                     },
                 )
                 .with_system(monster_tick)
@@ -146,7 +137,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
                     .spawn_bundle(ButtonBundle {
                         style: Style {
                             size: Size {
-                                width: Val::Px(100.),
+                                width: Val::Px(400.),
                                 height: Val::Px(100.),
                             },
                             ..Default::default()
@@ -189,12 +180,17 @@ impl<T: StateData> TowerDefensePlugin<T> {
         }
     }
 
-    fn clean_board(mut commands: Commands, board: Res<Board>) {
+    fn clean_board(
+        mut commands: Commands,
+        board: Res<Board>,
+        mut game_state: ResMut<State<GameState>>,
+    ) {
         commands.entity(board.board.unwrap()).despawn_recursive();
         commands.insert_resource(BuildTracker {
             target: None,
             blueprint: None,
-        })
+        });
+        game_state.set(GameState::None).unwrap();
     }
 
     fn spawn_ground(
@@ -243,7 +239,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
         }
     }
 
-    fn create_board(mut commands: Commands, spritesheets: Res<GameSprites>) {
+    fn create_board(
+        mut commands: Commands,
+        spritesheets: Res<GameSprites>,
+        mut game_state: ResMut<State<GameState>>,
+    ) {
+        game_state.set(GameState::Building).unwrap();
         let mut board = Board::new((16, 16), 32.);
         let board_position = board.board_offset();
         let board_entity = commands
