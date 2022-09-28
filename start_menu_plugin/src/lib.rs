@@ -41,7 +41,7 @@ impl<T: StateData> StartMenuPlugin<T> {
         }
     }
 
-    pub fn enter(mut commands: Commands) {
+    fn enter(mut commands: Commands) {
         let root_node = commands
             .spawn_bundle(NodeBundle {
                 style: Style {
@@ -87,7 +87,7 @@ impl<T: StateData> StartMenuPlugin<T> {
             .id();
         commands.insert_resource(UiRoot(root_node));
     }
-    pub fn exit(mut commands: Commands, root_node: Res<UiRoot>) {
+    fn exit(mut commands: Commands, root_node: Res<UiRoot>) {
         commands.entity(root_node.0).despawn_recursive();
     }
 }

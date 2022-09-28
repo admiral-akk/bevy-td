@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy::render::texture::ImageSettings;
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::WorldInspectorPlugin;
+use end_menu_plugin::EndMenuPlugin;
 use start_menu_plugin::StartMenuPlugin;
 use tower_defense_plugin::resources::game_sprites::GameSprites;
 use tower_defense_plugin::TowerDefensePlugin;
@@ -44,6 +45,11 @@ fn main() {
     .add_plugin(StartMenuPlugin {
         active_state: GameState::Start,
         in_game_state: GameState::InGame,
+    })
+    .add_plugin(EndMenuPlugin {
+        active_state: GameState::GameOver,
+        in_game_state: GameState::InGame,
+        start_menu_state: GameState::Start,
     })
     .insert_resource(GameSprites::init())
     .add_startup_system(load_resources)

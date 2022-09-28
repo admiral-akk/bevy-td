@@ -3,7 +3,8 @@ resolver = "2" # Important! wgpu/Bevy needs this!
 members = [
     "board_plugin",
     "tower_defense_plugin",
-    "start_menu_plugin"
+    "start_menu_plugin",
+    "end_menu_plugin"
 ]
 
 [package]
@@ -17,6 +18,7 @@ edition = "2021"
 board_plugin = { path = "board_plugin" }
 tower_defense_plugin = { path = "tower_defense_plugin" }
 start_menu_plugin = { path = "start_menu_plugin" }
+end_menu_plugin = { path = "end_menu_plugin" }
 bevy-inspector-egui = { version = "0.13.0", optional = true }
 
 # Enable a small amount of optimization in debug mode
