@@ -1,4 +1,3 @@
-
 use bevy::prelude::{Commands, Entity, EventReader, Query, ResMut, With};
 
 use crate::{
