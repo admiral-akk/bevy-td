@@ -12,6 +12,7 @@ debug = ["colored", "bevy-inspector-egui"]
 [dependencies]
 # Engine
 bevy = "0.8"
+assets_plugin = {path = "../assets_plugin"}
 
 # Serialization
 serde = "1.0"

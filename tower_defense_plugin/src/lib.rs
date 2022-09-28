@@ -3,6 +3,7 @@ mod events;
 pub mod resources;
 mod systems;
 
+use assets_plugin::resources::fonts::Fonts;
 use bevy::{
     ecs::schedule::{ShouldRun, StateData},
     prelude::*,
@@ -52,7 +53,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_state(GameState::Building)
         .insert_resource(EndMenuState(self.end_menu_state.clone()))
         .add_system_set(
-            SystemSet::on_enter(self.active_state.clone()).with_system(Self::create_board),
+            SystemSet::on_enter(self.active_state.clone())
+                .with_system(Self::create_board)
+                .with_system(Self::add_start_ui),
         )
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
@@ -97,7 +100,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(Self::game_over),
         )
         .add_system_set(
-            SystemSet::on_exit(self.active_state.clone()).with_system(Self::clean_board),
+            SystemSet::on_exit(self.active_state.clone())
+                .with_system(Self::clean_board)
+                .with_system(Self::clean_ui),
         )
         .add_event::<EnterBuildTarget>()
         .add_event::<HideBuildTarget>()
@@ -115,7 +120,65 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     }
 }
 
+pub struct UiRoot(pub Entity);
+
 impl<T: StateData> TowerDefensePlugin<T> {
+    fn add_start_ui(mut commands: Commands, fonts: Res<Fonts>) {
+        let ui_root = commands
+            .spawn_bundle(NodeBundle {
+                style: Style {
+                    size: Size {
+                        width: Val::Percent(100.),
+                        height: Val::Percent(100.),
+                    },
+                    flex_direction: FlexDirection::Column,
+                    align_content: AlignContent::FlexEnd,
+                    align_items: AlignItems::Center,
+
+                    ..Default::default()
+                },
+
+                color: UiColor(Color::rgba(0., 0., 0., 0.)),
+                ..Default::default()
+            })
+            .with_children(|parent| {
+                parent
+                    .spawn_bundle(ButtonBundle {
+                        style: Style {
+                            size: Size {
+                                width: Val::Px(100.),
+                                height: Val::Px(100.),
+                            },
+                            ..Default::default()
+                        },
+                        color: UiColor(Color::GRAY),
+                        ..Default::default()
+                    })
+                    .with_children(|parent| {
+                        parent.spawn_bundle(TextBundle {
+                            text: Text {
+                                sections: vec![TextSection {
+                                    value: "Go!".to_string(),
+                                    style: TextStyle {
+                                        font: fonts.get_handle(),
+                                        font_size: 128.,
+                                        ..Default::default()
+                                    },
+                                }],
+                                ..Default::default()
+                            },
+                            ..Default::default()
+                        });
+                    });
+            })
+            .id();
+        commands.insert_resource(UiRoot(ui_root));
+    }
+
+    fn clean_ui(mut commands: Commands, ui_root: Res<UiRoot>) {
+        commands.entity(ui_root.0).despawn_recursive();
+    }
+
     fn game_over(
         mut state: ResMut<State<T>>,
         mut game_over_evr: EventReader<GameOver>,
