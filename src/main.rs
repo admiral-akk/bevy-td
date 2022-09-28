@@ -1,3 +1,4 @@
+use assets_plugin::AssetsPlugin;
 use bevy::prelude::*;
 
 use bevy::render::texture::ImageSettings;
@@ -52,6 +53,7 @@ fn main() {
         in_game_state: GameState::InGame,
         start_menu_state: GameState::Start,
     })
+    .add_plugin(AssetsPlugin)
     .insert_resource(GameSprites::init())
     .add_startup_system(load_resources)
     .add_state(GameState::Start)

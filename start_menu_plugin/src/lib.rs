@@ -3,6 +3,7 @@ mod events;
 mod resources;
 mod systems;
 
+use assets_plugin::resources::fonts::Fonts;
 use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
@@ -41,7 +42,7 @@ impl<T: StateData> StartMenuPlugin<T> {
         }
     }
 
-    fn enter(mut commands: Commands) {
+    fn enter(mut commands: Commands, fonts: Res<Fonts>) {
         let root_node = commands
             .spawn_bundle(NodeBundle {
                 style: Style {
@@ -76,7 +77,10 @@ impl<T: StateData> StartMenuPlugin<T> {
                             text: Text {
                                 sections: vec![TextSection {
                                     value: "Start".to_string(),
-                                    ..Default::default()
+                                    style: TextStyle {
+                                        font: fonts.get_handle(),
+                                        ..Default::default()
+                                    },
                                 }],
                                 ..Default::default()
                             },

@@ -1,5 +1,5 @@
 [package]
-name = "start_menu_plugin"
+name = "assets_plugin"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,7 +12,6 @@ debug = ["colored", "bevy-inspector-egui"]
 [dependencies]
 # Engine
 bevy = "0.8"
-assets_plugin = {path = "../assets_plugin"}
 
 # Serialization
 serde = "1.0"
