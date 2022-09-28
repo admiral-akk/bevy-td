@@ -1,6 +1,6 @@
 use bevy::{
     ecs::schedule::StateData,
-    prelude::{App, Plugin, SystemSet},
+    prelude::{Plugin, SystemSet},
 };
 
 pub struct EndMenuPlugin<T> {
