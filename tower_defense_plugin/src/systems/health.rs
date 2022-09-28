@@ -1,4 +1,4 @@
-use bevy::prelude::{Commands, Entity, EventReader, Query, ResMut, With};
+use bevy::prelude::{Commands, DespawnRecursiveExt, Entity, EventReader, Query, ResMut, With};
 
 use crate::{
     components::{coordinates::Coordinates, health::Health, monster::Monster},
@@ -25,7 +25,7 @@ pub fn death(
     for (monster, health, coord) in monsters.iter() {
         if health.0 <= 0 {
             board.monsters.remove(coord);
-            commands.entity(monster).despawn();
+            commands.entity(monster).despawn_recursive();
         }
     }
 }

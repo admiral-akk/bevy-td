@@ -1,6 +1,7 @@
 use bevy::{
     prelude::{
-        BuildChildren, Commands, Entity, EventReader, Name, Query, Res, ResMut, Transform, With,
+        BuildChildren, Commands, DespawnRecursiveExt, Entity, EventReader, Name, Query, Res,
+        ResMut, Transform, With,
     },
     transform::TransformBundle,
 };
@@ -35,7 +36,7 @@ pub fn monster_despawn(
     for (monster, coordinates) in monsters.iter() {
         if board.is_end(coordinates) {
             board.monsters.remove(&coordinates);
-            commands.entity(monster).despawn();
+            commands.entity(monster).despawn_recursive();
             life.0 -= 1;
         }
     }
