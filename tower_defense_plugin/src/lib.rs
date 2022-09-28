@@ -3,7 +3,7 @@ mod events;
 pub mod resources;
 mod systems;
 
-use bevy::{ecs::schedule::StateData, prelude::*, window::WindowDescriptor};
+use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};

@@ -77,70 +77,7 @@ fn load_resources(
     path_sprites.update_handle(texture_atlases.add(path_atlas));
 }
 
-fn setup_board(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.insert_resource(BoardOptions {
-        map_size: (20, 20),
-        bomb_count: 40,
-        tile_padding: 3.0,
-        safe_start: true,
-        ..Default::default()
-    });
-    commands.insert_resource(BoardAssets {
-        label: "Default".to_string(),
-        board_material: SpriteMaterial {
-            color: Color::WHITE,
-            ..Default::default()
-        },
-        tile_material: SpriteMaterial {
-            color: Color::DARK_GRAY,
-            ..Default::default()
-        },
-        covered_tile_material: SpriteMaterial {
-            color: Color::GRAY,
-            ..Default::default()
-        },
-        bomb_counter_font: asset_server.load("fonts/pixeled.ttf"),
-        bomb_counter_colors: BoardAssets::default_colors(),
-        flag_material: SpriteMaterial {
-            texture: asset_server.load("sprites/flag.png"),
-            color: Color::WHITE,
-        },
-        bomb_material: SpriteMaterial {
-            texture: asset_server.load("sprites/bomb.png"),
-            color: Color::WHITE,
-        },
-    });
-}
-
 fn camera_setup(mut commands: Commands) {
     // 2D orthographic camera
     commands.spawn_bundle(Camera2dBundle::default());
-}
-
-fn state_handler(mut state: ResMut<State<AppState>>, keys: Res<Input<KeyCode>>) {
-    if keys.just_pressed(KeyCode::C) {
-        log::debug!("clearing detected");
-        if state.current() == &AppState::InGame {
-            log::info!("clearing game");
-            state.set(AppState::Out).unwrap();
-        }
-    }
-    if keys.just_pressed(KeyCode::G) {
-        log::debug!("loading detected");
-        if state.current() == &AppState::Out {
-            log::info!("loading game");
-            state.set(AppState::InGame).unwrap();
-        } else if state.current() == &AppState::InGame {
-            state.restart().unwrap();
-        }
-    }
-    if keys.just_pressed(KeyCode::Escape) {
-        log::debug!("pasuing detected");
-        if state.current() != &AppState::Paused {
-            log::info!("pausing game");
-            state.push(AppState::Paused).unwrap();
-        } else {
-            state.pop().unwrap();
-        }
-    }
 }
