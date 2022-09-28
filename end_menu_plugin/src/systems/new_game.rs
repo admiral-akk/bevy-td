@@ -3,12 +3,12 @@ use bevy::{
     ui::{Interaction, UiColor},
 };
 
-use crate::{components::start::Start, events::StartGame};
+use crate::{components::new_game::NewGame, events::StartGame};
 
-pub fn start(
+pub fn new_game(
     mut start_button: Query<
         (&Interaction, &mut UiColor),
-        (With<Button>, With<Start>, Changed<Interaction>),
+        (With<Button>, With<NewGame>, Changed<Interaction>),
     >,
     mut start_game_ewr: EventWriter<StartGame>,
 ) {

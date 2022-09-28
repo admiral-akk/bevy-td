@@ -59,6 +59,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(check_lives)
                 .with_system(Self::game_over),
         )
+        .add_system_set(
+            SystemSet::on_exit(self.active_state.clone()).with_system(Self::clean_board),
+        )
         .add_event::<EnterBuildTarget>()
         .add_event::<HideBuildTarget>()
         .add_event::<TryBuild>()
@@ -66,6 +69,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_event::<Attack>()
         .add_event::<Move>()
         .add_event::<GameOver>();
+
         #[cfg(feature = "debug")]
         {
             app.register_inspectable::<Coordinates>();
@@ -83,6 +87,14 @@ impl<T: StateData> TowerDefensePlugin<T> {
         for _ in game_over_evr.iter() {
             state.push(game_over_state.0.clone()).unwrap();
         }
+    }
+
+    fn clean_board(mut commands: Commands, board: Res<Board>) {
+        commands.entity(board.board.unwrap()).despawn_recursive();
+        commands.insert_resource(BuildTracker {
+            target: None,
+            blueprint: None,
+        })
     }
 
     fn spawn_ground(
@@ -157,9 +169,9 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .id();
         board.board = Some(board_entity);
         commands.insert_resource(board);
-        commands.insert_resource(SpawnTimer(Timer::from_seconds(4., true)));
-        commands.insert_resource(MoveTimer(Timer::from_seconds(1., true)));
-        commands.insert_resource(AttackTimer(Timer::from_seconds(1., true)));
+        commands.insert_resource(SpawnTimer(Timer::from_seconds(2., true)));
+        commands.insert_resource(MoveTimer(Timer::from_seconds(0.5, true)));
+        commands.insert_resource(AttackTimer(Timer::from_seconds(0.5, true)));
         commands.insert_resource(LifeTracker(2));
     }
 }

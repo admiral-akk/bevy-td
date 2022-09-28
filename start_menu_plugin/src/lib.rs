@@ -10,7 +10,7 @@ use bevy_inspector_egui::RegisterInspectable;
 use components::start::Start;
 use events::StartGame;
 use resources::{in_game_state::InGameState, ui_root::UiRoot};
-use systems::start::hover_start;
+use systems::start::start;
 
 pub struct StartMenuPlugin<T> {
     pub active_state: T,
@@ -23,7 +23,7 @@ impl<T: StateData> Plugin for StartMenuPlugin<T> {
         app.insert_resource(InGameState(self.in_game_state.clone()));
         app.add_system_set(
             SystemSet::on_update(self.active_state.clone())
-                .with_system(hover_start)
+                .with_system(start)
                 .with_system(Self::start_game),
         );
         app.add_system_set(SystemSet::on_exit(self.active_state.clone()).with_system(Self::exit));
@@ -64,8 +64,10 @@ impl<T: StateData> StartMenuPlugin<T> {
                         style: Style {
                             size: Size {
                                 width: Val::Percent(40.),
-                                height: Val::Percent(40.),
+                                height: Val::Percent(20.),
                             },
+                            align_items: AlignItems::Center,
+                            justify_content: JustifyContent::Center,
                             ..Default::default()
                         },
                         color: UiColor(Color::RED),
@@ -79,6 +81,7 @@ impl<T: StateData> StartMenuPlugin<T> {
                                     value: "Start".to_string(),
                                     style: TextStyle {
                                         font: fonts.get_handle(),
+                                        font_size: 128.,
                                         ..Default::default()
                                     },
                                 }],
