@@ -3,7 +3,10 @@ mod events;
 pub mod resources;
 mod systems;
 
-use bevy::{ecs::schedule::StateData, prelude::*};
+use bevy::{
+    ecs::schedule::{ShouldRun, StateData},
+    prelude::*,
+};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
@@ -32,28 +35,62 @@ pub struct TowerDefensePlugin<T> {
 
 pub struct EndMenuState<T>(pub T);
 
+#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+pub enum GameState {
+    Building,
+    Fighting,
+}
+
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
+        let active = self.active_state.clone();
+        let active2 = self.active_state.clone();
         app.insert_resource(BuildTracker {
             target: None,
             blueprint: None,
         })
+        .add_state(GameState::Building)
         .insert_resource(EndMenuState(self.end_menu_state.clone()))
         .add_system_set(
             SystemSet::on_enter(self.active_state.clone()).with_system(Self::create_board),
         )
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
-                .with_system(monster_tick)
-                .with_system(monster_move)
-                .with_system(attack)
+                .with_run_criteria(
+                    move |game_state: Res<State<GameState>>, app_state: Res<State<T>>| {
+                        if !app_state.current().eq(&active) {
+                            return ShouldRun::No;
+                        }
+                        match game_state.current() {
+                            GameState::Building => ShouldRun::Yes,
+                            _ => ShouldRun::No,
+                        }
+                    },
+                )
                 .with_system(mouse_move_on_board)
                 .with_system(mouse_click_on_board)
                 .with_system(hide_blueprint)
                 .with_system(enter_target)
+                .with_system(try_build),
+        )
+        .add_system_set(
+            SystemSet::on_update(self.active_state.clone())
+                .with_run_criteria(
+                    move |game_state: Res<State<GameState>>, app_state: Res<State<T>>| {
+                        if !app_state.current().eq(&active2) {
+                            return ShouldRun::No;
+                        }
+                        match game_state.current() {
+                            GameState::Fighting => ShouldRun::Yes,
+                            _ => ShouldRun::No,
+                        }
+                    },
+                )
+                .with_system(monster_tick)
+                .with_system(monster_move)
+                .with_system(attack)
                 .with_system(monster_spawn)
                 .with_system(monster_despawn)
-                .with_system(try_build)
                 .with_system(damage)
                 .with_system(death)
                 .with_system(check_lives)
