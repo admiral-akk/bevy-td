@@ -1,5 +1,3 @@
-
-
 use bevy::log;
 use bevy::prelude::*;
 
@@ -9,6 +7,7 @@ use bevy_inspector_egui::WorldInspectorPlugin;
 use board_plugin::resources::board_assets::BoardAssets;
 use board_plugin::resources::board_assets::SpriteMaterial;
 use board_plugin::resources::board_options::BoardOptions;
+use start_menu_plugin::StartMenuPlugin;
 use tower_defense_plugin::resources::game_sprites::GameSprites;
 use tower_defense_plugin::TowerDefensePlugin;
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
@@ -20,7 +19,9 @@ pub enum AppState {
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 pub enum GameState {
     Loading,
-    Loaded,
+    InGame,
+    Start,
+    GameOver,
 }
 fn main() {
     let mut app = App::new();
@@ -42,11 +43,15 @@ fn main() {
     // Startup system (cameras)
     app.add_startup_system(camera_setup);
     app.add_plugin(TowerDefensePlugin {
-        active_state: GameState::Loaded,
+        active_state: GameState::InGame,
+    })
+    .add_plugin(StartMenuPlugin {
+        active_state: GameState::Start,
+        in_game_state: GameState::InGame,
     })
     .insert_resource(GameSprites::init())
     .add_startup_system(load_resources)
-    .add_state(GameState::Loaded)
+    .add_state(GameState::Start)
     .run();
     // app.add_state(AppState::Out)
     //     .add_plugin(BoardPlugin {

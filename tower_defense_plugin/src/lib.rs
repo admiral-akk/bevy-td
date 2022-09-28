@@ -113,13 +113,8 @@ impl<T> TowerDefensePlugin<T> {
         }
     }
 
-    fn create_board(
-        mut commands: Commands,
-        _window: Res<WindowDescriptor>,
-        spritesheets: Res<GameSprites>,
-    ) {
+    fn create_board(mut commands: Commands, spritesheets: Res<GameSprites>) {
         let mut board = Board::new((16, 16), 32.);
-        let _map_size = board.board_size();
         let board_position = board.board_offset();
         let board_entity = commands
             .spawn()
