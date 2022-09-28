@@ -1,12 +1,8 @@
-use bevy::log;
 use bevy::prelude::*;
 
 use bevy::render::texture::ImageSettings;
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::WorldInspectorPlugin;
-use board_plugin::resources::board_assets::BoardAssets;
-use board_plugin::resources::board_assets::SpriteMaterial;
-use board_plugin::resources::board_options::BoardOptions;
 use start_menu_plugin::StartMenuPlugin;
 use tower_defense_plugin::resources::game_sprites::GameSprites;
 use tower_defense_plugin::TowerDefensePlugin;
