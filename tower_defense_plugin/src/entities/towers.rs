@@ -8,6 +8,49 @@ use bevy::{
     transform::TransformBundle,
 };
 
+pub enum TowerType {
+    None,
+    Peasant,
+    Guard,
+    Soldier,
+}
+
+pub fn get_tower(
+    commands: &mut Commands,
+    board: &mut ResMut<Board>,
+    coord: &Coordinates,
+    sprite_sheet: &Res<GameSprites>,
+    tower: TowerType,
+) -> Option<Entity> {
+    match tower {
+        TowerType::None => None,
+        TowerType::Peasant => Some(tower_entity(
+            commands,
+            board,
+            coord,
+            sprite_sheet.peasant(board.tile_size),
+            "Peasant",
+            Power(1),
+        )),
+        TowerType::Guard => Some(tower_entity(
+            commands,
+            board,
+            coord,
+            sprite_sheet.guard(board.tile_size),
+            "Guard",
+            Power(2),
+        )),
+        TowerType::Soldier => Some(tower_entity(
+            commands,
+            board,
+            coord,
+            sprite_sheet.soldier(board.tile_size),
+            "Soldier",
+            Power(3),
+        )),
+    }
+}
+
 fn tower_entity(
     commands: &mut Commands,
     board: &mut ResMut<Board>,
@@ -33,52 +76,4 @@ fn tower_entity(
         .id();
     board.towers.insert(*coord, tower);
     tower
-}
-
-pub fn peasant_entity(
-    commands: &mut Commands,
-    board: &mut ResMut<Board>,
-    coord: &Coordinates,
-    sprite_sheet: &Res<GameSprites>,
-) -> Entity {
-    tower_entity(
-        commands,
-        board,
-        coord,
-        sprite_sheet.peasant(board.tile_size),
-        "Peasant",
-        Power(1),
-    )
-}
-
-pub fn guard_entity(
-    commands: &mut Commands,
-    board: &mut ResMut<Board>,
-    coord: &Coordinates,
-    sprite_sheet: &Res<GameSprites>,
-) -> Entity {
-    tower_entity(
-        commands,
-        board,
-        coord,
-        sprite_sheet.guard(board.tile_size),
-        "Guard",
-        Power(2),
-    )
-}
-
-pub fn soldier_entity(
-    commands: &mut Commands,
-    board: &mut ResMut<Board>,
-    coord: &Coordinates,
-    sprite_sheet: &Res<GameSprites>,
-) -> Entity {
-    tower_entity(
-        commands,
-        board,
-        coord,
-        sprite_sheet.soldier(board.tile_size),
-        "Soldier",
-        Power(3),
-    )
 }
