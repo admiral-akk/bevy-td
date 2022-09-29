@@ -199,17 +199,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
         }
     }
 
-    fn clean_board(
-        mut commands: Commands,
-        board: Res<Board>,
-        mut game_state: ResMut<State<GameState>>,
-    ) {
+    fn clean_board(mut commands: Commands, board: Res<Board>) {
         commands.entity(board.board.unwrap()).despawn_recursive();
         commands.insert_resource(BuildTracker {
             target: None,
             blueprint: None,
         });
-        game_state.overwrite_set(GameState::None);
     }
 
     fn spawn_ground(
