@@ -1,5 +1,5 @@
 use crate::{
-    components::{coordinates::Coordinates, tower::Tower},
+    components::{coordinates::Coordinates, power::Power, tower::Tower},
     resources::{board::Board, game_sprites::GameSprites},
 };
 use bevy::{
@@ -13,6 +13,7 @@ fn tower_entity(
     coord: &Coordinates,
     sprite_sheet: &Res<GameSprites>,
     name: &str,
+    power: Power,
 ) -> Entity {
     let tower = commands
         .spawn()
@@ -27,6 +28,7 @@ fn tower_entity(
             ..Default::default()
         })
         .insert(Name::new(name.to_string()))
+        .insert(power)
         .id();
     board.towers.insert(*coord, tower);
     tower
@@ -38,5 +40,5 @@ pub fn peasant_entity(
     coord: &Coordinates,
     sprite_sheet: &Res<GameSprites>,
 ) -> Entity {
-    tower_entity(commands, board, coord, sprite_sheet, "Peasant")
+    tower_entity(commands, board, coord, sprite_sheet, "Peasant", Power(1))
 }
