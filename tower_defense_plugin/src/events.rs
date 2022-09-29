@@ -22,3 +22,6 @@ pub struct Attack(pub Entity, pub u32);
 
 #[derive(Debug, Copy, Clone)]
 pub struct GameOver;
+
+#[derive(Debug, Copy, Clone)]
+pub struct StartWave;

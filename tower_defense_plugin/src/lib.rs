@@ -10,8 +10,10 @@ use bevy::{
 };
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
-use components::{blueprint::Blueprint, coordinates::Coordinates, tile::Tile};
-use events::{Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, TryBuild};
+use components::{blueprint::Blueprint, coordinates::Coordinates, go::Go, tile::Tile};
+use events::{
+    Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, StartWave, TryBuild,
+};
 use resources::{
     board::Board,
     build_tracker::BuildTracker,
@@ -21,6 +23,7 @@ use resources::{
 };
 use systems::{
     blueprint::{enter_target, hide_blueprint},
+    go::{go, grey_out},
     health::{damage, death},
     input::{mouse_click_on_board, mouse_move_on_board},
     life::check_lives,
@@ -45,8 +48,6 @@ pub enum GameState {
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
-        let active = self.active_state.clone();
-        let active2 = self.active_state.clone();
         app.insert_resource(BuildTracker {
             target: None,
             blueprint: None,
@@ -70,8 +71,11 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(mouse_click_on_board)
                 .with_system(hide_blueprint)
                 .with_system(enter_target)
-                .with_system(try_build),
+                .with_system(try_build)
+                .with_system(go)
+                .with_system(Self::start_wave),
         )
+        .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
                 .with_run_criteria(
@@ -101,7 +105,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_event::<Spawn>()
         .add_event::<Attack>()
         .add_event::<Move>()
-        .add_event::<GameOver>();
+        .add_event::<GameOver>()
+        .add_event::<StartWave>();
 
         #[cfg(feature = "debug")]
         {
@@ -114,6 +119,15 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
 pub struct UiRoot(pub Entity);
 
 impl<T: StateData> TowerDefensePlugin<T> {
+    fn start_wave(
+        mut game_state: ResMut<State<GameState>>,
+        mut start_wave_evr: EventReader<StartWave>,
+    ) {
+        for _ in start_wave_evr.iter() {
+            game_state.set(GameState::Fighting).unwrap();
+        }
+    }
+
     fn add_start_ui(mut commands: Commands, fonts: Res<Fonts>) {
         let ui_root = commands
             .spawn_bundle(NodeBundle {
@@ -140,11 +154,14 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                 width: Val::Px(400.),
                                 height: Val::Px(100.),
                             },
+                            align_content: AlignContent::Center,
+                            align_items: AlignItems::Center,
                             ..Default::default()
                         },
                         color: UiColor(Color::GRAY),
                         ..Default::default()
                     })
+                    .insert(Go)
                     .with_children(|parent| {
                         parent.spawn_bundle(TextBundle {
                             text: Text {
@@ -172,10 +189,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
 
     fn game_over(
         mut state: ResMut<State<T>>,
+        mut game_state: ResMut<State<GameState>>,
         mut game_over_evr: EventReader<GameOver>,
         game_over_state: Res<EndMenuState<T>>,
     ) {
         for _ in game_over_evr.iter() {
+            game_state.set(GameState::None).unwrap();
             state.push(game_over_state.0.clone()).unwrap();
         }
     }
@@ -190,7 +209,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
             target: None,
             blueprint: None,
         });
-        game_state.set(GameState::None).unwrap();
+        game_state.overwrite_set(GameState::None);
     }
 
     fn spawn_ground(
