@@ -7,7 +7,7 @@ use crate::components::coordinates::Coordinates;
 
 use super::board::Board;
 
-// binary encoding, NWSE, 1 if has path, 0 otherwise. 0000 means ignore
+// binary encoding, NWSE, 1 if has path, 0 otherwise. 0000 means ignore.
 
 const PATH_INDEX: [usize; 16] = [
     0,
