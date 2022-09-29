@@ -1,4 +1,5 @@
 mod components;
+mod entities;
 mod events;
 pub mod resources;
 mod systems;

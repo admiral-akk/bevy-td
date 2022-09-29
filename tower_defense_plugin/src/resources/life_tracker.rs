@@ -1,1 +1,1 @@
-pub struct LifeTracker(pub u32);
+pub struct LifeTracker(pub i32);
