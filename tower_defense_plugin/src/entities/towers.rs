@@ -3,16 +3,34 @@ use crate::{
     resources::{board::Board, game_sprites::GameSprites},
 };
 use bevy::{
-    prelude::{Commands, Entity, Name, Res, ResMut, VisibilityBundle},
+    prelude::{Color, Commands, Entity, Name, Res, ResMut, VisibilityBundle},
     sprite::SpriteSheetBundle,
     transform::TransformBundle,
 };
 
+#[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
+#[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash)]
 pub enum TowerType {
+    #[default]
     None,
     Peasant,
     Guard,
     Soldier,
+}
+
+pub fn get_blueprint(
+    board: &Board,
+    sprite_sheet: &Res<GameSprites>,
+    tower: TowerType,
+) -> SpriteSheetBundle {
+    let mut bundle = match tower {
+        TowerType::Peasant => sprite_sheet.peasant(board.tile_size),
+        TowerType::Guard => sprite_sheet.guard(board.tile_size),
+        TowerType::Soldier => sprite_sheet.soldier(board.tile_size),
+        _ => SpriteSheetBundle::default(),
+    };
+    bundle.sprite.color = Color::rgba(1., 1., 1., 0.5);
+    bundle
 }
 
 pub fn get_tower(

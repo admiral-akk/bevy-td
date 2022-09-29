@@ -12,6 +12,7 @@ use bevy::{
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{blueprint::Blueprint, coordinates::Coordinates, go::Go, tile::Tile};
+use entities::towers::{get_blueprint, TowerType};
 use events::{
     Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, StartWave, TryBuild,
 };
@@ -280,23 +281,20 @@ impl<T: StateData> TowerDefensePlugin<T> {
         let board_position = board.board_offset();
         let board_entity = commands
             .spawn()
-            .insert(Name::new("Game Map"))
+            .insert(Name::new("Board"))
+            .insert(components::board::Board)
             .insert(Transform::from_translation(board_position))
             .insert(GlobalTransform::default())
             .insert_bundle(VisibilityBundle::default())
             .with_children(|parent| {
-                parent
-                    .spawn()
-                    // .insert(Transform::from_xyz(map_size.x / 2., map_size.y / 2., 0.))
-                    .insert(Name::new("Background"));
                 Self::spawn_ground(parent, &mut board, &spritesheets);
                 parent
                     .spawn()
                     .insert(Name::new("Blueprint"))
-                    .insert(Blueprint)
+                    .insert(Blueprint(TowerType::Guard))
                     .insert_bundle(TransformBundle::default())
                     .insert(Coordinates::default())
-                    .insert_bundle(spritesheets.peasant(board.tile_size));
+                    .insert_bundle(get_blueprint(&board, &spritesheets, TowerType::Guard));
             })
             .id();
         board.board = Some(board_entity);
