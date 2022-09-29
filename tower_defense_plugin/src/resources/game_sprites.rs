@@ -70,8 +70,17 @@ impl GameSprites {
     pub fn peasant(&self, tile_size: f32) -> SpriteSheetBundle {
         self.sprite_sheet_bundle(17 + 6 * 23, tile_size, 3.)
     }
+    pub fn priest(&self, tile_size: f32) -> SpriteSheetBundle {
+        self.sprite_sheet_bundle(19 + 6 * 23, tile_size, 3.)
+    }
+    pub fn guard(&self, tile_size: f32) -> SpriteSheetBundle {
+        self.sprite_sheet_bundle(20 + 6 * 23, tile_size, 3.)
+    }
+    pub fn soldier(&self, tile_size: f32) -> SpriteSheetBundle {
+        self.sprite_sheet_bundle(21 + 6 * 23, tile_size, 3.)
+    }
     pub fn monster(&self, tile_size: f32) -> SpriteSheetBundle {
-        self.sprite_sheet_bundle(18 + 3 * 23, tile_size, 4.)
+        self.sprite_sheet_bundle(22 + 3 * 23, tile_size, 4.)
     }
 
     pub fn grass(&self, coord: &Coordinates, tile_size: f32) -> SpriteSheetBundle {
