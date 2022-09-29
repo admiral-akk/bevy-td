@@ -3,19 +3,9 @@ use crate::{
     resources::{board::Board, game_sprites::GameSprites},
 };
 use bevy::{
-    prelude::{Bundle, Commands, Entity, Name, Res, ResMut, VisibilityBundle},
-    sprite::SpriteSheetBundle,
+    prelude::{Commands, Entity, Name, Res, ResMut, VisibilityBundle},
     transform::TransformBundle,
 };
-
-#[derive(Bundle)]
-pub struct TowerBundle {
-    tower: Tower,
-    coords: Coordinates,
-    name: Name,
-    #[bundle]
-    sprite_sheet: SpriteSheetBundle,
-}
 
 fn tower_entity(
     commands: &mut Commands,
