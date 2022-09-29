@@ -3,7 +3,7 @@ use bevy::{
     sprite::{SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
 };
 
-use crate::components::coordinates::Coordinates;
+use crate::components::{coordinates::Coordinates, tile};
 
 use super::board::Board;
 
@@ -47,67 +47,39 @@ impl GameSprites {
         self.game_sprite_handle.as_ref().unwrap().clone()
     }
 
-    pub fn spawn(&self, tile_size: f32) -> SpriteSheetBundle {
+    fn sprite_sheet_bundle(&self, index: usize, tile_size: f32, z: f32) -> SpriteSheetBundle {
         SpriteSheetBundle {
             sprite: TextureAtlasSprite {
-                index: 11 + 8 * 23,
+                index: index,
                 custom_size: Some(Vec2::new(tile_size, tile_size)),
                 ..Default::default()
             },
             texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(0., 0.5 * tile_size, 2.),
+            transform: Transform::from_xyz(0., 0., z),
             ..Default::default()
         }
     }
+
+    pub fn spawn(&self, tile_size: f32) -> SpriteSheetBundle {
+        self.sprite_sheet_bundle(11 + 8 * 23, tile_size, 2.)
+    }
     pub fn end(&self, tile_size: f32) -> SpriteSheetBundle {
-        SpriteSheetBundle {
-            sprite: TextureAtlasSprite {
-                index: 13 + 8 * 23,
-                custom_size: Some(Vec2::new(tile_size, tile_size)),
-                ..Default::default()
-            },
-            texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(0., 0., 2.),
-            ..Default::default()
-        }
+        self.sprite_sheet_bundle(13 + 8 * 23, tile_size, 2.)
     }
 
     pub fn peasant(&self, tile_size: f32) -> SpriteSheetBundle {
-        SpriteSheetBundle {
-            sprite: TextureAtlasSprite {
-                index: 17 + 6 * 23,
-                custom_size: Some(Vec2::new(tile_size, tile_size)),
-                ..Default::default()
-            },
-            texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(0., 0., 3.),
-            ..Default::default()
-        }
+        self.sprite_sheet_bundle(17 + 6 * 23, tile_size, 3.)
     }
     pub fn monster(&self, tile_size: f32) -> SpriteSheetBundle {
-        SpriteSheetBundle {
-            sprite: TextureAtlasSprite {
-                index: 18 + 3 * 23,
-                custom_size: Some(Vec2::new(tile_size, tile_size)),
-                ..Default::default()
-            },
-            texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(0., 0., 4.),
-            ..Default::default()
-        }
+        self.sprite_sheet_bundle(18 + 3 * 23, tile_size, 4.)
     }
 
     pub fn grass(&self, coord: &Coordinates, tile_size: f32) -> SpriteSheetBundle {
-        SpriteSheetBundle {
-            sprite: TextureAtlasSprite {
-                index: (coord.x * 3 / 2 + coord.y * 5 / 2) as usize % 2,
-                custom_size: Some(Vec2::new(tile_size, tile_size)),
-                ..Default::default()
-            },
-            texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(0., 0., 1.),
-            ..Default::default()
-        }
+        self.sprite_sheet_bundle(
+            (coord.x * 3 / 2 + coord.y * 5 / 2) as usize % 2,
+            tile_size,
+            1.,
+        )
     }
 
     pub fn path(&self, coord: &Coordinates, board: &Board, tile_size: f32) -> SpriteSheetBundle {
@@ -127,16 +99,6 @@ impl GameSprites {
         if board.is_path(&(coord - Coordinates::new(1, 0))) {
             index = index + 8;
         }
-
-        SpriteSheetBundle {
-            sprite: TextureAtlasSprite {
-                index: PATH_INDEX[index],
-                custom_size: Some(Vec2::new(tile_size, tile_size)),
-                ..Default::default()
-            },
-            texture_atlas: self.get_handle(),
-            transform: Transform::from_xyz(0., 0., 1.),
-            ..Default::default()
-        }
+        self.sprite_sheet_bundle(PATH_INDEX[index], tile_size, 1.)
     }
 }
