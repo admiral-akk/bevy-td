@@ -30,3 +30,9 @@ pub fn grey_out(mut button: Query<&mut UiColor, (With<Button>, With<Go>)>) {
         color.0 = Color::GRAY;
     }
 }
+
+pub fn enable(mut button: Query<&mut UiColor, (With<Button>, With<Go>)>) {
+    for mut color in button.iter_mut() {
+        color.0 = Color::RED;
+    }
+}

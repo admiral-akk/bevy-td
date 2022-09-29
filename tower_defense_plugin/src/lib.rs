@@ -18,12 +18,13 @@ use resources::{
     board::Board,
     build_tracker::BuildTracker,
     game_sprites::GameSprites,
-    life_tracker::LifeTracker,
+    life_tracker::{self, LifeTracker},
     spawn_timer::{AttackTimer, MoveTimer, SpawnTimer},
+    spawn_tracker::SpawnTracker,
 };
 use systems::{
     blueprint::{enter_target, hide_blueprint},
-    go::{go, grey_out},
+    go::{enable, go, grey_out},
     health::{damage, death},
     input::{mouse_click_on_board, mouse_move_on_board},
     life::check_lives,
@@ -75,6 +76,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(go)
                 .with_system(Self::start_wave),
         )
+        .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
         .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
         .add_system_set(
             SystemSet::on_update(self.active_state.clone())
@@ -92,7 +94,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(damage)
                 .with_system(death)
                 .with_system(check_lives)
-                .with_system(Self::game_over),
+                .with_system(Self::game_over)
+                .with_system(Self::wave_over),
         )
         .add_system_set(
             SystemSet::on_exit(self.active_state.clone())
@@ -122,9 +125,22 @@ impl<T: StateData> TowerDefensePlugin<T> {
     fn start_wave(
         mut game_state: ResMut<State<GameState>>,
         mut start_wave_evr: EventReader<StartWave>,
+        mut spawn_tracker: ResMut<SpawnTracker>,
     ) {
         for _ in start_wave_evr.iter() {
             game_state.set(GameState::Fighting).unwrap();
+            spawn_tracker.0 = 5;
+        }
+    }
+
+    fn wave_over(
+        spawn_tracker: Res<SpawnTracker>,
+        board: Res<Board>,
+        life_tracker: Res<LifeTracker>,
+        mut game_state: ResMut<State<GameState>>,
+    ) {
+        if spawn_tracker.0 == 0 && board.monsters.len() == 0 && life_tracker.0 > 0 {
+            game_state.set(GameState::Building).unwrap();
         }
     }
 
@@ -288,5 +304,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
         commands.insert_resource(MoveTimer(Timer::from_seconds(0.5, true)));
         commands.insert_resource(AttackTimer(Timer::from_seconds(0.5, true)));
         commands.insert_resource(LifeTracker(2));
+        commands.insert_resource(SpawnTracker(0));
     }
 }

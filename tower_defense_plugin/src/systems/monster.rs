@@ -9,7 +9,10 @@ use bevy::{
 use crate::{
     components::{coordinates::Coordinates, health::Health, monster::Monster},
     events::{Move, Spawn},
-    resources::{board::Board, game_sprites::GameSprites, life_tracker::LifeTracker},
+    resources::{
+        board::Board, game_sprites::GameSprites, life_tracker::LifeTracker,
+        spawn_tracker::SpawnTracker,
+    },
 };
 
 pub fn monster_move(
@@ -47,6 +50,7 @@ pub fn monster_spawn(
     mut board: ResMut<Board>,
     spritesheet: Res<GameSprites>,
     mut spawn_evr: EventReader<Spawn>,
+    mut spawn_tracker: ResMut<SpawnTracker>,
 ) {
     for _ in spawn_evr.iter() {
         let coord = board.start.clone();
@@ -67,5 +71,6 @@ pub fn monster_spawn(
             })
             .id();
         board.monsters.insert(coord, monster);
+        spawn_tracker.0 -= 1;
     }
 }
