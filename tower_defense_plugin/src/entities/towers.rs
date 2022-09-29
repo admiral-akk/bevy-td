@@ -4,6 +4,7 @@ use crate::{
 };
 use bevy::{
     prelude::{Commands, Entity, Name, Res, ResMut, VisibilityBundle},
+    sprite::SpriteSheetBundle,
     transform::TransformBundle,
 };
 
@@ -11,7 +12,7 @@ fn tower_entity(
     commands: &mut Commands,
     board: &mut ResMut<Board>,
     coord: &Coordinates,
-    sprite_sheet: &Res<GameSprites>,
+    sprite_sheet: SpriteSheetBundle,
     name: &str,
     power: Power,
 ) -> Entity {
@@ -19,7 +20,7 @@ fn tower_entity(
         .spawn()
         .insert(Tower)
         .insert(coord.clone())
-        .insert_bundle(sprite_sheet.peasant(board.tile_size))
+        .insert_bundle(sprite_sheet)
         .insert_bundle(TransformBundle {
             local: board.transform(&coord, 4.),
             ..Default::default()
@@ -40,5 +41,44 @@ pub fn peasant_entity(
     coord: &Coordinates,
     sprite_sheet: &Res<GameSprites>,
 ) -> Entity {
-    tower_entity(commands, board, coord, sprite_sheet, "Peasant", Power(1))
+    tower_entity(
+        commands,
+        board,
+        coord,
+        sprite_sheet.peasant(board.tile_size),
+        "Peasant",
+        Power(1),
+    )
+}
+
+pub fn guard_entity(
+    commands: &mut Commands,
+    board: &mut ResMut<Board>,
+    coord: &Coordinates,
+    sprite_sheet: &Res<GameSprites>,
+) -> Entity {
+    tower_entity(
+        commands,
+        board,
+        coord,
+        sprite_sheet.guard(board.tile_size),
+        "Guard",
+        Power(2),
+    )
+}
+
+pub fn soldier_entity(
+    commands: &mut Commands,
+    board: &mut ResMut<Board>,
+    coord: &Coordinates,
+    sprite_sheet: &Res<GameSprites>,
+) -> Entity {
+    tower_entity(
+        commands,
+        board,
+        coord,
+        sprite_sheet.soldier(board.tile_size),
+        "Soldier",
+        Power(3),
+    )
 }

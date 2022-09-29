@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::{
     components::{coordinates::Coordinates, power::Power, tower::Tower},
-    entities::towers::peasant_entity,
+    entities::towers::{soldier_entity},
     events::{Attack, TryBuild},
     resources::{
         board::Board, build_tracker::BuildTracker, game_sprites::GameSprites,
@@ -40,7 +40,7 @@ pub fn try_build(
 ) {
     for _ in build_evr.iter() {
         if let Some(coord) = build_tracker.target {
-            let peasant = peasant_entity(&mut commands, &mut board, &coord, &spritesheet);
+            let peasant = soldier_entity(&mut commands, &mut board, &coord, &spritesheet);
             commands
                 .entity(board.board.unwrap())
                 .push_children(&[peasant]);
