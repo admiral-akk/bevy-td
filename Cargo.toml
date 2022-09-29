@@ -4,7 +4,7 @@ members = [
     "tower_defense_plugin",
     "start_menu_plugin",
     "end_menu_plugin",
-    "assets_plugin"
+    "assets_plugin",
 ]
 
 [package]
