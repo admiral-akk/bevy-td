@@ -18,7 +18,7 @@ use resources::{
     board::Board,
     build_tracker::BuildTracker,
     game_sprites::GameSprites,
-    life_tracker::{self, LifeTracker},
+    life_tracker::{LifeTracker},
     spawn_timer::{AttackTimer, MoveTimer, SpawnTimer},
     spawn_tracker::SpawnTracker,
 };
