@@ -3,7 +3,7 @@ use bevy::{
     sprite::{SpriteSheetBundle, TextureAtlas, TextureAtlasSprite},
 };
 
-use crate::components::{coordinates::Coordinates};
+use crate::components::coordinates::Coordinates;
 
 use super::board::Board;
 
