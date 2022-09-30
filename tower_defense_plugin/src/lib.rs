@@ -17,7 +17,6 @@ use events::{
 };
 use resources::{
     board::Board,
-    build_tracker::BuildTracker,
     game_sprites::GameSprites,
     life_tracker::LifeTracker,
     spawn_timer::{AttackTimer, MoveTimer, SpawnTimer},
@@ -28,7 +27,6 @@ use systems::{
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
-    input::{mouse_click_on_board, mouse_move_on_board},
     life::check_lives,
     monster::{monster_despawn, monster_move, monster_spawn},
     reward::spawn_reward,
@@ -59,67 +57,64 @@ static LIVES: &str = "lives";
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
-        app.insert_resource(BuildTracker {
-            target: None,
-            blueprint: None,
-        })
-        .add_state(GameState::None)
-        .insert_resource(EndMenuState(self.end_menu_state.clone()))
-        .insert_resource(SpawnTimer(Timer::from_seconds(2., true)))
-        .insert_resource(MoveTimer(Timer::from_seconds(0.5, true)))
-        .insert_resource(AttackTimer(Timer::from_seconds(0.5, true)))
-        .insert_resource(LifeTracker(2))
-        .insert_resource(SpawnTracker(0))
-        .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
-        .add_system_set(
-            SystemSet::on_update(GameState::Building)
-                .with_system(mouse_move_on_board)
-                .with_system(select_tower)
-                .with_system(place_tower.before(select_tower))
-                .with_system(mouse_click_on_board)
-                .with_system(go)
-                .with_system(Self::start_wave),
-        )
-        .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
-        .add_system_set(
-            SystemSet::on_update(GameState::Fighting)
-                .with_system(monster_tick)
-                .with_system(monster_move)
-                .with_system(attack)
-                .with_system(monster_spawn)
-                .with_system(monster_despawn)
-                .with_system(damage)
-                .with_system(death)
-                .with_system(check_lives)
-                .with_system(Self::game_over)
-                .with_system(Self::wave_over),
-        )
-        .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
-        .add_system_set(
-            SystemSet::on_enter(self.active_state.clone())
-                .with_system(Self::create_board)
-                .with_system(Self::add_start_ui),
-        )
-        .add_system_set(
-            SystemSet::on_update(self.active_state.clone())
-                .with_system(cursor_move)
-                .with_system(update_transform)
-                .with_system(update_towers)
-                .with_system(update_monsters),
-        )
-        .add_system_set(
-            SystemSet::on_exit(self.active_state.clone())
-                .with_system(Self::clean_board)
-                .with_system(Self::clean_ui),
-        )
-        .add_event::<EnterBuildTarget>()
-        .add_event::<HideBuildTarget>()
-        .add_event::<TryBuild>()
-        .add_event::<Spawn>()
-        .add_event::<Attack>()
-        .add_event::<Move>()
-        .add_event::<GameOver>()
-        .add_event::<StartWave>();
+        app.add_state(GameState::None)
+            .insert_resource(EndMenuState(self.end_menu_state.clone()))
+            .insert_resource(SpawnTimer(Timer::from_seconds(2., true)))
+            .insert_resource(MoveTimer(Timer::from_seconds(0.5, true)))
+            .insert_resource(AttackTimer(Timer::from_seconds(0.5, true)))
+            .insert_resource(LifeTracker(2))
+            .insert_resource(SpawnTracker(0))
+            // Building systems
+            .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
+            .add_system_set(
+                SystemSet::on_update(GameState::Building)
+                    .with_system(select_tower)
+                    .with_system(place_tower.before(select_tower))
+                    .with_system(go)
+                    .with_system(Self::start_wave),
+            )
+            .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
+            // Fighting systems
+            .add_system_set(
+                SystemSet::on_update(GameState::Fighting)
+                    .with_system(monster_tick)
+                    .with_system(monster_move)
+                    .with_system(attack)
+                    .with_system(monster_spawn)
+                    .with_system(monster_despawn)
+                    .with_system(damage)
+                    .with_system(death)
+                    .with_system(check_lives)
+                    .with_system(Self::game_over)
+                    .with_system(Self::wave_over),
+            )
+            .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
+            // Universal systems
+            .add_system_set(
+                SystemSet::on_enter(self.active_state.clone())
+                    .with_system(Self::create_board)
+                    .with_system(Self::add_start_ui),
+            )
+            .add_system_set(
+                SystemSet::on_update(self.active_state.clone())
+                    .with_system(cursor_move)
+                    .with_system(update_transform)
+                    .with_system(update_towers)
+                    .with_system(update_monsters),
+            )
+            .add_system_set(
+                SystemSet::on_exit(self.active_state.clone())
+                    .with_system(Self::clean_board)
+                    .with_system(Self::clean_ui),
+            )
+            .add_event::<EnterBuildTarget>()
+            .add_event::<HideBuildTarget>()
+            .add_event::<TryBuild>()
+            .add_event::<Spawn>()
+            .add_event::<Attack>()
+            .add_event::<Move>()
+            .add_event::<GameOver>()
+            .add_event::<StartWave>();
 
         #[cfg(feature = "debug")]
         {
@@ -227,10 +222,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
 
     fn clean_board(mut commands: Commands, board: Res<Board>) {
         commands.entity(board.board.unwrap()).despawn_recursive();
-        commands.insert_resource(BuildTracker {
-            target: None,
-            blueprint: None,
-        });
     }
 
     fn spawn_ground(
