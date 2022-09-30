@@ -55,6 +55,7 @@ impl GameSprites {
                 ..Default::default()
             },
             texture_atlas: self.get_handle(),
+
             transform: Transform::from_xyz(0., 0., z),
             ..Default::default()
         }
