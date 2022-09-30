@@ -1,15 +1,16 @@
 use bevy::{
     prelude::{Entity, Transform, Vec2, Vec3},
-    utils::HashMap,
 };
 
 use crate::components::coordinates::Coordinates;
 
+use super::bimap::BiMap;
+
 pub struct Board {
     pub size: (u16, u16),
-    pub tiles: HashMap<Coordinates, Entity>,
-    pub towers: HashMap<Coordinates, Entity>,
-    pub monsters: HashMap<Coordinates, Entity>,
+    pub tiles: BiMap<Coordinates, Entity>,
+    pub towers: BiMap<Coordinates, Entity>,
+    pub monsters: BiMap<Coordinates, Entity>,
     pub start: Coordinates,
     pub end: Coordinates,
     pub path: Vec<Coordinates>,
@@ -42,9 +43,9 @@ impl Board {
         path.push(path_coord);
         Board {
             size,
-            tiles: HashMap::new(),
-            towers: HashMap::new(),
-            monsters: HashMap::new(),
+            tiles: BiMap::new(),
+            towers: BiMap::new(),
+            monsters: BiMap::new(),
             start,
             end,
             path,

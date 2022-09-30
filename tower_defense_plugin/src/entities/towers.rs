@@ -3,7 +3,7 @@ use crate::{
     resources::{board::Board, game_sprites::GameSprites},
 };
 use bevy::{
-    prelude::{Color, Commands, Entity, Name, Res, ResMut, VisibilityBundle},
+    prelude::{Color, Commands, Entity, Name, Res, VisibilityBundle},
     sprite::SpriteSheetBundle,
     transform::TransformBundle,
 };
@@ -35,7 +35,7 @@ pub fn get_blueprint(
 
 pub fn get_tower(
     commands: &mut Commands,
-    board: &mut ResMut<Board>,
+    board: &mut Board,
     coord: &Coordinates,
     sprite_sheet: &Res<GameSprites>,
     tower: TowerType,
@@ -71,7 +71,7 @@ pub fn get_tower(
 
 fn tower_entity(
     commands: &mut Commands,
-    board: &mut ResMut<Board>,
+    board: &mut Board,
     coord: &Coordinates,
     sprite_sheet: SpriteSheetBundle,
     name: &str,
