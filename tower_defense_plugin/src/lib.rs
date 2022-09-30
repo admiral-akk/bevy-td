@@ -27,13 +27,15 @@ use resources::{
     spawn_tracker::SpawnTracker,
 };
 use systems::{
-    blueprint::enter_target,
+    blueprint::update_build_target,
+    coordinates::update_transform,
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
     input::{mouse_click_on_board, mouse_move_on_board},
     life::check_lives,
     monster::{monster_despawn, monster_move, monster_spawn},
+    move_tower::{place_tower, select_tower},
     spawn::monster_tick,
     tower::{attack, try_build},
 };
@@ -74,13 +76,19 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     },
                 )
                 .with_system(mouse_move_on_board)
+                .with_system(place_tower)
+                .with_system(select_tower)
                 .with_system(mouse_click_on_board)
-                .with_system(enter_target)
+                .with_system(update_build_target)
                 .with_system(try_build)
                 .with_system(go)
                 .with_system(Self::start_wave),
         )
-        .add_system_set(SystemSet::on_update(self.active_state.clone()).with_system(cursor_move))
+        .add_system_set(
+            SystemSet::on_update(self.active_state.clone())
+                .with_system(cursor_move)
+                .with_system(update_transform),
+        )
         .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
         .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
         .add_system_set(

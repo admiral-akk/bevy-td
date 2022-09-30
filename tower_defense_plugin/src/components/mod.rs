@@ -6,5 +6,6 @@ pub(crate) mod go;
 pub(crate) mod health;
 pub(crate) mod monster;
 pub(crate) mod power;
+pub(crate) mod selected;
 pub(crate) mod tile;
 pub(crate) mod tower;

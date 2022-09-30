@@ -21,10 +21,9 @@ pub fn monster_move(
     mut monsters: Query<(Entity, &mut Transform, &mut Coordinates), With<Monster>>,
 ) {
     for _ in move_evr.iter() {
-        for (e, mut t, mut c) in monsters.iter_mut() {
+        for (e, _t, mut c) in monsters.iter_mut() {
             board.monsters.remove(&c);
             *c = board.next(&c);
-            *t = board.transform(&c, 4.);
             board.monsters.insert(*c, e);
         }
     }
