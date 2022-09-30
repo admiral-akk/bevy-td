@@ -5,10 +5,7 @@ pub mod resources;
 mod systems;
 
 use assets_plugin::resources::fonts::Fonts;
-use bevy::{
-    ecs::schedule::{StateData},
-    prelude::*,
-};
+use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{
@@ -68,11 +65,12 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         })
         .add_state(GameState::None)
         .insert_resource(EndMenuState(self.end_menu_state.clone()))
-        .add_system_set(
-            SystemSet::on_enter(self.active_state.clone())
-                .with_system(Self::create_board)
-                .with_system(Self::add_start_ui),
-        )
+        .insert_resource(SpawnTimer(Timer::from_seconds(2., true)))
+        .insert_resource(MoveTimer(Timer::from_seconds(0.5, true)))
+        .insert_resource(AttackTimer(Timer::from_seconds(0.5, true)))
+        .insert_resource(LifeTracker(2))
+        .insert_resource(SpawnTracker(0))
+        .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
         .add_system_set(
             SystemSet::on_update(GameState::Building)
                 .with_system(mouse_move_on_board)
@@ -82,15 +80,6 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(go)
                 .with_system(Self::start_wave),
         )
-        .add_system_set(
-            SystemSet::on_update(self.active_state.clone())
-                .with_system(cursor_move)
-                .with_system(update_transform)
-                .with_system(update_towers)
-                .with_system(update_monsters),
-        )
-        .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
-        .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
         .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
         .add_system_set(
             SystemSet::on_update(GameState::Fighting)
@@ -104,6 +93,19 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(check_lives)
                 .with_system(Self::game_over)
                 .with_system(Self::wave_over),
+        )
+        .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
+        .add_system_set(
+            SystemSet::on_enter(self.active_state.clone())
+                .with_system(Self::create_board)
+                .with_system(Self::add_start_ui),
+        )
+        .add_system_set(
+            SystemSet::on_update(self.active_state.clone())
+                .with_system(cursor_move)
+                .with_system(update_transform)
+                .with_system(update_towers)
+                .with_system(update_monsters),
         )
         .add_system_set(
             SystemSet::on_exit(self.active_state.clone())
@@ -300,10 +302,5 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .id();
         board.board = Some(board_entity);
         commands.insert_resource(board);
-        commands.insert_resource(SpawnTimer(Timer::from_seconds(2., true)));
-        commands.insert_resource(MoveTimer(Timer::from_seconds(0.5, true)));
-        commands.insert_resource(AttackTimer(Timer::from_seconds(0.5, true)));
-        commands.insert_resource(LifeTracker(2));
-        commands.insert_resource(SpawnTracker(0));
     }
 }
