@@ -1,4 +1,5 @@
 pub(crate) mod blueprint;
+pub(crate) mod cursor;
 pub(crate) mod go;
 pub(crate) mod health;
 pub(crate) mod input;

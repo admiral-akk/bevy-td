@@ -1,6 +1,7 @@
 pub(crate) mod blueprint;
 pub(crate) mod board;
 pub(crate) mod coordinates;
+pub(crate) mod cursor;
 pub(crate) mod go;
 pub(crate) mod health;
 pub(crate) mod monster;

@@ -11,7 +11,9 @@ use bevy::{
 };
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
-use components::{blueprint::Blueprint, coordinates::Coordinates, go::Go, tile::Tile};
+use components::{
+    blueprint::Blueprint, coordinates::Coordinates, cursor::Cursor, go::Go, tile::Tile,
+};
 use entities::towers::{get_blueprint, TowerType};
 use events::{
     Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, StartWave, TryBuild,
@@ -25,7 +27,8 @@ use resources::{
     spawn_tracker::SpawnTracker,
 };
 use systems::{
-    blueprint::{enter_target, hide_blueprint},
+    blueprint::enter_target,
+    cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
     input::{mouse_click_on_board, mouse_move_on_board},
@@ -72,12 +75,12 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 )
                 .with_system(mouse_move_on_board)
                 .with_system(mouse_click_on_board)
-                .with_system(hide_blueprint)
                 .with_system(enter_target)
                 .with_system(try_build)
                 .with_system(go)
                 .with_system(Self::start_wave),
         )
+        .add_system_set(SystemSet::on_update(self.active_state.clone()).with_system(cursor_move))
         .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
         .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
         .add_system_set(
@@ -287,6 +290,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .insert(GlobalTransform::default())
             .insert_bundle(VisibilityBundle::default())
             .with_children(|parent| {
+                parent.spawn().insert(Cursor(None));
                 Self::spawn_ground(parent, &mut board, &spritesheets);
                 parent
                     .spawn()
