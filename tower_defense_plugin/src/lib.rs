@@ -14,7 +14,7 @@ use bevy_inspector_egui::RegisterInspectable;
 use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, tile::Tile,
 };
-use entities::towers::{get_tower, TowerType};
+
 use events::{
     Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, StartWave, TryBuild,
 };
@@ -34,6 +34,7 @@ use systems::{
     input::{mouse_click_on_board, mouse_move_on_board},
     life::check_lives,
     monster::{monster_despawn, monster_move, monster_spawn},
+    reward::spawn_reward,
     selected::{place_tower, select_tower},
     spawn::monster_tick,
     tower::attack,
@@ -52,6 +53,12 @@ pub enum GameState {
     Building,
     Fighting,
 }
+
+static TICK: &str = "tick";
+static ATTACK: &str = "attack";
+static HIT: &str = "hit";
+static MOVE: &str = "move";
+static LIVES: &str = "lives";
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
@@ -88,6 +95,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(update_towers)
                 .with_system(update_monsters),
         )
+        .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
         .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
         .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
         .add_system_set(
@@ -288,14 +296,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
     ) {
         game_state.set(GameState::Building).unwrap();
         let mut board = Board::new((16, 16), 32.);
-        let tower = get_tower(
-            &mut commands,
-            &mut board,
-            &Coordinates::new(0, 0),
-            &spritesheets,
-            TowerType::Guard,
-        )
-        .unwrap();
         let board_position = board.board_offset();
         let board_entity = commands
             .spawn()
@@ -309,7 +309,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
                 parent.spawn().insert(Selected(None));
                 Self::spawn_ground(parent, &mut board, &spritesheets);
             })
-            .add_child(tower)
             .id();
         board.board = Some(board_entity);
         commands.insert_resource(board);
