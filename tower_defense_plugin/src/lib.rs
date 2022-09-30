@@ -6,7 +6,7 @@ mod systems;
 
 use assets_plugin::resources::fonts::Fonts;
 use bevy::{
-    ecs::schedule::{ShouldRun, StateData},
+    ecs::schedule::{StateData},
     prelude::*,
 };
 #[cfg(feature = "debug")]
@@ -74,13 +74,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 .with_system(Self::add_start_ui),
         )
         .add_system_set(
-            SystemSet::on_update(self.active_state.clone())
-                .with_run_criteria(
-                    |game_state: Res<State<GameState>>| match game_state.current() {
-                        GameState::Building => ShouldRun::Yes,
-                        _ => ShouldRun::No,
-                    },
-                )
+            SystemSet::on_update(GameState::Building)
                 .with_system(mouse_move_on_board)
                 .with_system(select_tower)
                 .with_system(place_tower.before(select_tower))
@@ -99,13 +93,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
         .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
         .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
         .add_system_set(
-            SystemSet::on_update(self.active_state.clone())
-                .with_run_criteria(
-                    |game_state: Res<State<GameState>>| match game_state.current() {
-                        GameState::Fighting => ShouldRun::Yes,
-                        _ => ShouldRun::No,
-                    },
-                )
+            SystemSet::on_update(GameState::Fighting)
                 .with_system(monster_tick)
                 .with_system(monster_move)
                 .with_system(attack)
