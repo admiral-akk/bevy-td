@@ -9,7 +9,8 @@ use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{
-    coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, tile::Tile,
+    coordinates::Coordinates, cursor::Cursor, go::Go, monster::Monster, selected::Selected,
+    tile::Tile,
 };
 
 use events::{
@@ -23,7 +24,9 @@ use resources::{
     spawn_tracker::SpawnTracker,
 };
 use systems::{
-    coordinates::{update_monsters, update_towers, update_transform},
+    coordinates::{
+        remove_monsters, remove_towers, update_monsters, update_towers, update_transform,
+    },
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
@@ -49,11 +52,17 @@ pub enum GameState {
     Fighting,
 }
 
-static TICK: &str = "tick";
-static ATTACK: &str = "attack";
-static HIT: &str = "hit";
-static MOVE: &str = "move";
-static LIVES: &str = "lives";
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemLabel)]
+enum GameStages {
+    /// everything that handles input
+    Input,
+    /// everything that updates player state
+    Player,
+    /// everything that moves things (works with transforms)
+    Movement,
+    /// systems that update the world map
+    Map,
+}
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
@@ -62,14 +71,13 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .insert_resource(SpawnTimer(Timer::from_seconds(2., true)))
             .insert_resource(MoveTimer(Timer::from_seconds(0.5, true)))
             .insert_resource(AttackTimer(Timer::from_seconds(0.5, true)))
-            .insert_resource(LifeTracker(2))
-            .insert_resource(SpawnTracker(0))
             // Building systems
             .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
             .add_system_set(
                 SystemSet::on_update(GameState::Building)
                     .with_system(select_tower)
                     .with_system(place_tower.before(select_tower))
+                    .with_system(remove_towers)
                     .with_system(go)
                     .with_system(Self::start_wave),
             )
@@ -78,15 +86,16 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_system_set(
                 SystemSet::on_update(GameState::Fighting)
                     .with_system(monster_tick)
-                    .with_system(monster_move)
-                    .with_system(attack)
-                    .with_system(monster_spawn)
-                    .with_system(monster_despawn)
-                    .with_system(damage)
-                    .with_system(death)
-                    .with_system(check_lives)
-                    .with_system(Self::game_over)
-                    .with_system(Self::wave_over),
+                    .with_system(attack.after(monster_tick))
+                    .with_system(damage.after(attack))
+                    .with_system(death.after(damage))
+                    .with_system(monster_move.after(death))
+                    .with_system(monster_despawn.after(monster_move))
+                    .with_system(remove_monsters.after(monster_despawn))
+                    .with_system(check_lives.after(remove_monsters))
+                    .with_system(Self::game_over.after(check_lives))
+                    .with_system(Self::wave_over.after(Self::game_over))
+                    .with_system(monster_spawn.after(Self::wave_over)),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems
@@ -140,11 +149,11 @@ impl<T: StateData> TowerDefensePlugin<T> {
 
     fn wave_over(
         spawn_tracker: Res<SpawnTracker>,
-        board: Res<Board>,
         life_tracker: Res<LifeTracker>,
         mut game_state: ResMut<State<GameState>>,
+        monsters: Query<With<Monster>>,
     ) {
-        if spawn_tracker.0 == 0 && board.monsters.len() == 0 && life_tracker.0 > 0 {
+        if spawn_tracker.0 == 0 && monsters.is_empty() && life_tracker.0 > 0 {
             game_state.set(GameState::Building).unwrap();
         }
     }
@@ -293,5 +302,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .id();
         board.board = Some(board_entity);
         commands.insert_resource(board);
+        commands.insert_resource(LifeTracker(2));
+        commands.insert_resource(SpawnTracker(0));
     }
 }
