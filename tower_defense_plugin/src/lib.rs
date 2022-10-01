@@ -9,8 +9,8 @@ use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use components::{
-    coordinates::Coordinates, cursor::Cursor, go::Go, monster::Monster, selected::Selected,
-    tile::Tile,
+    coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, monster::Monster,
+    selected::Selected, tile::Tile,
 };
 
 use events::{
@@ -30,7 +30,7 @@ use systems::{
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
-    life::check_lives,
+    life::{check_lives, update_lives},
     monster::{monster_despawn, monster_move, monster_spawn},
     reward::spawn_reward,
     selected::{place_tower, select_tower},
@@ -95,7 +95,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(check_lives.after(remove_monsters))
                     .with_system(Self::game_over.after(check_lives))
                     .with_system(Self::wave_over.after(Self::game_over))
-                    .with_system(monster_spawn.after(Self::wave_over)),
+                    .with_system(monster_spawn.after(Self::wave_over))
+                    .with_system(update_lives.after(monster_spawn)),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems
@@ -166,9 +167,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
                         width: Val::Percent(100.),
                         height: Val::Percent(100.),
                     },
+
+                    position_type: PositionType::Absolute,
                     flex_direction: FlexDirection::Column,
                     align_content: AlignContent::FlexEnd,
                     align_items: AlignItems::Center,
+                    justify_content: JustifyContent::SpaceBetween,
 
                     ..Default::default()
                 },
@@ -178,35 +182,80 @@ impl<T: StateData> TowerDefensePlugin<T> {
             })
             .with_children(|parent| {
                 parent
-                    .spawn_bundle(ButtonBundle {
+                    .spawn_bundle(NodeBundle {
                         style: Style {
-                            size: Size {
-                                width: Val::Px(400.),
-                                height: Val::Px(100.),
-                            },
-                            align_content: AlignContent::Center,
-                            align_items: AlignItems::Center,
+                            flex_direction: FlexDirection::Row,
                             ..Default::default()
                         },
-                        color: UiColor(Color::GRAY),
+                        color: UiColor(Color::rgba(0., 0., 0., 0.)),
                         ..Default::default()
                     })
-                    .insert(Go)
                     .with_children(|parent| {
-                        parent.spawn_bundle(TextBundle {
-                            text: Text {
-                                sections: vec![TextSection {
-                                    value: "Go!".to_string(),
-                                    style: TextStyle {
-                                        font: fonts.get_handle(),
-                                        font_size: 128.,
+                        parent
+                            .spawn_bundle(ButtonBundle {
+                                style: Style {
+                                    size: Size {
+                                        width: Val::Px(400.),
+                                        height: Val::Px(130.),
+                                    },
+                                    flex_direction: FlexDirection::Column,
+                                    align_content: AlignContent::Center,
+                                    align_items: AlignItems::Center,
+                                    ..Default::default()
+                                },
+                                color: UiColor(Color::GRAY),
+                                ..Default::default()
+                            })
+                            .insert(Go)
+                            .with_children(|parent| {
+                                parent.spawn_bundle(TextBundle {
+                                    style: Style {
+                                        align_self: AlignSelf::Center,
+                                        align_content: AlignContent::Center,
                                         ..Default::default()
                                     },
-                                }],
-                                ..Default::default()
-                            },
+                                    text: Text {
+                                        sections: vec![TextSection {
+                                            value: "Go!".to_string(),
+                                            style: TextStyle {
+                                                font: fonts.get_handle(),
+                                                font_size: 128.,
+                                                ..Default::default()
+                                            },
+                                        }],
+                                        alignment: TextAlignment::CENTER,
+                                        ..Default::default()
+                                    },
+                                    ..Default::default()
+                                });
+                            });
+                    });
+                parent
+                    .spawn_bundle(NodeBundle {
+                        style: Style {
+                            flex_direction: FlexDirection::Row,
                             ..Default::default()
-                        });
+                        },
+                        color: UiColor(Color::rgba(0., 0., 0., 0.)),
+                        ..Default::default()
+                    })
+                    .with_children(|parent| {
+                        parent
+                            .spawn_bundle(TextBundle {
+                                text: Text {
+                                    sections: vec![TextSection {
+                                        value: "Lives: 2".to_string(),
+                                        style: TextStyle {
+                                            font: fonts.get_handle(),
+                                            font_size: 128.,
+                                            ..Default::default()
+                                        },
+                                    }],
+                                    ..Default::default()
+                                },
+                                ..Default::default()
+                            })
+                            .insert(Lives);
                     });
             })
             .id();
