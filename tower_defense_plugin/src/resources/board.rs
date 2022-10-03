@@ -1,6 +1,6 @@
 use bevy::prelude::{Entity, Transform, Vec2, Vec3};
 
-use crate::components::coordinates::Coordinates;
+use crate::components::coordinates::{Coordinates};
 
 use super::bimap::BiMap;
 
@@ -14,6 +14,19 @@ pub struct Board {
     pub path: Vec<Coordinates>,
     pub tile_size: f32,
     pub board: Option<Entity>,
+}
+
+pub enum TileType {
+    None,
+    Grass,
+    Road,
+    Start,
+    Finish,
+    Bench,
+    Trainer,
+    Trainee,
+    Result,
+    Arrow,
 }
 
 impl Board {
@@ -51,6 +64,34 @@ impl Board {
             board: None,
         }
     }
+
+    pub fn tile_type(&self, coordinates: &Coordinates) -> TileType {
+        let _max_trainer = (self.size.1 - 1) / 3;
+        if coordinates.y == 0 {
+            return TileType::Bench;
+        } else if coordinates.y == 1 {
+            return TileType::None;
+        } else if coordinates.x < 16 {
+            // On the board
+            if self.is_start(&coordinates) {
+                return TileType::Start;
+            }
+            if self.is_end(&coordinates) {
+                return TileType::Finish;
+            }
+            if self.is_path(&coordinates) {
+                return TileType::Road;
+            }
+            return TileType::Grass;
+        }
+        if coordinates.x == 16 {
+            return TileType::None;
+        } else {
+            // Trainer
+        }
+        TileType::None
+    }
+
     pub fn width(&self) -> u16 {
         self.size.0
     }

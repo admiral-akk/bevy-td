@@ -19,7 +19,7 @@ use events::{
     Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, StartWave, TryBuild,
 };
 use resources::{
-    board::Board,
+    board::{Board, TileType},
     game_sprites::GameSprites,
     life_tracker::LifeTracker,
     spawn_timer::{AttackTimer, MoveTimer, SpawnTimer},
@@ -169,16 +169,13 @@ impl<T: StateData> TowerDefensePlugin<T> {
                         width: Val::Percent(100.),
                         height: Val::Percent(100.),
                     },
-
                     position_type: PositionType::Absolute,
                     flex_direction: FlexDirection::Column,
                     align_content: AlignContent::FlexEnd,
                     align_items: AlignItems::Center,
                     justify_content: JustifyContent::SpaceBetween,
-
                     ..Default::default()
                 },
-
                 color: UiColor(Color::rgba(0., 0., 0., 0.)),
                 ..Default::default()
             })
@@ -292,35 +289,53 @@ impl<T: StateData> TowerDefensePlugin<T> {
         for y in 0..board.height() {
             for x in 0..board.width() {
                 let coordinate = Coordinates::new(x, y);
-                let tile = background
-                    .spawn_bundle(TileBundle::new(
-                        coordinate,
-                        board.transform(&coordinate, 1.),
-                    ))
-                    .with_children(|parent| {
-                        parent
-                            .spawn()
-                            .insert(Name::new("Grass"))
-                            .insert_bundle(spritesheets.grass(&coordinate, board.tile_size));
-                        if board.is_path(&coordinate) {
-                            parent.spawn().insert(Name::new("Road")).insert_bundle(
-                                spritesheets.path(&coordinate, board, board.tile_size),
-                            );
-                        }
-                        if board.is_start(&coordinate) {
-                            parent
-                                .spawn()
-                                .insert(Name::new("Start"))
-                                .insert_bundle(spritesheets.spawn(board.tile_size));
-                        }
-                        if board.is_end(&coordinate) {
-                            parent
-                                .spawn()
-                                .insert(Name::new("Target"))
-                                .insert_bundle(spritesheets.end(board.tile_size));
-                        }
-                    })
-                    .id();
+                let tile =
+                    background
+                        .spawn_bundle(TileBundle::new(
+                            coordinate,
+                            board.transform(&coordinate, 1.),
+                        ))
+                        .with_children(|parent| match board.tile_type(&coordinate) {
+                            TileType::Grass => {
+                                parent.spawn().insert(Name::new("Grass")).insert_bundle(
+                                    spritesheets.grass(&coordinate, board.tile_size),
+                                );
+                            }
+                            TileType::Road => {
+                                parent.spawn().insert(Name::new("Grass")).insert_bundle(
+                                    spritesheets.grass(&coordinate, board.tile_size),
+                                );
+                                parent.spawn().insert(Name::new("Road")).insert_bundle(
+                                    spritesheets.path(&coordinate, board, board.tile_size),
+                                );
+                            }
+                            TileType::Start => {
+                                parent.spawn().insert(Name::new("Grass")).insert_bundle(
+                                    spritesheets.grass(&coordinate, board.tile_size),
+                                );
+                                parent.spawn().insert(Name::new("Road")).insert_bundle(
+                                    spritesheets.path(&coordinate, board, board.tile_size),
+                                );
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Start"))
+                                    .insert_bundle(spritesheets.spawn(board.tile_size));
+                            }
+                            TileType::Finish => {
+                                parent.spawn().insert(Name::new("Grass")).insert_bundle(
+                                    spritesheets.grass(&coordinate, board.tile_size),
+                                );
+                                parent.spawn().insert(Name::new("Road")).insert_bundle(
+                                    spritesheets.path(&coordinate, board, board.tile_size),
+                                );
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Target"))
+                                    .insert_bundle(spritesheets.end(board.tile_size));
+                            }
+                            _ => {}
+                        })
+                        .id();
 
                 board.tiles.insert(coordinate, tile);
             }
