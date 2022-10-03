@@ -61,6 +61,10 @@ impl GameSprites {
         }
     }
 
+    pub fn bench(&self, tile_size: f32) -> SpriteSheetBundle {
+        self.sprite_sheet_bundle(0 + 1 * 23, tile_size, 2.)
+    }
+
     pub fn spawn(&self, tile_size: f32) -> SpriteSheetBundle {
         self.sprite_sheet_bundle(11 + 8 * 23, tile_size, 2.)
     }

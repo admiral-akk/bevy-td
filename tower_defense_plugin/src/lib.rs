@@ -333,6 +333,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                     .insert(Name::new("Target"))
                                     .insert_bundle(spritesheets.end(board.tile_size));
                             }
+                            TileType::Bench => {
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Bench"))
+                                    .insert_bundle(spritesheets.bench(board.tile_size));
+                            }
                             _ => {}
                         })
                         .id();
