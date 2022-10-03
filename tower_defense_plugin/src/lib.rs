@@ -9,10 +9,10 @@ use assets_plugin::resources::fonts::Fonts;
 use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
-use bundles::board_bundle::BoardBundle;
+use bundles::{board_bundle::BoardBundle, tile_bundle::TileBundle};
 use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, monster::Monster,
-    selected::Selected, tile::Tile,
+    selected::Selected,
 };
 
 use events::{
@@ -293,13 +293,10 @@ impl<T: StateData> TowerDefensePlugin<T> {
             for x in 0..board.width() {
                 let coordinate = Coordinates::new(x, y);
                 let tile = background
-                    .spawn()
-                    .insert(Name::new(format!("Tile {}, {}", x, y)))
-                    .insert(Tile)
-                    .insert(coordinate.clone())
-                    .insert(GlobalTransform::default())
-                    .insert(board.transform(&coordinate, 1.))
-                    .insert_bundle(VisibilityBundle::default())
+                    .spawn_bundle(TileBundle::new(
+                        coordinate,
+                        board.transform(&coordinate, 1.),
+                    ))
                     .with_children(|parent| {
                         parent
                             .spawn()
