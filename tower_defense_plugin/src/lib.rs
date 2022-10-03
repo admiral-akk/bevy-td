@@ -1,3 +1,4 @@
+mod bundles;
 mod components;
 mod entities;
 mod events;
@@ -8,6 +9,7 @@ use assets_plugin::resources::fonts::Fonts;
 use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
+use bundles::board_bundle::BoardBundle;
 use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, monster::Monster,
     selected::Selected, tile::Tile,
@@ -334,15 +336,10 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut game_state: ResMut<State<GameState>>,
     ) {
         game_state.set(GameState::Building).unwrap();
-        let mut board = Board::new((16, 16), 32.);
+        let mut board = Board::new((20, 18), 32.);
         let board_position = board.board_offset();
         let board_entity = commands
-            .spawn()
-            .insert(Name::new("Board"))
-            .insert(components::board::Board)
-            .insert(Transform::from_translation(board_position))
-            .insert(GlobalTransform::default())
-            .insert_bundle(VisibilityBundle::default())
+            .spawn_bundle(BoardBundle::new(board_position))
             .with_children(|parent| {
                 parent.spawn().insert(Cursor(None));
                 parent.spawn().insert(Selected(None));

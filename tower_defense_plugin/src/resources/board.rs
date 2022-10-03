@@ -1,6 +1,4 @@
-use bevy::{
-    prelude::{Entity, Transform, Vec2, Vec3},
-};
+use bevy::prelude::{Entity, Transform, Vec2, Vec3};
 
 use crate::components::coordinates::Coordinates;
 
@@ -62,7 +60,7 @@ impl Board {
     }
 
     pub fn board_offset(&self) -> Vec3 {
-        let offset = -self.board_size() / 2.;
+        let offset = -0.5 * self.board_size();
         Vec3::new(offset.x, offset.y, 0.)
     }
 
