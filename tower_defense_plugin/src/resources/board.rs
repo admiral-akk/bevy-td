@@ -113,9 +113,7 @@ impl Board {
                     return TileType::None;
                 }
             }
-            // Trainer
         }
-        TileType::None
     }
 
     pub fn width(&self) -> u16 {
