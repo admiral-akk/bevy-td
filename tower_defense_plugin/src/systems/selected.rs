@@ -1,13 +1,8 @@
-use bevy::{
-    prelude::{
-        Input, MouseButton, Query, Res,
-        ResMut, With,
-    },
-};
+use bevy::prelude::{Input, MouseButton, Query, Res, ResMut, With};
 
 use crate::{
     components::{coordinates::Coordinates, cursor::Cursor, selected::Selected, tower::Tower},
-    resources::board::Board,
+    resources::board::{Board, TileType},
 };
 
 pub fn select_tower(
@@ -41,6 +36,17 @@ pub fn place_tower(
     let mut selected = selected.single_mut();
     if let Some(selected_pos) = selected.0 {
         if let Some(cursor_pos) = cursor.single().0 {
+            match board.tile_type(&cursor_pos) {
+                TileType::None
+                | TileType::Arrow
+                | TileType::Finish
+                | TileType::Road
+                | TileType::Result
+                | TileType::Start => {
+                    return;
+                }
+                _ => {}
+            }
             if click.just_pressed(MouseButton::Left) {
                 if let Some(tower) = board.towers.get(&selected_pos) {
                     *towers.get_mut(*tower).unwrap() = cursor_pos.clone();
