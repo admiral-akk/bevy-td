@@ -339,6 +339,30 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                     .insert(Name::new("Bench"))
                                     .insert_bundle(spritesheets.bench(board.tile_size));
                             }
+                            TileType::Arrow => {
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Arrow"))
+                                    .insert_bundle(spritesheets.arrow(board.tile_size));
+                            }
+                            TileType::Result => {
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Result"))
+                                    .insert_bundle(spritesheets.result(board.tile_size));
+                            }
+                            TileType::Trainee => {
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Trainee"))
+                                    .insert_bundle(spritesheets.trainee(board.tile_size));
+                            }
+                            TileType::Trainer => {
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Trainer"))
+                                    .insert_bundle(spritesheets.trainer(board.tile_size));
+                            }
                             _ => {}
                         })
                         .id();
