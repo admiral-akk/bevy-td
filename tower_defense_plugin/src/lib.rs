@@ -54,18 +54,6 @@ pub enum GameState {
     Fighting,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, SystemLabel)]
-enum GameStages {
-    /// everything that handles input
-    Input,
-    /// everything that updates player state
-    Player,
-    /// everything that moves things (works with transforms)
-    Movement,
-    /// systems that update the world map
-    Map,
-}
-
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::None)
