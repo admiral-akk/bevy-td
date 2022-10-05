@@ -1,6 +1,5 @@
 pub(crate) mod bimap;
 pub(crate) mod board;
 pub mod game_sprites;
+pub(crate) mod game_step_timer;
 pub(crate) mod life_tracker;
-pub(crate) mod spawn_timer;
-pub(crate) mod spawn_tracker;

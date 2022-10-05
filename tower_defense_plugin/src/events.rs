@@ -12,12 +12,6 @@ pub struct HideBuildTarget;
 pub struct TryBuild;
 
 #[derive(Debug, Copy, Clone)]
-pub struct Spawn;
-
-#[derive(Debug, Copy, Clone)]
-pub struct Move;
-
-#[derive(Debug, Copy, Clone)]
 pub struct Attack(pub Entity, pub i32);
 
 #[derive(Debug, Copy, Clone)]
@@ -25,6 +19,3 @@ pub struct GameOver;
 
 #[derive(Debug, Copy, Clone)]
 pub struct StartWave;
-
-#[derive(Debug, Copy, Clone)]
-pub struct Tick;

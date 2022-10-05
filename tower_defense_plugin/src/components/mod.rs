@@ -7,6 +7,7 @@ pub(crate) mod lives;
 pub(crate) mod monster;
 pub(crate) mod power;
 pub(crate) mod selected;
+pub(crate) mod spawn;
 pub(crate) mod tick_timer;
 pub(crate) mod tile;
 pub(crate) mod tower;

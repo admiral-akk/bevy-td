@@ -1,5 +1,5 @@
 use crate::{
-    components::{coordinates::Coordinates, power::Power, tower::Tower},
+    components::{coordinates::Coordinates, power::Power, tick_timer::TickTimer, tower::Tower},
     resources::{board::Board, game_sprites::GameSprites},
 };
 use bevy::{
@@ -82,6 +82,7 @@ fn tower_entity(
         .insert(Tower)
         .insert(coord.clone())
         .insert_bundle(sprite_sheet)
+        .insert(TickTimer::new(1))
         .insert_bundle(TransformBundle {
             local: board.transform(&coord, 4.),
             ..Default::default()

@@ -12,18 +12,15 @@ use bevy_inspector_egui::RegisterInspectable;
 use bundles::{board_bundle::BoardBundle, tile_bundle::TileBundle};
 use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, monster::Monster,
-    selected::Selected,
+    selected::Selected, spawn::Spawn, tick_timer::TickTimer,
 };
 
-use events::{
-    Attack, EnterBuildTarget, GameOver, HideBuildTarget, Move, Spawn, StartWave, Tick, TryBuild,
-};
+use events::{Attack, EnterBuildTarget, GameOver, HideBuildTarget, StartWave, TryBuild};
 use resources::{
     board::{Board, TileType},
     game_sprites::GameSprites,
+    game_step_timer::GameStepTimer,
     life_tracker::LifeTracker,
-    spawn_timer::{AttackTimer, GameTickTimer, MoveTimer, SpawnTimer},
-    spawn_tracker::SpawnTracker,
 };
 use systems::{
     coordinates::{
@@ -36,8 +33,7 @@ use systems::{
     monster::{monster_despawn, monster_move, monster_spawn},
     reward::spawn_reward,
     selected::{place_tower, select_tower},
-    spawn::monster_tick,
-    tick::tick,
+    tick::{reset, tick},
     tower::attack,
 };
 
@@ -59,10 +55,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::None)
             .insert_resource(EndMenuState(self.end_menu_state.clone()))
-            .insert_resource(GameTickTimer(Timer::from_seconds(0.4, true)))
-            .insert_resource(SpawnTimer(Timer::from_seconds(2., true)))
-            .insert_resource(MoveTimer(Timer::from_seconds(0.5, true)))
-            .insert_resource(AttackTimer(Timer::from_seconds(0.5, true)))
+            .insert_resource(GameStepTimer(Timer::from_seconds(0.4, true)))
             // Building systems
             .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
             .add_system_set(
@@ -75,11 +68,11 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             )
             .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
             // Fighting systems
+            .add_system_set(SystemSet::on_enter(GameState::Fighting).with_system(reset))
             .add_system_set(
                 SystemSet::on_update(GameState::Fighting)
                     .with_system(tick)
-                    .with_system(monster_tick.after(tick))
-                    .with_system(attack.after(monster_tick))
+                    .with_system(attack.after(tick))
                     .with_system(damage.after(attack))
                     .with_system(death.after(damage))
                     .with_system(monster_move.after(death))
@@ -115,8 +108,6 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_event::<TryBuild>()
             .add_event::<Spawn>()
             .add_event::<Attack>()
-            .add_event::<Move>()
-            .add_event::<Tick>()
             .add_event::<GameOver>()
             .add_event::<StartWave>();
 
@@ -134,21 +125,24 @@ impl<T: StateData> TowerDefensePlugin<T> {
     fn start_wave(
         mut game_state: ResMut<State<GameState>>,
         mut start_wave_evr: EventReader<StartWave>,
-        mut spawn_tracker: ResMut<SpawnTracker>,
+        mut spawn: Query<&mut Spawn>,
     ) {
         for _ in start_wave_evr.iter() {
             game_state.set(GameState::Fighting).unwrap();
-            spawn_tracker.spawns_left = 5;
+            for mut spawn in spawn.iter_mut() {
+                spawn.set_creep_count(5);
+            }
         }
     }
 
     fn wave_over(
-        spawn_tracker: Res<SpawnTracker>,
+        spawn: Query<&Spawn>,
         life_tracker: Res<LifeTracker>,
         mut game_state: ResMut<State<GameState>>,
         monsters: Query<With<Monster>>,
     ) {
-        if spawn_tracker.spawns_left == 0 && monsters.is_empty() && life_tracker.0 > 0 {
+        let spawn = spawn.single();
+        if !spawn.has_spawn() && monsters.is_empty() && life_tracker.0 > 0 {
             game_state.set(GameState::Building).unwrap();
         }
     }
@@ -302,6 +296,11 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                 );
                             }
                             TileType::Start => {
+                                parent
+                                    .spawn()
+                                    .insert(coordinate.clone())
+                                    .insert(Spawn::new())
+                                    .insert(TickTimer::new(4));
                                 parent.spawn().insert(Name::new("Grass")).insert_bundle(
                                     spritesheets.grass(&coordinate, board.tile_size),
                                 );
@@ -383,6 +382,5 @@ impl<T: StateData> TowerDefensePlugin<T> {
         board.board = Some(board_entity);
         commands.insert_resource(board);
         commands.insert_resource(LifeTracker(2));
-        commands.insert_resource(SpawnTracker::new());
     }
 }
