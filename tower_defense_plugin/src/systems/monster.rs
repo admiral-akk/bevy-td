@@ -1,7 +1,7 @@
 use bevy::{
     prelude::{
-        BuildChildren, Commands, DespawnRecursiveExt, Entity, Name, Query, Res,
-        ResMut, Transform, With,
+        BuildChildren, Commands, DespawnRecursiveExt, Entity, Name, Query, Res, ResMut, Transform,
+        With,
     },
     transform::TransformBundle,
 };
