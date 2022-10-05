@@ -383,6 +383,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
         board.board = Some(board_entity);
         commands.insert_resource(board);
         commands.insert_resource(LifeTracker(2));
-        commands.insert_resource(SpawnTracker::new(2));
+        commands.insert_resource(SpawnTracker::new());
     }
 }
