@@ -25,3 +25,6 @@ pub struct GameOver;
 
 #[derive(Debug, Copy, Clone)]
 pub struct StartWave;
+
+#[derive(Debug, Copy, Clone)]
+pub struct Tick;

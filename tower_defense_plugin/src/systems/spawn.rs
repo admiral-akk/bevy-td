@@ -20,7 +20,7 @@ pub fn monster_tick(
 ) {
     spawn_timer.0.tick(time.delta());
     move_timer.0.tick(time.delta());
-    if spawn_timer.0.just_finished() && spawn_tracker.0 > 0 {
+    if spawn_timer.0.just_finished() && spawn_tracker.spawns_left > 0 {
         spawn_ewr.send(Spawn);
     }
     if move_timer.0.just_finished() {

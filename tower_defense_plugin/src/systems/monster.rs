@@ -70,6 +70,6 @@ pub fn monster_spawn(
             })
             .id();
         board.monsters.insert(coord, monster);
-        spawn_tracker.0 -= 1;
+        spawn_tracker.spawns_left -= 1;
     }
 }
