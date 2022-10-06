@@ -1,6 +1,6 @@
 use bevy::{
     prelude::{
-        BuildChildren, Commands, DespawnRecursiveExt, Entity, Name, Query, Res, ResMut, Transform,
+        BuildChildren, Commands, DespawnRecursiveExt, Entity, Name, Query, Res, ResMut,
         With,
     },
     transform::TransformBundle,
@@ -16,10 +16,10 @@ use crate::{
 
 pub fn monster_move(
     mut board: ResMut<Board>,
-    mut monsters: Query<(Entity, &mut Transform, &mut Coordinates, &mut TickTimer), With<Monster>>,
+    mut monsters: Query<(Entity, &mut Coordinates, &mut TickTimer), With<Monster>>,
 ) {
-    for (e, _t, mut c, mut timer) in monsters.iter_mut() {
-        if timer.active() {
+    for (e, mut c, mut timer) in monsters.iter_mut() {
+        if timer.active() && board.monsters.contains_key(&c) {
             board.monsters.remove(&c);
             *c = board.next(&c);
             board.monsters.insert(*c, e);

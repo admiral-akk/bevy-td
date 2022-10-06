@@ -11,7 +11,7 @@ impl TickTimer {
     pub fn new(duration: u32) -> Self {
         TickTimer {
             duration: duration + 1,
-            tick: 0,
+            tick: 1,
         }
     }
 

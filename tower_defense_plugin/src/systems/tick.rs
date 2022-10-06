@@ -1,5 +1,5 @@
 use bevy::{
-    prelude::{Query, Res, ResMut, With},
+    prelude::{Query, Res, ResMut},
     time::Time,
 };
 
@@ -8,7 +8,7 @@ use crate::{components::tick_timer::TickTimer, resources::game_step_timer::GameS
 pub fn tick(
     time: Res<Time>,
     mut tick_timer: ResMut<GameStepTimer>,
-    mut tick_timers: Query<&mut TickTimer, With<TickTimer>>,
+    mut tick_timers: Query<&mut TickTimer>,
 ) {
     tick_timer.0.tick(time.delta());
     if tick_timer.0.just_finished() {
@@ -18,7 +18,7 @@ pub fn tick(
     }
 }
 
-pub fn reset(mut tick_timers: Query<&mut TickTimer, With<TickTimer>>) {
+pub fn reset(mut tick_timers: Query<&mut TickTimer>) {
     for mut tick_timer in tick_timers.iter_mut() {
         tick_timer.reset();
     }
