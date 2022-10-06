@@ -15,14 +15,12 @@ use crate::{
 };
 
 pub fn monster_move(
-    mut board: ResMut<Board>,
-    mut monsters: Query<(Entity, &mut Coordinates, &mut TickTimer), With<Monster>>,
+    board: Res<Board>,
+    mut monsters: Query<(&mut Coordinates, &mut TickTimer), With<Monster>>,
 ) {
-    for (e, mut c, mut timer) in monsters.iter_mut() {
+    for (mut c, mut timer) in monsters.iter_mut() {
         if timer.active() && board.monsters.contains_key(&c) {
-            board.monsters.remove(&c);
             *c = board.next(&c);
-            board.monsters.insert(*c, e);
         }
     }
 }

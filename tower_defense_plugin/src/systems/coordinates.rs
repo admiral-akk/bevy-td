@@ -1,6 +1,4 @@
-use bevy::{
-    prelude::{Changed, Entity, Query, RemovedComponents, Res, ResMut, Transform, With},
-};
+use bevy::prelude::{Changed, Entity, Query, RemovedComponents, Res, ResMut, Transform, With};
 
 use crate::{
     components::{coordinates::Coordinates, monster::Monster, tower::Tower},
@@ -28,8 +26,8 @@ pub fn update_monsters(
     mut updated_coordinates: Query<(Entity, &Coordinates), (Changed<Coordinates>, With<Monster>)>,
     mut board: ResMut<Board>,
 ) {
-    for (tower, new_coord) in updated_coordinates.iter_mut() {
-        board.monsters.update_key(&tower, *new_coord);
+    for (monster, new_coord) in updated_coordinates.iter_mut() {
+        board.monsters.update_key(&monster, *new_coord);
     }
 }
 

@@ -63,8 +63,8 @@ impl<T: StateData> StartMenuPlugin<T> {
                     .spawn_bundle(ButtonBundle {
                         style: Style {
                             size: Size {
-                                width: Val::Percent(40.),
-                                height: Val::Percent(20.),
+                                width: Val::Px(400.),
+                                height: Val::Px(100.),
                             },
                             align_items: AlignItems::Center,
                             justify_content: JustifyContent::Center,
@@ -78,7 +78,7 @@ impl<T: StateData> StartMenuPlugin<T> {
                         parent.spawn_bundle(TextBundle {
                             text: Text {
                                 sections: vec![TextSection {
-                                    value: "Start".to_string(),
+                                    value: "Begin".to_string(),
                                     style: TextStyle {
                                         font: fonts.get_handle(),
                                         font_size: 128.,

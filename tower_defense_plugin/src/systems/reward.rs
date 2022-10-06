@@ -1,16 +1,9 @@
-use bevy::{
-    prelude::{
-        BuildChildren, Commands, Res,
-        ResMut,
-    },
-};
+use bevy::prelude::{BuildChildren, Commands, Res, ResMut};
 
 use crate::{
-    components::{coordinates::Coordinates},
+    components::coordinates::Coordinates,
     entities::towers::{get_tower, TowerType},
-    resources::{
-        board::Board, game_sprites::GameSprites,
-    },
+    resources::{board::Board, game_sprites::GameSprites},
 };
 
 pub fn spawn_reward(

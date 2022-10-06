@@ -19,7 +19,6 @@ pub fn select_tower(
         if board.towers.contains_key(&cursor) {
             if click.just_pressed(MouseButton::Left) {
                 selected.0 = Some(cursor.clone());
-                bevy::log::error!("Selected: {:?}", cursor);
                 click.clear();
             }
         }
@@ -50,7 +49,6 @@ pub fn place_tower(
             if click.just_pressed(MouseButton::Left) {
                 if let Some(tower) = board.towers.get(&selected_pos) {
                     *towers.get_mut(*tower).unwrap() = cursor_pos.clone();
-                    bevy::log::error!("Moved tower to: {:?}", cursor_pos);
                 }
                 selected.0 = None;
                 click.clear();

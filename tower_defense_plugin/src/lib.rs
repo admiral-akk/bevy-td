@@ -55,7 +55,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::None)
             .insert_resource(EndMenuState(self.end_menu_state.clone()))
-            .insert_resource(GameStepTimer(Timer::from_seconds(0.4, true)))
+            .insert_resource(GameStepTimer(Timer::from_seconds(0.1, true), false))
             // Building systems
             .add_system_set(SystemSet::on_enter(GameState::Building).with_system(spawn_reward))
             .add_system_set(
@@ -75,8 +75,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(attack.after(tick))
                     .with_system(damage.after(attack))
                     .with_system(death.after(damage))
-                    .with_system(monster_move.after(death))
-                    .with_system(monster_despawn.after(monster_move))
+                    .with_system(monster_move.after(death).before(update_transform))
+                    .with_system(update_monsters.after(monster_move))
+                    .with_system(monster_despawn.after(update_monsters))
                     .with_system(remove_monsters.after(monster_despawn))
                     .with_system(check_lives.after(remove_monsters))
                     .with_system(Self::game_over.after(check_lives))
@@ -95,8 +96,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 SystemSet::on_update(self.active_state.clone())
                     .with_system(cursor_move)
                     .with_system(update_transform)
-                    .with_system(update_towers)
-                    .with_system(update_monsters),
+                    .with_system(update_towers),
             )
             .add_system_set(
                 SystemSet::on_exit(self.active_state.clone())
