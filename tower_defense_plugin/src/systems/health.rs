@@ -1,15 +1,8 @@
-use bevy::prelude::{Commands, DespawnRecursiveExt, Entity, EventReader, Query, ResMut, With};
+use bevy::prelude::{Changed, Commands, DespawnRecursiveExt, Entity, EventReader, Query};
 
-use crate::{
-    components::{coordinates::Coordinates, health::Health, monster::Monster},
-    events::Attack,
-    resources::board::Board,
-};
+use crate::{components::health::Health, events::Attack};
 
-pub fn damage(
-    mut monsters: Query<&mut Health, With<Monster>>,
-    mut attack_evr: EventReader<Attack>,
-) {
+pub fn damage(mut monsters: Query<&mut Health>, mut attack_evr: EventReader<Attack>) {
     for attack in attack_evr.iter() {
         if let Ok(mut health) = monsters.get_mut(attack.0) {
             health.0 -= attack.1;
@@ -17,15 +10,10 @@ pub fn damage(
     }
 }
 
-pub fn death(
-    mut commands: Commands,
-    mut board: ResMut<Board>,
-    monsters: Query<(Entity, &Health, &Coordinates), With<Monster>>,
-) {
-    for (monster, health, coord) in monsters.iter() {
+pub fn death(mut commands: Commands, entities: Query<(Entity, &Health), Changed<Health>>) {
+    for (entity, health) in entities.iter() {
         if health.0 <= 0 {
-            board.monsters.remove(coord);
-            commands.entity(monster).despawn_recursive();
+            commands.entity(entity).despawn_recursive();
         }
     }
 }

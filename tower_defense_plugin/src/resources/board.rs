@@ -7,8 +7,7 @@ use super::bimap::BiMap;
 pub struct Board {
     pub size: (u16, u16),
     pub tiles: BiMap<Coordinates, Entity>,
-    pub towers: BiMap<Coordinates, Entity>,
-    pub monsters: BiMap<Coordinates, Entity>,
+    pub entities: BiMap<Coordinates, Entity>,
     pub start: Coordinates,
     pub end: Coordinates,
     pub path: Vec<Coordinates>,
@@ -56,8 +55,7 @@ impl Board {
         Board {
             size,
             tiles: BiMap::new(),
-            towers: BiMap::new(),
-            monsters: BiMap::new(),
+            entities: BiMap::new(),
             start,
             end,
             path,
@@ -69,7 +67,7 @@ impl Board {
     pub fn monster_spawn(&self) -> Coordinates {
         for x in 0..16 {
             let coord = Coordinates::new(x, 12);
-            if !self.monsters.contains_key(&coord) {
+            if !self.entities.contains_key(&coord) {
                 return coord;
             }
         }
@@ -138,7 +136,7 @@ impl Board {
     }
 
     pub fn empty(&self, coord: &Coordinates) -> bool {
-        !self.monsters.contains_key(coord) && !self.towers.contains_key(coord)
+        !self.entities.contains_key(coord)
     }
 
     pub fn width(&self) -> u16 {
@@ -189,11 +187,13 @@ impl Board {
         self.path.contains(coord)
     }
 
-    pub fn neighbouring_monsters(&self, coord: &Coordinates) -> Vec<Coordinates> {
+    pub fn neighbouring_entities(&self, coord: &Coordinates) -> Vec<Entity> {
         return coord
             .orthogonal_neighbours()
             .into_iter()
-            .filter(|coord| self.monsters.contains_key(coord))
+            .map(|coord| self.entities.get(&coord))
+            .filter(|entity| entity.is_some())
+            .map(|entity| *entity.unwrap())
             .collect();
     }
 

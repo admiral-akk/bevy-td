@@ -23,20 +23,17 @@ use resources::{
     life_tracker::LifeTracker,
 };
 use systems::{
-    coordinates::{
-        remove_monsters, remove_towers, update_monsters, update_towers, update_transform,
-    },
+    attack::attack,
+    coordinates::{added, removed, updated},
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
     life::{check_lives, update_lives},
-    monster::monster_despawn,
     movement::movement,
     reward::spawn_reward,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
     tick::{end_turn, reset, tick},
-    tower::attack,
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -62,13 +59,13 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_system_set(
                 SystemSet::on_enter(GameState::Building)
                     .with_system(spawn_reward)
-                    .with_system(monster_spawn),
+                    .with_system(monster_spawn)
+                    .with_system(added),
             )
             .add_system_set(
                 SystemSet::on_update(GameState::Building)
                     .with_system(select_tower)
                     .with_system(place_tower.before(select_tower))
-                    .with_system(remove_towers)
                     .with_system(go)
                     .with_system(Self::start_wave),
             )
@@ -81,11 +78,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(attack.after(tick))
                     .with_system(damage.after(attack))
                     .with_system(death.after(damage))
-                    .with_system(movement.after(death).before(update_transform))
-                    .with_system(update_monsters.after(movement))
-                    .with_system(monster_despawn.after(update_monsters))
-                    .with_system(remove_monsters.after(monster_despawn))
-                    .with_system(check_lives.after(remove_monsters))
+                    .with_system(movement.after(death).before(updated))
+                    .with_system(check_lives.after(movement))
                     .with_system(Self::game_over.after(check_lives))
                     .with_system(Self::wave_over.after(Self::game_over))
                     .with_system(update_lives.after(Self::wave_over))
@@ -101,8 +95,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_system_set(
                 SystemSet::on_update(self.active_state.clone())
                     .with_system(cursor_move)
-                    .with_system(update_transform)
-                    .with_system(update_towers),
+                    .with_system(added)
+                    .with_system(removed)
+                    .with_system(updated),
             )
             .add_system_set(
                 SystemSet::on_exit(self.active_state.clone())

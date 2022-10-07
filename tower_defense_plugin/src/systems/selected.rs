@@ -10,17 +10,19 @@ pub fn select_tower(
     board: Res<Board>,
     mut selected: Query<&mut Selected>,
     mut click: ResMut<Input<MouseButton>>,
-    _tower: Query<Entity, With<Tower>>,
+    tower: Query<Entity, With<Tower>>,
 ) {
     let mut selected = selected.single_mut();
     if selected.0.is_some() {
         return;
     }
     if let Some(cursor) = cursor.single().0 {
-        if board.towers.contains_key(&cursor) {
-            if click.just_pressed(MouseButton::Left) {
-                selected.0 = Some(cursor.clone());
-                click.clear();
+        if let Some(entity) = board.entities.get(&cursor) {
+            if let Ok(_) = tower.get(*entity) {
+                if click.just_pressed(MouseButton::Left) {
+                    selected.0 = Some(cursor.clone());
+                    click.clear();
+                }
             }
         }
     }
@@ -40,8 +42,10 @@ pub fn place_tower(
                 return;
             }
             if click.just_pressed(MouseButton::Left) {
-                if let Some(tower) = board.towers.get(&selected_pos) {
-                    *towers.get_mut(*tower).unwrap() = cursor_pos.clone();
+                if let Some(entity) = board.entities.get(&selected_pos) {
+                    if let Ok(mut coord) = towers.get_mut(*entity) {
+                        *coord = cursor_pos.clone();
+                    }
                 }
                 selected.0 = None;
                 click.clear();
