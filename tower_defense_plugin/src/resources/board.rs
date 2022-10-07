@@ -19,6 +19,7 @@ pub struct Board {
 pub enum TileType {
     None,
     Grass,
+    Dirt,
     Road,
     Start,
     Finish,
@@ -65,23 +66,33 @@ impl Board {
         }
     }
 
+    pub fn invalid_placement(&self, coordinates: &Coordinates) -> bool {
+        match self.tile_type(coordinates) {
+            TileType::None
+            | TileType::Arrow
+            | TileType::Finish
+            | TileType::Road
+            | TileType::Result
+            | TileType::Start
+            | TileType::Dirt => {
+                return true;
+            }
+            _ => {}
+        }
+        return false;
+    }
+
     pub fn tile_type(&self, coordinates: &Coordinates) -> TileType {
         if coordinates.y == 0 {
             return TileType::Bench;
         } else if coordinates.y == 1 {
             return TileType::None;
         } else if coordinates.x < 16 {
-            // On the board
-            if self.is_start(&coordinates) {
-                return TileType::Start;
+            if coordinates.y < 10 {
+                return TileType::Grass;
+            } else {
+                return TileType::Dirt;
             }
-            if self.is_end(&coordinates) {
-                return TileType::Finish;
-            }
-            if self.is_path(&coordinates) {
-                return TileType::Road;
-            }
-            return TileType::Grass;
         } else if coordinates.x == 16 {
             return TileType::None;
         } else {
@@ -114,6 +125,10 @@ impl Board {
                 }
             }
         }
+    }
+
+    pub fn empty(&self, coord: &Coordinates) -> bool {
+        !self.monsters.contains_key(coord) && !self.towers.contains_key(coord)
     }
 
     pub fn width(&self) -> u16 {

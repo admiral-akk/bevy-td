@@ -1,3 +1,4 @@
+pub(crate) mod blueprint;
 pub(crate) mod coordinates;
 pub(crate) mod cursor;
 pub(crate) mod go;

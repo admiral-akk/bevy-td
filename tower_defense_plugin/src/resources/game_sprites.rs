@@ -73,6 +73,10 @@ impl GameSprites {
         self.sprite_sheet_bundle(18 + 8 * 23, tile_size, 2.)
     }
 
+    pub fn dirt(&self, tile_size: f32) -> SpriteSheetBundle {
+        self.sprite_sheet_bundle(2 + 1 * 23, tile_size, 2.)
+    }
+
     pub fn result(&self, tile_size: f32) -> SpriteSheetBundle {
         self.sprite_sheet_bundle(2 + 2 * 23, tile_size, 2.)
     }

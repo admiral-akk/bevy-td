@@ -287,6 +287,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                     spritesheets.grass(&coordinate, board.tile_size),
                                 );
                             }
+                            TileType::Dirt => {
+                                parent
+                                    .spawn()
+                                    .insert(Name::new("Dirt"))
+                                    .insert_bundle(spritesheets.dirt(board.tile_size));
+                            }
                             TileType::Road => {
                                 parent.spawn().insert(Name::new("Grass")).insert_bundle(
                                     spritesheets.grass(&coordinate, board.tile_size),
@@ -376,6 +382,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .with_children(|parent| {
                 parent.spawn().insert(Cursor(None));
                 parent.spawn().insert(Selected(None));
+                parent.spawn().insert(Spawn::new());
                 Self::spawn_ground(parent, &mut board, &spritesheets);
             })
             .id();
