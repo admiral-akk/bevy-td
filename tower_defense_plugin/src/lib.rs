@@ -30,11 +30,12 @@ use systems::{
     go::{enable, go, grey_out},
     health::{damage, death},
     life::{check_lives, update_lives},
-    monster::{monster_despawn, monster_move},
+    monster::monster_despawn,
+    movement::movement,
     reward::spawn_reward,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
-    tick::{reset, tick},
+    tick::{end_turn, reset, tick},
     tower::attack,
 };
 
@@ -80,14 +81,15 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(attack.after(tick))
                     .with_system(damage.after(attack))
                     .with_system(death.after(damage))
-                    .with_system(monster_move.after(death).before(update_transform))
-                    .with_system(update_monsters.after(monster_move))
+                    .with_system(movement.after(death).before(update_transform))
+                    .with_system(update_monsters.after(movement))
                     .with_system(monster_despawn.after(update_monsters))
                     .with_system(remove_monsters.after(monster_despawn))
                     .with_system(check_lives.after(remove_monsters))
                     .with_system(Self::game_over.after(check_lives))
                     .with_system(Self::wave_over.after(Self::game_over))
-                    .with_system(update_lives.after(Self::wave_over)),
+                    .with_system(update_lives.after(Self::wave_over))
+                    .with_system(end_turn.after(update_lives)),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems

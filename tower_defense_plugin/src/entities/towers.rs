@@ -1,5 +1,8 @@
 use crate::{
-    components::{coordinates::Coordinates, power::Power, tick_timer::TickTimer, tower::Tower},
+    components::{
+        coordinates::Coordinates, health::Health, movement::Movement, power::Power,
+        tick_timer::TickTimer, tower::Tower,
+    },
     resources::{board::Board, game_sprites::GameSprites},
 };
 use bevy::{
@@ -80,6 +83,8 @@ fn tower_entity(
     let tower = commands
         .spawn()
         .insert(Tower)
+        .insert(Movement(1))
+        .insert(Health(3))
         .insert(coord.clone())
         .insert_bundle(sprite_sheet)
         .insert(TickTimer::new(1))

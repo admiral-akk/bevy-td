@@ -1,5 +1,3 @@
-
-
 use bevy::{
     prelude::{Query, Res, ResMut, With, Without},
     time::Time,
@@ -24,21 +22,21 @@ pub fn tick(
                     timer.tick();
                     timer.set_active(true);
                 }
-                for mut timer in monster_timers.iter_mut() {
-                    timer.set_active(false);
-                }
             }
             false => {
                 for mut timer in monster_timers.iter_mut() {
                     timer.tick();
                     timer.set_active(true);
                 }
-                for mut timer in tower_timers.iter_mut() {
-                    timer.set_active(false);
-                }
             }
         };
         tick_timer.1 = !tick_timer.1;
+    }
+}
+
+pub fn end_turn(mut timers: Query<&mut TickTimer>) {
+    for mut timer in timers.iter_mut() {
+        timer.set_active(false);
     }
 }
 

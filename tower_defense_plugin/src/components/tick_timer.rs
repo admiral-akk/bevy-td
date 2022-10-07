@@ -21,13 +21,7 @@ impl TickTimer {
     }
 
     pub fn active(&mut self) -> bool {
-        if self.tick >= self.duration && self.active {
-            self.tick = 0;
-            self.active = false;
-            true
-        } else {
-            false
-        }
+        self.tick >= self.duration && self.active
     }
 
     pub fn tick(&mut self) {

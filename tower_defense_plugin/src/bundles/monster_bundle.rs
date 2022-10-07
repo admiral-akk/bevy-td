@@ -4,7 +4,8 @@ use bevy::{
 };
 
 use crate::components::{
-    coordinates::Coordinates, health::Health, monster::Monster, tick_timer::TickTimer,
+    coordinates::Coordinates, health::Health, monster::Monster, movement::Movement,
+    tick_timer::TickTimer,
 };
 
 #[derive(Bundle, Default)]
@@ -12,6 +13,7 @@ pub struct MonsterBundle {
     name: Name,
     monster: Monster,
     health: Health,
+    movement: Movement,
     coordinates: Coordinates,
     tick_timer: TickTimer,
     #[bundle]
@@ -26,6 +28,7 @@ impl MonsterBundle {
             name: Name::new("Monster"),
             monster: Monster,
             health: Health(3),
+            movement: Movement(2),
             coordinates,
             tick_timer: TickTimer::new(1),
             transform: TransformBundle {

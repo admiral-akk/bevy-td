@@ -5,6 +5,7 @@ pub(crate) mod go;
 pub(crate) mod health;
 pub(crate) mod lives;
 pub(crate) mod monster;
+pub(crate) mod movement;
 pub(crate) mod owned;
 pub(crate) mod power;
 pub(crate) mod projection;

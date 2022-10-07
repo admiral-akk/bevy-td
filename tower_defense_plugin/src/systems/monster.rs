@@ -1,27 +1,9 @@
-use bevy::{
-    prelude::{
-        Commands, DespawnRecursiveExt, Entity, Query, Res, ResMut, With,
-    },
-};
+use bevy::prelude::{Commands, DespawnRecursiveExt, Entity, Query, ResMut, With};
 
 use crate::{
-    components::{
-        coordinates::Coordinates, monster::Monster,
-        tick_timer::TickTimer,
-    },
+    components::{coordinates::Coordinates, monster::Monster},
     resources::{board::Board, life_tracker::LifeTracker},
 };
-
-pub fn monster_move(
-    board: Res<Board>,
-    mut monsters: Query<(&mut Coordinates, &mut TickTimer), With<Monster>>,
-) {
-    for (mut c, mut timer) in monsters.iter_mut() {
-        if timer.active() && board.monsters.contains_key(&c) {
-            *c = board.next(&c);
-        }
-    }
-}
 
 pub fn monster_despawn(
     mut commands: Commands,
