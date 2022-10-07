@@ -7,5 +7,6 @@ pub(crate) mod life;
 pub(crate) mod monster;
 pub(crate) mod reward;
 pub(crate) mod selected;
+pub(crate) mod spawn_wave;
 pub(crate) mod tick;
 pub(crate) mod tower;

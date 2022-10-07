@@ -2,7 +2,7 @@ use bevy::prelude::{Entity, Input, MouseButton, Query, Res, ResMut, With};
 
 use crate::{
     components::{coordinates::Coordinates, cursor::Cursor, selected::Selected, tower::Tower},
-    resources::board::{Board},
+    resources::board::Board,
 };
 
 pub fn select_tower(

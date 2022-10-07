@@ -66,6 +66,16 @@ impl Board {
         }
     }
 
+    pub fn monster_spawn(&self) -> Coordinates {
+        for x in 0..16 {
+            let coord = Coordinates::new(x, 12);
+            if !self.monsters.contains_key(&coord) {
+                return coord;
+            }
+        }
+        return Coordinates::new(100, 100);
+    }
+
     pub fn invalid_placement(&self, coordinates: &Coordinates) -> bool {
         match self.tile_type(coordinates) {
             TileType::None
