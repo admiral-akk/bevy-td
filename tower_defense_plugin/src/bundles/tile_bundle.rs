@@ -9,7 +9,6 @@ use crate::components::{coordinates::Coordinates, tile::Tile};
 pub struct TileBundle {
     name: Name,
     tile: Tile,
-    coordinates: Coordinates,
     #[bundle]
     transform: TransformBundle,
     #[bundle]
@@ -21,7 +20,6 @@ impl TileBundle {
         TileBundle {
             name: Name::new(format!("Tile {}, {}", coordinates.x, coordinates.y)),
             tile: Tile,
-            coordinates,
             transform: TransformBundle::from_transform(tile_offset),
             visibility: VisibilityBundle::default(),
         }
