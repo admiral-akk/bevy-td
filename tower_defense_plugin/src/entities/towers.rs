@@ -1,7 +1,7 @@
 use crate::{
     components::{
         allegiance::Allegiance, coordinates::Coordinates, health::Health, movement::Movement,
-        power::Power, tick_timer::TickTimer, tower::Tower,
+        power::Power, tower::Tower, unit::Unit,
     },
     resources::{board::Board, game_sprites::GameSprites},
 };
@@ -91,7 +91,7 @@ fn tower_entity(
                 .insert(Allegiance(0))
                 .insert(coord.clone())
                 .insert_bundle(sprite_sheet)
-                .insert(TickTimer::new(1))
+                .insert(Unit)
                 .insert_bundle(TransformBundle {
                     local: board.transform(&coord, 4.),
                     ..Default::default()

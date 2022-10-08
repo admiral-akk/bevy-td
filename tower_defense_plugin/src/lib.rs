@@ -5,6 +5,8 @@ mod events;
 pub mod resources;
 mod systems;
 
+use std::collections::VecDeque;
+
 use assets_plugin::resources::fonts::Fonts;
 use bevy::{ecs::schedule::StateData, prelude::*};
 #[cfg(feature = "debug")]
@@ -12,10 +14,12 @@ use bevy_inspector_egui::RegisterInspectable;
 use bundles::{board_bundle::BoardBundle, tile_bundle::TileBundle};
 use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, monster::Monster,
-    selected::Selected, spawn::Spawn, tick_timer::TickTimer,
+    selected::Selected, spawn::Spawn, turn_order::TurnOrder,
 };
 
-use events::{Attack, EnterBuildTarget, GameOver, HideBuildTarget, StartWave, TryBuild};
+use events::{
+    ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, StartWave, TryBuild,
+};
 use resources::{
     board::{Board, TileType},
     game_sprites::GameSprites,
@@ -33,7 +37,7 @@ use systems::{
     reward::spawn_reward,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
-    tick::{end_turn, reset, tick},
+    turn_order::{add_turn, remove_turn, tick_active},
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -54,7 +58,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::None)
             .insert_resource(EndMenuState(self.end_menu_state.clone()))
-            .insert_resource(GameStepTimer(Timer::from_seconds(0.1, true), false))
+            .insert_resource(GameStepTimer(Timer::from_seconds(0.1, true)))
             // Building systems
             .add_system_set(
                 SystemSet::on_enter(GameState::Building)
@@ -67,15 +71,18 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(select_tower)
                     .with_system(place_tower.before(select_tower))
                     .with_system(go)
-                    .with_system(Self::start_wave),
+                    .with_system(Self::start_wave)
+                    .with_system(added)
+                    .with_system(removed)
+                    .with_system(updated),
             )
             .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
             // Fighting systems
-            .add_system_set(SystemSet::on_enter(GameState::Fighting).with_system(reset))
+            .add_system_set(SystemSet::on_enter(GameState::Fighting))
             .add_system_set(
                 SystemSet::on_update(GameState::Fighting)
-                    .with_system(tick)
-                    .with_system(attack.after(tick))
+                    .with_system(tick_active)
+                    .with_system(attack.after(tick_active))
                     .with_system(damage.after(attack))
                     .with_system(death.after(damage))
                     .with_system(movement.after(death).before(updated))
@@ -83,7 +90,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(Self::game_over.after(check_lives))
                     .with_system(Self::wave_over.after(Self::game_over))
                     .with_system(update_lives.after(Self::wave_over))
-                    .with_system(end_turn.after(update_lives)),
+                    .with_system(added.after(update_lives))
+                    .with_system(removed.after(added))
+                    .with_system(updated.after(removed)),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems
@@ -95,9 +104,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_system_set(
                 SystemSet::on_update(self.active_state.clone())
                     .with_system(cursor_move)
-                    .with_system(added)
-                    .with_system(removed)
-                    .with_system(updated),
+                    .with_system(add_turn)
+                    .with_system(remove_turn),
             )
             .add_system_set(
                 SystemSet::on_exit(self.active_state.clone())
@@ -110,7 +118,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_event::<Spawn>()
             .add_event::<Attack>()
             .add_event::<GameOver>()
-            .add_event::<StartWave>();
+            .add_event::<StartWave>()
+            .add_event::<ActiveUnit>();
 
         #[cfg(feature = "debug")]
         {
@@ -303,11 +312,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                 );
                             }
                             TileType::Start => {
-                                parent
-                                    .spawn()
-                                    .insert(coordinate.clone())
-                                    .insert(Spawn::new())
-                                    .insert(TickTimer::new(4));
+                                parent.spawn().insert(Spawn::new());
                                 parent.spawn().insert(Name::new("Grass")).insert_bundle(
                                     spritesheets.grass(&coordinate, board.tile_size),
                                 );
@@ -384,6 +389,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
                 parent.spawn().insert(Cursor(None));
                 parent.spawn().insert(Selected(None));
                 parent.spawn().insert(Spawn::new());
+                parent.spawn().insert(TurnOrder(VecDeque::new()));
                 Self::spawn_ground(parent, &mut board, &spritesheets);
             })
             .id();
