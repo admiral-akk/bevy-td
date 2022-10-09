@@ -35,7 +35,7 @@ use systems::{
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
-    life::{check_lives, update_lives},
+    life::{check_lives},
     movement::movement,
     reward::spawn_reward,
     selected::{place_tower, select_tower},
@@ -61,8 +61,55 @@ fn in_game(state: Res<GameState>) -> bool {
     state.eq(&GameState::Fighting)
 }
 
+#[derive(Copy, Clone, StageLabel)]
+pub enum GameStage {
+    Tick,
+    Attack,
+    ResolveAttack,
+    Move,
+    CheckEnd,
+    CleanUp,
+}
+
+impl GameStage {
+    const STAGES: [GameStage; 6] = [
+        GameStage::Tick,
+        GameStage::Attack,
+        GameStage::ResolveAttack,
+        GameStage::Move,
+        GameStage::CheckEnd,
+        GameStage::CleanUp,
+    ];
+
+    pub fn add_stages(app: &mut App) {
+        for i in 0..GameStage::STAGES.len() {
+            if i == 0 {
+                app.add_stage_after(
+                    CoreStage::Update,
+                    GameStage::STAGES[i],
+                    SystemStage::single_threaded(),
+                );
+            } else {
+                app.add_stage_after(
+                    GameStage::STAGES[i - 1],
+                    GameStage::STAGES[i],
+                    SystemStage::single_threaded(),
+                );
+            }
+        }
+    }
+}
+
+fn is_fighting(state: Res<State<GameState>>) -> ShouldRun {
+    match state.current() {
+        GameState::Fighting => ShouldRun::Yes,
+        _ => ShouldRun::No,
+    }
+}
+
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
+        GameStage::add_stages(app);
         app.add_state(GameState::None)
             .insert_resource(EndMenuState(self.end_menu_state.clone()))
             .insert_resource(GameStepTimer(Timer::from_seconds(0.1, true)))
@@ -85,34 +132,47 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             )
             .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
             // Fighting systems
-            .add_system_set(SystemSet::on_enter(GameState::Fighting))
-            .add_system_set(
-                SystemSet::on_update(GameState::Fighting)
-                    .with_system(tick_active)
-                    .with_system(attack.after(tick_active))
-                    .with_system(damage.after(attack))
-                    .with_system(death.after(damage))
-                    .with_system(movement.after(death).before(updated))
-                    .with_system(check_lives.after(movement))
-                    .with_system(Self::game_over.after(check_lives))
-                    .with_system(Self::wave_over.after(Self::game_over))
-                    .with_system(update_lives.after(Self::wave_over))
-                    .with_system(added.after(update_lives))
-                    .with_system(updated.after(added))
-                    .with_system(removed),
+            .add_system_set_to_stage(
+                GameStage::Tick,
+                SystemSet::new()
+                    .with_run_criteria(is_fighting)
+                    .with_system(tick_active),
             )
             .add_system_set_to_stage(
-                CoreStage::PostUpdate,
+                GameStage::Attack,
                 SystemSet::new()
-                    .with_run_criteria(|state: Res<State<GameState>>| {
-                        if state.current().eq(&GameState::Fighting) {
-                            ShouldRun::Yes
-                        } else {
-                            ShouldRun::No
-                        }
-                    })
+                    .with_run_criteria(is_fighting)
+                    .with_system(attack),
+            )
+            .add_system_set_to_stage(
+                GameStage::ResolveAttack,
+                SystemSet::new()
+                    .with_run_criteria(is_fighting)
+                    .with_system(damage)
+                    .with_system(death.after(damage)),
+            )
+            .add_system_set_to_stage(
+                GameStage::Move,
+                SystemSet::new()
+                    .with_run_criteria(is_fighting)
+                    .with_system(movement),
+            )
+            .add_system_set_to_stage(
+                GameStage::CheckEnd,
+                SystemSet::new()
+                    .with_run_criteria(is_fighting)
+                    .with_system(check_lives)
+                    .with_system(Self::game_over.after(check_lives))
+                    .with_system(Self::wave_over.after(Self::game_over)),
+            )
+            .add_system_set_to_stage(
+                GameStage::CleanUp,
+                SystemSet::new()
+                    .with_run_criteria(is_fighting)
                     .with_system(remove_turn)
-                    .with_system(removed),
+                    .with_system(removed)
+                    .with_system(added)
+                    .with_system(updated),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems
