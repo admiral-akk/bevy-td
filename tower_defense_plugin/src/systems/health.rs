@@ -1,6 +1,11 @@
-use bevy::prelude::{Changed, Commands, DespawnRecursiveExt, Entity, EventReader, Query};
+use bevy::prelude::{
+    Changed, Commands, DespawnRecursiveExt, Entity, EventReader, EventWriter, Query,
+};
 
-use crate::{components::health::Health, events::Attack};
+use crate::{
+    components::health::Health,
+    events::{Attack, Removed},
+};
 
 pub fn damage(mut monsters: Query<&mut Health>, mut attack_evr: EventReader<Attack>) {
     for attack in attack_evr.iter() {
@@ -10,9 +15,14 @@ pub fn damage(mut monsters: Query<&mut Health>, mut attack_evr: EventReader<Atta
     }
 }
 
-pub fn death(mut commands: Commands, entities: Query<(Entity, &Health), Changed<Health>>) {
+pub fn death(
+    mut commands: Commands,
+    entities: Query<(Entity, &Health), Changed<Health>>,
+    mut removed_ewr: EventWriter<Removed>,
+) {
     for (entity, health) in entities.iter() {
         if health.0 <= 0 {
+            removed_ewr.send(Removed(entity));
             commands.entity(entity).despawn_recursive();
         }
     }

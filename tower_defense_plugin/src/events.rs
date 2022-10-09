@@ -22,3 +22,6 @@ pub struct StartWave;
 
 #[derive(Debug, Copy, Clone)]
 pub struct ActiveUnit(pub Entity);
+
+#[derive(Debug, Copy, Clone)]
+pub struct Removed(pub Entity);

@@ -18,7 +18,7 @@ use components::{
 };
 
 use events::{
-    ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, StartWave, TryBuild,
+    ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, Removed, StartWave, TryBuild,
 };
 use resources::{
     board::{Board, TileType},
@@ -91,8 +91,9 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(Self::wave_over.after(Self::game_over))
                     .with_system(update_lives.after(Self::wave_over))
                     .with_system(added.after(update_lives))
-                    .with_system(removed.after(added))
-                    .with_system(updated.after(removed)),
+                    .with_system(updated.after(added))
+                    .with_system(remove_turn.after(updated))
+                    .with_system(removed.after(remove_turn)),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems
@@ -119,7 +120,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_event::<Attack>()
             .add_event::<GameOver>()
             .add_event::<StartWave>()
-            .add_event::<ActiveUnit>();
+            .add_event::<ActiveUnit>()
+            .add_event::<Removed>();
 
         #[cfg(feature = "debug")]
         {

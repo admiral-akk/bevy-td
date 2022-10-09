@@ -1,11 +1,11 @@
 use bevy::{
-    prelude::{Added, Entity, EventWriter, Query, RemovedComponents, Res, ResMut},
+    prelude::{Added, Entity, EventReader, EventWriter, Query, Res, ResMut},
     time::Time,
 };
 
 use crate::{
     components::{turn_order::TurnOrder, unit::Unit},
-    events::ActiveUnit,
+    events::{ActiveUnit, Removed},
     resources::game_step_timer::GameStepTimer,
 };
 
@@ -30,11 +30,13 @@ pub fn tick_active(
     }
 }
 
-pub fn remove_turn(mut turn_order: Query<&mut TurnOrder>, removed: RemovedComponents<Unit>) {
+pub fn remove_turn(mut turn_order: Query<&mut TurnOrder>, mut removed_ewr: EventReader<Removed>) {
     let turn_order = &mut turn_order.single_mut().0;
-    for removed in removed.iter() {
+    for removed in removed_ewr.iter() {
+        bevy::log::error!("Attempt removed unit!");
         for (i, e) in turn_order.iter().enumerate() {
-            if e.eq(&removed) {
+            if removed.0.eq(e) {
+                bevy::log::error!("Removed unit!");
                 turn_order.remove(i);
                 break;
             }
