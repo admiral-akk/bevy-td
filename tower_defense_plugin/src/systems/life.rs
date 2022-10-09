@@ -1,16 +1,17 @@
-use bevy::{
-    prelude::{EventWriter, Query, Res, With},
-    text::Text,
-};
+use bevy::prelude::{EventWriter, Query};
 
-use crate::{components::lives::Lives, events::GameOver, resources::life_tracker::LifeTracker};
+use crate::{components::allegiance::Allegiance, events::GameOver};
 
-pub fn check_lives(life: Res<LifeTracker>, mut game_over_ewr: EventWriter<GameOver>) {
-    if life.0 <= 0 {
-        game_over_ewr.send(GameOver);
+pub fn check_units(units: Query<&Allegiance>, mut game_over_ewr: EventWriter<GameOver>) {
+    let mut has_enemy = false;
+    let mut has_friendly = false;
+    for unit in units.iter() {
+        has_enemy |= unit.eq(&Allegiance(1));
+        has_friendly |= unit.eq(&Allegiance(0));
     }
-}
-
-pub fn update_lives(life: Res<LifeTracker>, mut life_ui: Query<&mut Text, With<Lives>>) {
-    life_ui.single_mut().sections[0].value = format!("Lives: {}", life.0);
+    if !has_friendly {
+        game_over_ewr.send(GameOver(true));
+    } else if !has_enemy {
+        game_over_ewr.send(GameOver(false));
+    }
 }

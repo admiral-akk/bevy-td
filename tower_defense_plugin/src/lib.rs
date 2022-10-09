@@ -35,7 +35,7 @@ use systems::{
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
-    life::{check_lives},
+    life::check_units,
     movement::movement,
     reward::spawn_reward,
     selected::{place_tower, select_tower},
@@ -64,9 +64,9 @@ fn in_game(state: Res<GameState>) -> bool {
 #[derive(Copy, Clone, StageLabel)]
 pub enum GameStage {
     Tick,
+    Move,
     Attack,
     ResolveAttack,
-    Move,
     CheckEnd,
     CleanUp,
 }
@@ -107,6 +107,17 @@ fn is_fighting(state: Res<State<GameState>>) -> ShouldRun {
     }
 }
 
+fn fighting_system_set() -> SystemSet {
+    SystemSet::new().with_run_criteria(is_fighting)
+}
+
+fn in_game_system_set() -> SystemSet {
+    SystemSet::new().with_run_criteria(|state: Res<State<GameState>>| match state.current() {
+        GameState::None => ShouldRun::No,
+        _ => ShouldRun::Yes,
+    })
+}
+
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
         GameStage::add_stages(app);
@@ -125,31 +136,13 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(select_tower)
                     .with_system(place_tower.before(select_tower))
                     .with_system(go)
-                    .with_system(Self::start_wave)
-                    .with_system(added)
-                    .with_system(removed)
-                    .with_system(updated),
+                    .with_system(Self::start_wave),
             )
             .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
             // Fighting systems
             .add_system_set_to_stage(
                 GameStage::Tick,
-                SystemSet::new()
-                    .with_run_criteria(is_fighting)
-                    .with_system(tick_active),
-            )
-            .add_system_set_to_stage(
-                GameStage::Attack,
-                SystemSet::new()
-                    .with_run_criteria(is_fighting)
-                    .with_system(attack),
-            )
-            .add_system_set_to_stage(
-                GameStage::ResolveAttack,
-                SystemSet::new()
-                    .with_run_criteria(is_fighting)
-                    .with_system(damage)
-                    .with_system(death.after(damage)),
+                fighting_system_set().with_system(tick_active),
             )
             .add_system_set_to_stage(
                 GameStage::Move,
@@ -157,22 +150,27 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_run_criteria(is_fighting)
                     .with_system(movement),
             )
+            .add_system_set_to_stage(GameStage::Attack, fighting_system_set().with_system(attack))
             .add_system_set_to_stage(
-                GameStage::CheckEnd,
-                SystemSet::new()
-                    .with_run_criteria(is_fighting)
-                    .with_system(check_lives)
-                    .with_system(Self::game_over.after(check_lives))
-                    .with_system(Self::wave_over.after(Self::game_over)),
+                GameStage::ResolveAttack,
+                fighting_system_set()
+                    .with_system(damage)
+                    .with_system(death.after(damage)),
             )
             .add_system_set_to_stage(
                 GameStage::CleanUp,
-                SystemSet::new()
-                    .with_run_criteria(is_fighting)
+                in_game_system_set()
+                    .with_system(add_turn)
                     .with_system(remove_turn)
                     .with_system(removed)
                     .with_system(added)
                     .with_system(updated),
+            )
+            .add_system_set_to_stage(
+                GameStage::CheckEnd,
+                fighting_system_set()
+                    .with_system(check_units)
+                    .with_system(Self::game_over.after(check_units)),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems
@@ -182,10 +180,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(Self::add_start_ui),
             )
             .add_system_set(
-                SystemSet::on_update(self.active_state.clone())
-                    .with_system(cursor_move)
-                    .with_system(add_turn)
-                    .with_system(remove_turn),
+                SystemSet::on_update(self.active_state.clone()).with_system(cursor_move),
             )
             .add_system_set(
                 SystemSet::on_exit(self.active_state.clone())
@@ -348,9 +343,16 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut game_over_evr: EventReader<GameOver>,
         game_over_state: Res<EndMenuState<T>>,
     ) {
-        for _ in game_over_evr.iter() {
-            game_state.set(GameState::None).unwrap();
-            state.push(game_over_state.0.clone()).unwrap();
+        for e in game_over_evr.iter() {
+            match e.0 {
+                false => {
+                    game_state.set(GameState::Building).unwrap();
+                }
+                true => {
+                    game_state.set(GameState::None).unwrap();
+                    state.push(game_over_state.0.clone()).unwrap();
+                }
+            }
         }
     }
 
