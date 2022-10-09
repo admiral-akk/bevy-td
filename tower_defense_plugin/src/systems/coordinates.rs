@@ -1,8 +1,8 @@
 use bevy::prelude::{
-    Added, Changed, Entity, EventReader, Query, ResMut, Transform,
+    Added, Changed, Entity, Query, RemovedComponents, ResMut, Transform,
 };
 
-use crate::{components::coordinates::Coordinates, events::Removed, resources::board::Board};
+use crate::{components::coordinates::Coordinates, resources::board::Board};
 
 pub fn added(
     mut added: Query<(Entity, &Coordinates, &mut Transform), Added<Coordinates>>,
@@ -24,9 +24,9 @@ pub fn updated(
     }
 }
 
-pub fn removed(mut removed_ewr: EventReader<Removed>, mut board: ResMut<Board>) {
-    for removed in removed_ewr.iter() {
+pub fn removed(removed: RemovedComponents<Coordinates>, mut board: ResMut<Board>) {
+    for removed in removed.iter() {
         bevy::log::error!("Attempt removed coordinates!");
-        board.entities.remove_value(&removed.0);
+        board.entities.remove_value(&removed);
     }
 }

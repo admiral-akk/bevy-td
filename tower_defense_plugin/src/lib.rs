@@ -8,7 +8,10 @@ mod systems;
 use std::collections::VecDeque;
 
 use assets_plugin::resources::fonts::Fonts;
-use bevy::{ecs::schedule::StateData, prelude::*};
+use bevy::{
+    ecs::schedule::{ShouldRun, StateData},
+    prelude::*,
+};
 #[cfg(feature = "debug")]
 use bevy_inspector_egui::RegisterInspectable;
 use bundles::{board_bundle::BoardBundle, tile_bundle::TileBundle};
@@ -54,6 +57,10 @@ pub enum GameState {
     Fighting,
 }
 
+fn in_game(state: Res<GameState>) -> bool {
+    state.eq(&GameState::Fighting)
+}
+
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::None)
@@ -92,8 +99,20 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(update_lives.after(Self::wave_over))
                     .with_system(added.after(update_lives))
                     .with_system(updated.after(added))
-                    .with_system(remove_turn.after(updated))
-                    .with_system(removed.after(remove_turn)),
+                    .with_system(removed),
+            )
+            .add_system_set_to_stage(
+                CoreStage::PostUpdate,
+                SystemSet::new()
+                    .with_run_criteria(|state: Res<State<GameState>>| {
+                        if state.current().eq(&GameState::Fighting) {
+                            ShouldRun::Yes
+                        } else {
+                            ShouldRun::No
+                        }
+                    })
+                    .with_system(remove_turn)
+                    .with_system(removed),
             )
             .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
             // Universal systems

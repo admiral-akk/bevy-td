@@ -17,15 +17,18 @@ impl Coordinates {
     }
 
     pub fn orthogonal_neighbours(&self) -> Vec<Coordinates> {
-        let mut neighbours = Vec::from([
-            Coordinates::new(self.x, self.y + 1),
-            Coordinates::new(self.x + 1, self.y),
-        ]);
-        if self.y > 0 {
+        let mut neighbours = Vec::new();
+        if self.y > 2 {
             neighbours.push(Coordinates::new(self.x, self.y - 1));
+        }
+        if self.y < 18 {
+            neighbours.push(Coordinates::new(self.x, self.y + 1));
         }
         if self.x > 0 {
             neighbours.push(Coordinates::new(self.x - 1, self.y));
+        }
+        if self.y < 16 {
+            neighbours.push(Coordinates::new(self.x + 1, self.y));
         }
         neighbours
     }
