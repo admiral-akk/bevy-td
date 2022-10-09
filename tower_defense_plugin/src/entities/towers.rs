@@ -87,7 +87,7 @@ fn tower_entity(
                 .spawn()
                 .insert(Tower)
                 .insert(Movement(1))
-                .insert(Health(3))
+                .insert(Health(40))
                 .insert(Allegiance(0))
                 .insert(coord.clone())
                 .insert_bundle(sprite_sheet)
