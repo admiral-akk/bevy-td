@@ -1,16 +1,13 @@
 use bevy::{
     prelude::{
         Added, BuildChildren, Changed, Children, Color, Commands, DespawnRecursiveExt, Entity,
-        EventReader, Query, Transform, Vec2,
+        EventReader, Query, Transform, Vec2, Visibility,
     },
     sprite::{Anchor, Sprite, SpriteBundle},
 };
 
 use crate::{
-    components::{
-        health::Health,
-        health_bar::{HealthBar},
-    },
+    components::{health::Health, health_bar::HealthBar},
     events::Attack,
 };
 
@@ -24,16 +21,17 @@ pub fn damage(mut monsters: Query<&mut Health>, mut attack_evr: EventReader<Atta
 
 pub fn update_health_bar(
     changed: Query<(&Health, &Children), Changed<Health>>,
-    mut health_bar: Query<(&HealthBar, &mut Sprite, &mut Transform)>,
+    mut health_bar: Query<(&HealthBar, &mut Sprite, &mut Visibility)>,
 ) {
     for (health, children) in changed.iter() {
         for child in children.iter() {
-            if let Ok((health_bar, mut sprite, _transform)) = health_bar.get_mut(*child) {
+            if let Ok((health_bar, mut sprite, mut visibility)) = health_bar.get_mut(*child) {
                 let size = sprite.custom_size.unwrap();
                 sprite.custom_size = Some(Vec2::new(
                     health_bar.width * health.health as f32 / health.max as f32,
                     size.y,
                 ));
+                visibility.is_visible = health.health != health.max;
             }
         }
     }
@@ -64,6 +62,7 @@ pub fn add_health_bar(mut commands: Commands, changed: Query<Entity, Added<Healt
                     ..Default::default()
                 },
                 transform: Transform::from_xyz(-13., 20., 2.),
+                visibility: Visibility { is_visible: false },
                 ..Default::default()
             })
             .insert(HealthBar::new(26.))
