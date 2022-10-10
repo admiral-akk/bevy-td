@@ -27,7 +27,7 @@ impl Coordinates {
         if self.x > 0 {
             neighbours.push(Coordinates::new(self.x - 1, self.y));
         }
-        if self.y < 16 {
+        if self.x < 16 {
             neighbours.push(Coordinates::new(self.x + 1, self.y));
         }
         neighbours

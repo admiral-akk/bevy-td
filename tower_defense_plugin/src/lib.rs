@@ -16,8 +16,8 @@ use bevy::{
 use bevy_inspector_egui::RegisterInspectable;
 use bundles::{board_bundle::BoardBundle, tile_bundle::TileBundle};
 use components::{
-    coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, monster::Monster,
-    selected::Selected, spawn::Spawn, turn_order::TurnOrder,
+    coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, selected::Selected,
+    spawn::Spawn, turn_order::TurnOrder,
 };
 
 use events::{
@@ -27,11 +27,10 @@ use resources::{
     board::{Board, TileType},
     game_sprites::GameSprites,
     game_step_timer::GameStepTimer,
-    life_tracker::LifeTracker,
 };
 use systems::{
     attack::attack,
-    coordinates::{added, removed, updated},
+    coordinates::{added, removed, return_to_start, updated},
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::{damage, death},
@@ -172,7 +171,11 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(check_units)
                     .with_system(Self::game_over.after(check_units)),
             )
-            .add_system_set(SystemSet::on_exit(GameState::Fighting).with_system(enable))
+            .add_system_set(
+                SystemSet::on_exit(GameState::Fighting)
+                    .with_system(enable)
+                    .with_system(return_to_start),
+            )
             // Universal systems
             .add_system_set(
                 SystemSet::on_enter(self.active_state.clone())
@@ -220,19 +223,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
             }
         }
     }
-
-    fn wave_over(
-        spawn: Query<&Spawn>,
-        life_tracker: Res<LifeTracker>,
-        mut game_state: ResMut<State<GameState>>,
-        monsters: Query<With<Monster>>,
-    ) {
-        let spawn = spawn.single();
-        if !spawn.has_spawn() && monsters.is_empty() && life_tracker.0 > 0 {
-            game_state.set(GameState::Building).unwrap();
-        }
-    }
-
     fn add_start_ui(mut commands: Commands, fonts: Res<Fonts>) {
         let ui_root = commands
             .spawn_bundle(NodeBundle {
@@ -478,6 +468,5 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .id();
         board.board = Some(board_entity);
         commands.insert_resource(board);
-        commands.insert_resource(LifeTracker(2));
     }
 }

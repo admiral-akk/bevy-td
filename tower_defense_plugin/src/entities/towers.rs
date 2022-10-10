@@ -1,7 +1,7 @@
 use crate::{
     components::{
         allegiance::Allegiance, coordinates::Coordinates, health::Health, movement::Movement,
-        power::Power, tower::Tower, unit::Unit,
+        power::Power, start::Start, tower::Tower, unit::Unit,
     },
     resources::{board::Board, game_sprites::GameSprites},
 };
@@ -89,6 +89,7 @@ fn tower_entity(
                 .insert(Movement(1))
                 .insert(Health(40))
                 .insert(Allegiance(0))
+                .insert(Start(coord.clone()))
                 .insert(coord.clone())
                 .insert_bundle(sprite_sheet)
                 .insert(Unit)

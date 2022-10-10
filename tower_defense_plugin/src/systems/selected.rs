@@ -1,7 +1,9 @@
 use bevy::prelude::{Entity, Input, MouseButton, Query, Res, ResMut, With};
 
 use crate::{
-    components::{coordinates::Coordinates, cursor::Cursor, selected::Selected, tower::Tower},
+    components::{
+        coordinates::Coordinates, cursor::Cursor, selected::Selected, start::Start, tower::Tower,
+    },
     resources::board::Board,
 };
 
@@ -32,7 +34,7 @@ pub fn place_tower(
     board: Res<Board>,
     cursor: Query<&Cursor>,
     mut selected: Query<&mut Selected>,
-    mut towers: Query<&mut Coordinates, With<Tower>>,
+    mut towers: Query<(&mut Coordinates, &mut Start), With<Tower>>,
     mut click: ResMut<Input<MouseButton>>,
 ) {
     let mut selected = selected.single_mut();
@@ -43,8 +45,9 @@ pub fn place_tower(
             }
             if click.just_pressed(MouseButton::Left) {
                 if let Some(entity) = board.entities.get(&selected_pos) {
-                    if let Ok(mut coord) = towers.get_mut(*entity) {
+                    if let Ok((mut coord, mut start)) = towers.get_mut(*entity) {
                         *coord = cursor_pos.clone();
+                        start.0 = cursor_pos.clone();
                     }
                 }
                 selected.0 = None;
