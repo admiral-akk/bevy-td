@@ -13,7 +13,6 @@ pub(crate) mod projection;
 pub(crate) mod selected;
 pub(crate) mod spawn;
 pub(crate) mod start;
-pub(crate) mod tile;
 pub(crate) mod tower;
 pub(crate) mod turn_order;
 pub(crate) mod unit;
