@@ -4,6 +4,7 @@ pub(crate) mod coordinates;
 pub(crate) mod cursor;
 pub(crate) mod go;
 pub(crate) mod health;
+pub(crate) mod health_bar;
 pub(crate) mod monster;
 pub(crate) mod movement;
 pub(crate) mod owned;

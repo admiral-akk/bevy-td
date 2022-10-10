@@ -33,7 +33,7 @@ use systems::{
     coordinates::{added, removed, return_to_start, updated},
     cursor::cursor_move,
     go::{enable, go, grey_out},
-    health::{damage, death},
+    health::{add_health_bar, damage, death, update_health_bar},
     life::check_units,
     movement::movement,
     reward::spawn_reward,
@@ -154,7 +154,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 GameStage::ResolveAttack,
                 fighting_system_set()
                     .with_system(damage)
-                    .with_system(death.after(damage)),
+                    .with_system(death.after(damage))
+                    .with_system(update_health_bar.after(damage)),
             )
             .add_system_set_to_stage(
                 GameStage::CleanUp,
@@ -163,7 +164,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(remove_turn)
                     .with_system(removed)
                     .with_system(added)
-                    .with_system(updated),
+                    .with_system(updated)
+                    .with_system(add_health_bar),
             )
             .add_system_set_to_stage(
                 GameStage::CheckEnd,

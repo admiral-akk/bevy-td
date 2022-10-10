@@ -30,7 +30,7 @@ impl MonsterBundle {
             name: Name::new("Monster"),
             monster: Monster,
             allegiance: Allegiance(1),
-            health: Health(3),
+            health: Health::new(3),
             movement: Movement(1),
             power: Power(1),
             coordinates,
