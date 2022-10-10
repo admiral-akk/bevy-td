@@ -16,8 +16,7 @@ use bevy::{
 use bevy_inspector_egui::RegisterInspectable;
 use bundles::{board_bundle::BoardBundle, tile_bundle::TileBundle};
 use components::{
-    coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, spawn::Spawn,
-    turn_order::TurnOrder,
+    coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, turn_order::TurnOrder,
 };
 
 use events::{
@@ -54,10 +53,6 @@ pub enum GameState {
     None,
     Building,
     Fighting,
-}
-
-fn in_game(state: Res<GameState>) -> bool {
-    state.eq(&GameState::Fighting)
 }
 
 #[derive(Copy, Clone, StageLabel)]
@@ -195,7 +190,6 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_event::<EnterBuildTarget>()
             .add_event::<HideBuildTarget>()
             .add_event::<TryBuild>()
-            .add_event::<Spawn>()
             .add_event::<Attack>()
             .add_event::<GameOver>()
             .add_event::<StartWave>()
@@ -216,13 +210,9 @@ impl<T: StateData> TowerDefensePlugin<T> {
     fn start_wave(
         mut game_state: ResMut<State<GameState>>,
         mut start_wave_evr: EventReader<StartWave>,
-        mut spawn: Query<&mut Spawn>,
     ) {
         for _ in start_wave_evr.iter() {
             game_state.set(GameState::Fighting).unwrap();
-            for mut spawn in spawn.iter_mut() {
-                spawn.set_creep_count(5);
-            }
         }
     }
     fn add_start_ui(mut commands: Commands, fonts: Res<Fonts>) {
@@ -360,7 +350,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                 );
                             }
                             TileType::Start => {
-                                parent.spawn().insert(Spawn::new());
                                 parent.spawn().insert(Name::new("Grass")).insert_bundle(
                                     spritesheets.grass(&coordinate, board.tile_size),
                                 );
@@ -436,7 +425,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .with_children(|parent| {
                 parent.spawn().insert(Cursor(None));
                 parent.spawn().insert(Selected(None));
-                parent.spawn().insert(Spawn::new());
                 parent.spawn().insert(TurnOrder(VecDeque::new()));
                 Self::spawn_ground(parent, &mut board, &spritesheets);
             })

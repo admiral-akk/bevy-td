@@ -6,7 +6,7 @@ use crate::{
     resources::{board::Board, game_sprites::GameSprites},
 };
 use bevy::{
-    prelude::{BuildChildren, Color, Commands, Name, Res, VisibilityBundle},
+    prelude::{BuildChildren, Commands, Name, Res, VisibilityBundle},
     sprite::SpriteSheetBundle,
     transform::TransformBundle,
 };
@@ -19,21 +19,6 @@ pub enum TowerType {
     Peasant,
     Guard,
     Soldier,
-}
-
-pub fn get_blueprint(
-    board: &Board,
-    sprite_sheet: &Res<GameSprites>,
-    tower: TowerType,
-) -> SpriteSheetBundle {
-    let mut bundle = match tower {
-        TowerType::Peasant => sprite_sheet.peasant(board.tile_size),
-        TowerType::Guard => sprite_sheet.guard(board.tile_size),
-        TowerType::Soldier => sprite_sheet.soldier(board.tile_size),
-        _ => SpriteSheetBundle::default(),
-    };
-    bundle.sprite.color = Color::rgba(1., 1., 1., 0.5);
-    bundle
 }
 
 pub fn get_tower(
