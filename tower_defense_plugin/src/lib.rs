@@ -16,8 +16,8 @@ use bevy::{
 use bevy_inspector_egui::RegisterInspectable;
 use bundles::{board_bundle::BoardBundle, tile_bundle::TileBundle};
 use components::{
-    coordinates::Coordinates, cursor::Cursor, go::Go, lives::Lives, selected::Selected,
-    spawn::Spawn, turn_order::TurnOrder,
+    coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, spawn::Spawn,
+    turn_order::TurnOrder,
 };
 
 use events::{
@@ -290,33 +290,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
                                     ..Default::default()
                                 });
                             });
-                    });
-                parent
-                    .spawn_bundle(NodeBundle {
-                        style: Style {
-                            flex_direction: FlexDirection::Row,
-                            ..Default::default()
-                        },
-                        color: UiColor(Color::rgba(0., 0., 0., 0.)),
-                        ..Default::default()
-                    })
-                    .with_children(|parent| {
-                        parent
-                            .spawn_bundle(TextBundle {
-                                text: Text {
-                                    sections: vec![TextSection {
-                                        value: "Lives: 2".to_string(),
-                                        style: TextStyle {
-                                            font: fonts.get_handle(),
-                                            font_size: 128.,
-                                            ..Default::default()
-                                        },
-                                    }],
-                                    ..Default::default()
-                                },
-                                ..Default::default()
-                            })
-                            .insert(Lives);
                     });
             })
             .id();
