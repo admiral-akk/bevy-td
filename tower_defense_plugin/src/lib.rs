@@ -221,16 +221,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut board: ResMut<Board>,
         spritesheets: Res<GameSprites>,
     ) {
-        for _ in reward_evr.iter() {
+        for selected_reward in reward_evr.iter() {
             game_state.set(GameState::Building).unwrap();
-            let spawn = Coordinates::new(0, 0);
-            get_tower(
-                &mut commands,
-                &mut board,
-                &spawn,
-                &spritesheets,
-                TowerType::Guard,
-            );
+            for tower in selected_reward.0.iter() {
+                let spawn = Coordinates::new(0, 0);
+                get_tower(&mut commands, &mut board, &spawn, &spritesheets, *tower);
+            }
         }
     }
 

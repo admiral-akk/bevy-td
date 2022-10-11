@@ -11,6 +11,8 @@ use bevy::{
 
 use bevy::prelude::Component;
 
+use crate::entities::towers::TowerType;
+
 use super::button::reward_button;
 
 #[derive(Component)]
@@ -68,9 +70,9 @@ pub fn add_reward_ui(mut commands: Commands, fonts: Res<Fonts>) {
 
     let background = spawn_background(&mut commands);
 
-    let reward_1 = reward_button(&mut commands, &fonts);
-    let reward_2 = reward_button(&mut commands, &fonts);
-    let reward_3 = reward_button(&mut commands, &fonts);
+    let reward_1 = reward_button(&mut commands, &fonts, TowerType::Peasant);
+    let reward_2 = reward_button(&mut commands, &fonts, TowerType::Guard);
+    let reward_3 = reward_button(&mut commands, &fonts, TowerType::Soldier);
 
     commands.entity(root).add_child(background);
     commands

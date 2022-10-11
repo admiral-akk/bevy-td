@@ -1,2 +1,4 @@
-#[derive(Debug, Copy, Clone)]
-pub struct Reward;
+use crate::entities::towers::TowerType;
+
+#[derive(Debug, Clone)]
+pub struct Reward(pub Vec<TowerType>);

@@ -11,23 +11,24 @@ use bevy::{
     },
 };
 
+use crate::entities::towers::TowerType;
 use crate::plugins::events::Reward;
 
 #[derive(Component)]
-pub struct RewardButton(pub u32);
+pub struct RewardButton(pub TowerType);
 
 pub fn handle_reward(
     mut button: Query<
-        (&mut UiColor, &Interaction),
+        (&mut UiColor, &Interaction, &RewardButton),
         (With<Button>, With<RewardButton>, Changed<Interaction>),
     >,
     mut reward_ewr: EventWriter<Reward>,
 ) {
-    for (mut color, interaction) in button.iter_mut() {
+    for (mut color, interaction, reward) in button.iter_mut() {
         match interaction {
             Interaction::Clicked => {
                 color.0 = Color::BLUE;
-                reward_ewr.send(Reward);
+                reward_ewr.send(Reward(Vec::from([reward.0])));
             }
             Interaction::Hovered => {
                 color.0 = Color::GREEN;
@@ -39,7 +40,7 @@ pub fn handle_reward(
     }
 }
 
-pub fn reward_button(commands: &mut Commands, fonts: &Res<Fonts>) -> Entity {
+pub fn reward_button(commands: &mut Commands, fonts: &Res<Fonts>, reward: TowerType) -> Entity {
     let button = commands
         .spawn_bundle(ButtonBundle {
             style: Style {
@@ -56,7 +57,7 @@ pub fn reward_button(commands: &mut Commands, fonts: &Res<Fonts>) -> Entity {
             color: UiColor(Color::GRAY),
             ..Default::default()
         })
-        .insert(RewardButton(1))
+        .insert(RewardButton(reward))
         .id();
     let text = commands
         .spawn_bundle(TextBundle {
