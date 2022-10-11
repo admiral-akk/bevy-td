@@ -23,7 +23,7 @@ pub enum TowerType {
 
 pub fn get_tower(
     commands: &mut Commands,
-    board: &mut Board,
+    board: &Board,
     coord: &Coordinates,
     sprite_sheet: &Res<GameSprites>,
     tower: TowerType,
@@ -59,7 +59,7 @@ pub fn get_tower(
 
 fn tower_entity(
     commands: &mut Commands,
-    board: &mut Board,
+    board: &Board,
     coord: &Coordinates,
     sprite_sheet: SpriteSheetBundle,
     name: &str,

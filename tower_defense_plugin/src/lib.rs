@@ -2,6 +2,7 @@ mod bundles;
 mod components;
 mod entities;
 mod events;
+mod plugins;
 pub mod resources;
 mod systems;
 
@@ -19,9 +20,11 @@ use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, turn_order::TurnOrder,
 };
 
+use entities::towers::{get_tower, TowerType};
 use events::{
     ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, Removed, StartWave, TryBuild,
 };
+use plugins::{events::Reward, reward_plugin::RewardPlugin};
 use resources::{
     board::{Board, TileType},
     game_sprites::GameSprites,
@@ -35,7 +38,6 @@ use systems::{
     health::{add_health_bar, damage, death, update_health_bar},
     life::check_units,
     movement::movement,
-    reward::spawn_reward,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
     turn_order::{add_turn, remove_turn, tick_active},
@@ -53,6 +55,7 @@ pub enum GameState {
     None,
     Building,
     Fighting,
+    Reward,
 }
 
 #[derive(Copy, Clone, StageLabel)]
@@ -115,15 +118,19 @@ fn in_game_system_set() -> SystemSet {
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
         GameStage::add_stages(app);
+        app.add_plugin(RewardPlugin::new(GameState::Reward));
         app.add_state(GameState::None)
             .insert_resource(EndMenuState(self.end_menu_state.clone()))
             .insert_resource(GameStepTimer(Timer::from_seconds(0.1, true)))
             // Building systems
             .add_system_set(
                 SystemSet::on_enter(GameState::Building)
-                    .with_system(spawn_reward)
                     .with_system(monster_spawn)
                     .with_system(added),
+            )
+            .add_system_set_to_stage(
+                CoreStage::PostUpdate,
+                in_game_system_set().with_system(Self::handle_reward),
             )
             .add_system_set(
                 SystemSet::on_update(GameState::Building)
@@ -207,6 +214,44 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
 pub struct UiRoot(pub Entity);
 
 impl<T: StateData> TowerDefensePlugin<T> {
+    fn handle_reward(
+        mut commands: Commands,
+        mut reward_evr: EventReader<Reward>,
+        mut game_state: ResMut<State<GameState>>,
+        mut board: ResMut<Board>,
+        spritesheets: Res<GameSprites>,
+    ) {
+        for _ in reward_evr.iter() {
+            game_state.set(GameState::Building).unwrap();
+            let spawn = Coordinates::new(0, 0);
+            get_tower(
+                &mut commands,
+                &mut board,
+                &spawn,
+                &spritesheets,
+                TowerType::Guard,
+            );
+        }
+    }
+
+    fn game_over(
+        mut state: ResMut<State<T>>,
+        mut game_state: ResMut<State<GameState>>,
+        mut game_over_evr: EventReader<GameOver>,
+        game_over_state: Res<EndMenuState<T>>,
+    ) {
+        for e in game_over_evr.iter() {
+            match e.0 {
+                false => {
+                    game_state.set(GameState::Reward).unwrap();
+                }
+                true => {
+                    game_state.set(GameState::None).unwrap();
+                    state.push(game_over_state.0.clone()).unwrap();
+                }
+            }
+        }
+    }
     fn start_wave(
         mut game_state: ResMut<State<GameState>>,
         mut start_wave_evr: EventReader<StartWave>,
@@ -290,25 +335,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
 
     fn clean_ui(mut commands: Commands, ui_root: Res<UiRoot>) {
         commands.entity(ui_root.0).despawn_recursive();
-    }
-
-    fn game_over(
-        mut state: ResMut<State<T>>,
-        mut game_state: ResMut<State<GameState>>,
-        mut game_over_evr: EventReader<GameOver>,
-        game_over_state: Res<EndMenuState<T>>,
-    ) {
-        for e in game_over_evr.iter() {
-            match e.0 {
-                false => {
-                    game_state.set(GameState::Building).unwrap();
-                }
-                true => {
-                    game_state.set(GameState::None).unwrap();
-                    state.push(game_over_state.0.clone()).unwrap();
-                }
-            }
-        }
     }
 
     fn clean_board(mut commands: Commands, board: Res<Board>) {
@@ -430,6 +456,14 @@ impl<T: StateData> TowerDefensePlugin<T> {
             })
             .id();
         board.board = Some(board_entity);
+        let spawn = Coordinates::new(0, 0);
+        get_tower(
+            &mut commands,
+            &board,
+            &spawn,
+            &spritesheets,
+            TowerType::Guard,
+        );
         commands.insert_resource(board);
     }
 }
