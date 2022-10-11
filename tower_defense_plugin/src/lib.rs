@@ -8,7 +8,7 @@ mod systems;
 
 use std::collections::VecDeque;
 
-use assets_plugin::resources::fonts::Fonts;
+use assets_plugin::resources::{fonts::Fonts, heroes::HeroSprites};
 use bevy::{
     ecs::schedule::{ShouldRun, StateData},
     prelude::*,
@@ -220,12 +220,20 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut game_state: ResMut<State<GameState>>,
         mut board: ResMut<Board>,
         spritesheets: Res<GameSprites>,
+        hero_sprites: Res<HeroSprites>,
     ) {
         for selected_reward in reward_evr.iter() {
             game_state.set(GameState::Building).unwrap();
             for tower in selected_reward.0.iter() {
                 let spawn = Coordinates::new(0, 0);
-                get_tower(&mut commands, &mut board, &spawn, &spritesheets, *tower);
+                get_tower(
+                    &mut commands,
+                    &mut board,
+                    &spawn,
+                    &spritesheets,
+                    *tower,
+                    &hero_sprites,
+                );
             }
         }
     }
@@ -438,6 +446,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut commands: Commands,
         spritesheets: Res<GameSprites>,
         mut game_state: ResMut<State<GameState>>,
+        hero_sprites: Res<HeroSprites>,
     ) {
         game_state.set(GameState::Building).unwrap();
         let mut board = Board::new((20, 18), 32.);
@@ -459,6 +468,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
             &spawn,
             &spritesheets,
             TowerType::Guard,
+            &hero_sprites,
         );
         commands.insert_resource(board);
     }

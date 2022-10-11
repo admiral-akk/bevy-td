@@ -10,7 +10,8 @@ pub fn added(
     mut board: ResMut<Board>,
 ) {
     for (entity, coord, mut transform) in added.iter_mut() {
-        *transform = board.transform(coord, transform.translation.z);
+        let tran = board.transform(coord, transform.translation.z);
+        *transform = transform.with_translation(tran.translation);
         board.entities.insert(*coord, entity);
     }
 }
@@ -20,7 +21,8 @@ pub fn updated(
     mut board: ResMut<Board>,
 ) {
     for (entity, coord, mut transform) in updated.iter_mut() {
-        *transform = board.transform(coord, transform.translation.z);
+        let tran = board.transform(coord, transform.translation.z);
+        *transform = transform.with_translation(tran.translation);
         board.entities.update_key(&entity, *coord);
     }
 }

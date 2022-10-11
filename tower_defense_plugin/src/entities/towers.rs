@@ -5,8 +5,9 @@ use crate::{
     },
     resources::{board::Board, game_sprites::GameSprites},
 };
+use assets_plugin::resources::heroes::{HeroSprites, HeroTypes};
 use bevy::{
-    prelude::{BuildChildren, Commands, Name, Res, VisibilityBundle},
+    prelude::{BuildChildren, Commands, Name, Res, Vec3, VisibilityBundle},
     sprite::SpriteSheetBundle,
     transform::TransformBundle,
 };
@@ -25,8 +26,9 @@ pub fn get_tower(
     commands: &mut Commands,
     board: &Board,
     coord: &Coordinates,
-    sprite_sheet: &Res<GameSprites>,
+    _sprite_sheet: &Res<GameSprites>,
     tower: TowerType,
+    hero_sprites: &Res<HeroSprites>,
 ) {
     match tower {
         TowerType::None => {}
@@ -34,7 +36,7 @@ pub fn get_tower(
             commands,
             board,
             coord,
-            sprite_sheet.peasant(board.tile_size),
+            hero_sprites.fetch_sprite_sheet(HeroTypes::Shepard),
             "Peasant",
             Power(1),
         ),
@@ -42,7 +44,7 @@ pub fn get_tower(
             commands,
             board,
             coord,
-            sprite_sheet.guard(board.tile_size),
+            hero_sprites.fetch_sprite_sheet(HeroTypes::Rogue),
             "Guard",
             Power(2),
         ),
@@ -50,7 +52,7 @@ pub fn get_tower(
             commands,
             board,
             coord,
-            sprite_sheet.soldier(board.tile_size),
+            hero_sprites.fetch_sprite_sheet(HeroTypes::Assassin),
             "Soldier",
             Power(3),
         ),
@@ -79,7 +81,7 @@ fn tower_entity(
                 .insert_bundle(sprite_sheet)
                 .insert(Unit)
                 .insert_bundle(TransformBundle {
-                    local: board.transform(&coord, 4.),
+                    local: board.transform(&coord, 4.).with_scale(Vec3::splat(2.)),
                     ..Default::default()
                 })
                 .insert_bundle(VisibilityBundle {
