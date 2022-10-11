@@ -5,7 +5,7 @@ use bevy::{
     },
     ui::{
         AlignContent, AlignItems, AlignSelf, FlexDirection, JustifyContent, PositionType, Size,
-        Style, UiColor, Val,
+        Style, UiColor, UiRect, Val,
     },
 };
 
@@ -34,10 +34,12 @@ fn spawn_root(commands: &mut Commands) -> Entity {
                 flex_direction: FlexDirection::Column,
                 align_content: AlignContent::FlexEnd,
                 align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
+                justify_content: JustifyContent::FlexEnd,
+                padding: UiRect::all(Val::Px(100.)),
                 ..Default::default()
             },
             color: UiColor(Color::rgba(0., 0., 0., 0.)),
+
             ..Default::default()
         })
         .insert(RewardUi)
@@ -48,10 +50,6 @@ fn spawn_background(commands: &mut Commands) -> Entity {
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
-                size: Size {
-                    width: Val::Percent(80.),
-                    height: Val::Percent(30.),
-                },
                 flex_direction: FlexDirection::Row,
                 align_content: AlignContent::FlexEnd,
                 align_items: AlignItems::Center,

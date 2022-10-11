@@ -1,5 +1,6 @@
 use assets_plugin::resources::fonts::Fonts;
 use bevy::prelude::{Changed, Component, EventWriter};
+use bevy::ui::UiRect;
 use bevy::{
     prelude::{
         BuildChildren, Button, ButtonBundle, Color, Commands, Entity, Query, Res, TextBundle, With,
@@ -49,6 +50,7 @@ pub fn reward_button(commands: &mut Commands, fonts: &Res<Fonts>) -> Entity {
                 flex_direction: FlexDirection::Column,
                 align_content: AlignContent::Center,
                 align_items: AlignItems::Center,
+                margin: UiRect::all(Val::Px(20.)),
                 ..Default::default()
             },
             color: UiColor(Color::GRAY),
