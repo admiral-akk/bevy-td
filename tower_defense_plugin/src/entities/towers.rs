@@ -5,7 +5,7 @@ use crate::{
     },
     resources::{board::Board, game_sprites::GameSprites},
 };
-use assets_plugin::resources::heroes::{HeroSprites, HeroTypes};
+use assets_plugin::resources::heroes::{HeroSprites, HeroType};
 use bevy::{
     prelude::{BuildChildren, Commands, Name, Res, Vec3, VisibilityBundle},
     sprite::SpriteSheetBundle,
@@ -36,7 +36,7 @@ pub fn get_tower(
             commands,
             board,
             coord,
-            hero_sprites.fetch_sprite_sheet(HeroTypes::Shepard),
+            hero_sprites.fetch_sprite_sheet(HeroType::Shepard),
             "Peasant",
             Power(1),
         ),
@@ -44,7 +44,7 @@ pub fn get_tower(
             commands,
             board,
             coord,
-            hero_sprites.fetch_sprite_sheet(HeroTypes::Rogue),
+            hero_sprites.fetch_sprite_sheet(HeroType::Rogue),
             "Guard",
             Power(2),
         ),
@@ -52,7 +52,7 @@ pub fn get_tower(
             commands,
             board,
             coord,
-            hero_sprites.fetch_sprite_sheet(HeroTypes::Assassin),
+            hero_sprites.fetch_sprite_sheet(HeroType::Assassin),
             "Soldier",
             Power(3),
         ),
