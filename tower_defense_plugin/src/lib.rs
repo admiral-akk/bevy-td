@@ -24,10 +24,7 @@ use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, turn_order::TurnOrder,
 };
 
-use entities::{
-    heroes::add_hero,
-    towers::{get_tower},
-};
+use entities::heroes::add_hero;
 use events::{
     ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, Removed, StartWave, TryBuild,
 };
@@ -165,22 +162,14 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut commands: Commands,
         mut reward_evr: EventReader<Reward>,
         mut game_state: ResMut<State<GameState>>,
-        mut board: ResMut<Board>,
-        spritesheets: Res<GameSprites>,
+        board: ResMut<Board>,
         hero_sprites: Res<HeroSprites>,
     ) {
-        for selected_reward in reward_evr.iter() {
+        for Reward(selected_reward) in reward_evr.iter() {
             game_state.set(GameState::Building).unwrap();
-            for tower in selected_reward.0.iter() {
+            for hero_type in selected_reward.iter() {
                 let spawn = Coordinates::new(0, 0);
-                get_tower(
-                    &mut commands,
-                    &mut board,
-                    &spawn,
-                    &spritesheets,
-                    *tower,
-                    &hero_sprites,
-                );
+                add_hero(&mut commands, spawn, &board, &hero_sprites, *hero_type);
             }
         }
     }

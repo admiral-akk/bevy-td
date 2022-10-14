@@ -1,4 +1,4 @@
-use assets_plugin::resources::fonts::Fonts;
+use assets_plugin::resources::{fonts::Fonts, heroes::HeroType};
 use bevy::{
     prelude::{
         BuildChildren, Color, Commands, DespawnRecursiveExt, Entity, NodeBundle, Query, Res, With,
@@ -10,8 +10,6 @@ use bevy::{
 };
 
 use bevy::prelude::Component;
-
-use crate::entities::towers::TowerType;
 
 use super::button::reward_button;
 
@@ -70,9 +68,9 @@ pub fn add_reward_ui(mut commands: Commands, fonts: Res<Fonts>) {
 
     let background = spawn_background(&mut commands);
 
-    let reward_1 = reward_button(&mut commands, &fonts, TowerType::Peasant);
-    let reward_2 = reward_button(&mut commands, &fonts, TowerType::Guard);
-    let reward_3 = reward_button(&mut commands, &fonts, TowerType::Soldier);
+    let reward_1 = reward_button(&mut commands, &fonts, HeroType::Rogue);
+    let reward_2 = reward_button(&mut commands, &fonts, HeroType::Barbarian);
+    let reward_3 = reward_button(&mut commands, &fonts, HeroType::Paladin);
 
     commands.entity(root).add_child(background);
     commands

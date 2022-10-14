@@ -7,7 +7,7 @@ use bevy::{
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
-#[derive(Hash, Eq, PartialEq, EnumIter, Display)]
+#[derive(Hash, Eq, PartialEq, EnumIter, Display, Debug, Clone, Copy)]
 pub enum HeroType {
     Assassin,
     Barbarian,

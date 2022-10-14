@@ -1,4 +1,4 @@
-use crate::entities::towers::TowerType;
+use assets_plugin::resources::heroes::HeroType;
 
 #[derive(Debug, Clone)]
-pub struct Reward(pub Vec<TowerType>);
+pub struct Reward(pub Vec<HeroType>);

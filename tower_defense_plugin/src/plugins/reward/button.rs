@@ -1,4 +1,5 @@
 use assets_plugin::resources::fonts::Fonts;
+use assets_plugin::resources::heroes::HeroType;
 use bevy::prelude::{Changed, Component, EventWriter};
 use bevy::ui::UiRect;
 use bevy::{
@@ -11,11 +12,10 @@ use bevy::{
     },
 };
 
-use crate::entities::towers::TowerType;
 use crate::plugins::events::Reward;
 
 #[derive(Component)]
-pub struct RewardButton(pub TowerType);
+pub struct RewardButton(pub HeroType);
 
 pub fn handle_reward(
     mut button: Query<
@@ -40,7 +40,7 @@ pub fn handle_reward(
     }
 }
 
-pub fn reward_button(commands: &mut Commands, fonts: &Res<Fonts>, reward: TowerType) -> Entity {
+pub fn reward_button(commands: &mut Commands, fonts: &Res<Fonts>, reward: HeroType) -> Entity {
     let button = commands
         .spawn_bundle(ButtonBundle {
             style: Style {
