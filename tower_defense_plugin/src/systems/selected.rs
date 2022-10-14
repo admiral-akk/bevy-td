@@ -2,7 +2,7 @@ use bevy::prelude::{Entity, Input, MouseButton, Query, Res, ResMut, With};
 
 use crate::{
     components::{
-        coordinates::Coordinates, cursor::Cursor, selected::Selected, start::Start, tower::Tower,
+        coordinates::Coordinates, cursor::Cursor, hero::Hero, selected::Selected, start::Start,
     },
     resources::board::Board,
 };
@@ -12,7 +12,7 @@ pub fn select_tower(
     board: Res<Board>,
     mut selected: Query<&mut Selected>,
     mut click: ResMut<Input<MouseButton>>,
-    tower: Query<Entity, With<Tower>>,
+    tower: Query<Entity, With<Hero>>,
 ) {
     let mut selected = selected.single_mut();
     if selected.0.is_some() {
@@ -34,7 +34,7 @@ pub fn place_tower(
     board: Res<Board>,
     cursor: Query<&Cursor>,
     mut selected: Query<&mut Selected>,
-    mut towers: Query<(&mut Coordinates, &mut Start), With<Tower>>,
+    mut towers: Query<(&mut Coordinates, &mut Start), With<Hero>>,
     mut click: ResMut<Input<MouseButton>>,
 ) {
     let mut selected = selected.single_mut();

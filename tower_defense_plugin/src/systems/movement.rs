@@ -1,7 +1,7 @@
 use bevy::prelude::{Component, EventReader, Query, Res};
 
 use crate::{
-    components::{allegiance::Allegiance, coordinates::Coordinates, movement::Movement},
+    components::{allegiance::Allegiance, coordinates::Coordinates, movements::movement::Movement},
     events::ActiveUnit,
     resources::board::Board,
 };

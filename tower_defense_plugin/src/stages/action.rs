@@ -7,13 +7,13 @@ use bevy::{
 };
 
 use crate::{
-    components::movement::Charging,
+    components::movements::charging::Charging,
     systems::{
         attack::attack,
         health::{damage, death, update_health_bar},
         life::check_units,
-        movement::{apply_move},
-        turn_order::{tick_active},
+        movement::apply_move,
+        turn_order::tick_active,
     },
 };
 pub struct ActionStage {

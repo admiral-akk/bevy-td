@@ -1,7 +1,7 @@
 use crate::{
     components::{
-        allegiance::Allegiance, coordinates::Coordinates, health::Health, movement::Charging,
-        power::Power, start::Start, tower::Tower, unit::Unit,
+        allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero,
+        movements::charging::Charging, power::Power, start::Start, unit::Unit,
     },
     resources::{board::Board, game_sprites::GameSprites},
 };
@@ -72,7 +72,7 @@ fn tower_entity(
         .with_children(|parent| {
             parent
                 .spawn()
-                .insert(Tower)
+                .insert(Hero)
                 .insert(Charging(1))
                 .insert(Health::new(40))
                 .insert(Allegiance(0))

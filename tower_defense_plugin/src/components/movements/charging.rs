@@ -2,9 +2,12 @@ use std::collections::{HashSet, VecDeque};
 
 use bevy::prelude::{Component, Res};
 
-use crate::resources::board::Board;
+use crate::{
+    components::{allegiance::Allegiance, coordinates::Coordinates},
+    resources::board::Board,
+};
 
-use super::{allegiance::Allegiance, coordinates::Coordinates};
+use super::movement::Movement;
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
 #[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
@@ -39,13 +42,4 @@ impl Movement for Charging {
         }
         return None;
     }
-}
-
-pub trait Movement {
-    fn next(
-        &self,
-        entities: Vec<(Coordinates, Allegiance)>,
-        active: (Coordinates, Allegiance),
-        board: &Res<Board>,
-    ) -> Option<Coordinates>;
 }

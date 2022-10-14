@@ -1,19 +1,21 @@
+use crate::{
+    components::{
+        allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero,
+        movements::charging::Charging, power::Power, unit::Unit,
+    },
+};
+
 use bevy::{
     prelude::{Bundle, Name, Transform, VisibilityBundle},
     transform::TransformBundle,
 };
 
-use crate::components::{
-    allegiance::Allegiance, coordinates::Coordinates, health::Health, monster::Monster,
-    movements::charging::Charging, power::Power, unit::Unit,
-};
-
 #[derive(Bundle, Default)]
-pub struct MonsterBundle {
+pub struct HeroBundle {
     name: Name,
-    monster: Monster,
-    health: Health,
+    hero: Hero,
     movement: Charging,
+    health: Health,
     coordinates: Coordinates,
     power: Power,
     allegiance: Allegiance,
@@ -23,16 +25,15 @@ pub struct MonsterBundle {
     #[bundle]
     visibility: VisibilityBundle,
 }
-
-impl MonsterBundle {
+impl HeroBundle {
     pub fn new(coordinates: Coordinates, transform: Transform) -> Self {
-        MonsterBundle {
-            name: Name::new("Monster"),
-            monster: Monster,
-            allegiance: Allegiance(1),
-            health: Health::new(3),
+        HeroBundle {
+            name: Name::new("Hero"),
+            hero: Hero,
             movement: Charging(1),
-            power: Power(1),
+            allegiance: Allegiance(1),
+            health: Health::new(30),
+            power: Power(3),
             coordinates,
             unit: Unit,
             transform: TransformBundle {

@@ -10,6 +10,8 @@ use strum_macros::{Display, EnumIter};
 #[derive(Hash, Eq, PartialEq, EnumIter, Display)]
 pub enum MonsterType {
     Jelly,
+    Treant,
+    Zombie,
 }
 
 impl MonsterType {

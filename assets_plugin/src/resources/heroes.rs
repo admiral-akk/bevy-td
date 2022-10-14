@@ -9,9 +9,11 @@ use strum_macros::{Display, EnumIter};
 
 #[derive(Hash, Eq, PartialEq, EnumIter, Display)]
 pub enum HeroType {
-    Shepard,
     Assassin,
+    Barbarian,
+    Paladin,
     Rogue,
+    Shepard,
 }
 
 impl HeroType {
