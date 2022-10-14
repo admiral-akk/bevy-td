@@ -8,10 +8,10 @@ use bevy::{
 
 use crate::{
     components::{health::Health, health_bar::HealthBar},
-    events::Attack,
+    events::AttackEvent,
 };
 
-pub fn damage(mut monsters: Query<&mut Health>, mut attack_evr: EventReader<Attack>) {
+pub fn damage(mut monsters: Query<&mut Health>, mut attack_evr: EventReader<AttackEvent>) {
     for attack in attack_evr.iter() {
         if let Ok(mut health) = monsters.get_mut(attack.0) {
             health.health -= attack.1;

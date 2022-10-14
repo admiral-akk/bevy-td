@@ -1,25 +1,18 @@
+use bevy::prelude::{Bundle, Component};
 
-
-use bevy::{
-    prelude::{Bundle, Component},
-};
-
-use crate::components::{
-    action::Action,
-    movements::{movement::Movement},
-};
+use crate::components::{action::Action, attacks::attack::Attack};
 
 #[derive(Bundle, Default)]
-pub struct AttackBundle<T: Movement + Component> {
+pub struct AttackBundle<T: Attack + Component> {
     action: Action,
-    movement: T,
+    attack: T,
 }
 
-impl<T: Movement + Component> AttackBundle<T> {
-    pub fn new(movement: T) -> Self {
+impl<T: Attack + Component> AttackBundle<T> {
+    pub fn new(attack: T) -> Self {
         AttackBundle {
             action: Action,
-            movement,
+            attack,
         }
     }
 }

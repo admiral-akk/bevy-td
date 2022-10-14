@@ -1,11 +1,10 @@
-
-
 use crate::components::{
-    allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero, power::Power, start::Start, unit::Unit,
+    allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero, power::Power,
+    start::Start, unit::Unit,
 };
 
 use bevy::{
-    prelude::{Bundle, Entity, Name, Transform, VisibilityBundle},
+    prelude::{Bundle, Name, Transform, VisibilityBundle},
     transform::TransformBundle,
 };
 
@@ -25,7 +24,7 @@ pub struct HeroBundle {
     visibility: VisibilityBundle,
 }
 impl HeroBundle {
-    pub fn new(coordinates: Coordinates, transform: Transform, actions: &[Entity]) -> Self {
+    pub fn new(coordinates: Coordinates, transform: Transform) -> Self {
         HeroBundle {
             name: Name::new("Hero"),
             hero: Hero,
@@ -34,7 +33,7 @@ impl HeroBundle {
             power: Power(3),
             start: Start(coordinates),
             coordinates,
-            unit: Unit(Vec::from(actions)),
+            unit: Unit(Vec::new()),
             transform: TransformBundle {
                 local: transform,
                 ..Default::default()

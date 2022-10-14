@@ -7,9 +7,9 @@ use bevy::{
 };
 
 use crate::{
-    components::movements::charging::Charging,
+    components::{attacks::melee::MeleeAttack, movements::charging::Charging},
     systems::{
-        attack::attack,
+        attack::{try_attack},
         health::{damage, death, update_health_bar},
         life::check_units,
         movement::apply_move,
@@ -80,7 +80,7 @@ impl ActionStage {
             )
             .add_system_set_to_stage(
                 GameStage::Attack,
-                system_set(active_state.clone()).with_system(attack),
+                system_set(active_state.clone()).with_system(try_attack::<MeleeAttack>),
             )
             .add_system_set_to_stage(
                 GameStage::ResolveAttack,

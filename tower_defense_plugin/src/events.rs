@@ -12,7 +12,7 @@ pub struct HideBuildTarget;
 pub struct TryBuild;
 
 #[derive(Debug, Copy, Clone)]
-pub struct Attack(pub Entity, pub i32);
+pub struct AttackEvent(pub Entity, pub i32);
 
 #[derive(Debug, Copy, Clone)]
 pub struct GameOver(pub bool);

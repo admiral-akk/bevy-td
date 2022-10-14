@@ -39,14 +39,21 @@ pub fn tick_active(
     }
 }
 
+pub fn reset_turn(mut turn_order: Query<&mut TurnOrder>) {
+    turn_order.single_mut().1 = 0;
+}
+
 pub fn remove_turn(mut turn_order: Query<&mut TurnOrder>, removed: RemovedComponents<Unit>) {
-    let turn_order = &mut turn_order.single_mut().0;
+    let queue = &mut turn_order.single_mut();
     for removed in removed.iter() {
         bevy::log::error!("Attempt removed unit!");
-        for (i, e) in turn_order.iter().enumerate() {
+        for (i, e) in queue.0.iter().enumerate() {
             if removed.eq(e) {
                 bevy::log::error!("Removed unit!");
-                turn_order.remove(i);
+                if i == 0 {
+                    queue.1 = 0;
+                }
+                queue.0.remove(i);
                 break;
             }
         }

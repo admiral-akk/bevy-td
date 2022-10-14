@@ -26,7 +26,7 @@ use components::{
 
 use entities::heroes::add_hero;
 use events::{
-    ActiveAction, ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, Removed,
+    ActiveAction, ActiveUnit, AttackEvent, EnterBuildTarget, GameOver, HideBuildTarget, Removed,
     StartWave, TryBuild,
 };
 use plugins::{events::Reward, reward_plugin::RewardPlugin};
@@ -37,13 +37,14 @@ use resources::{
 };
 use stages::action::ActionStage;
 use systems::{
+    action::add_action,
     coordinates::{added, removed, return_to_start, updated},
     cursor::cursor_move,
     go::{enable, go, grey_out},
     health::add_health_bar,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
-    turn_order::{add_turn, remove_turn},
+    turn_order::{add_turn, remove_turn, reset_turn},
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -116,6 +117,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(added)
                     .with_system(updated)
                     .with_system(add_health_bar)
+                    .with_system(add_action)
                     .with_system(Self::game_over),
             )
             .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
@@ -123,7 +125,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_system_set(
                 SystemSet::on_exit(GameState::Fighting)
                     .with_system(enable)
-                    .with_system(return_to_start),
+                    .with_system(return_to_start)
+                    .with_system(reset_turn),
             )
             // Universal systems
             .add_system_set(
@@ -142,7 +145,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_event::<EnterBuildTarget>()
             .add_event::<HideBuildTarget>()
             .add_event::<TryBuild>()
-            .add_event::<Attack>()
+            .add_event::<AttackEvent>()
             .add_event::<GameOver>()
             .add_event::<StartWave>()
             .add_event::<ActiveAction>()

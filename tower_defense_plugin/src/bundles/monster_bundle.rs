@@ -1,7 +1,5 @@
-
-
 use bevy::{
-    prelude::{Bundle, Entity, Name, Transform, VisibilityBundle},
+    prelude::{Bundle, Name, Transform, VisibilityBundle},
     transform::TransformBundle,
 };
 
@@ -26,7 +24,7 @@ pub struct MonsterBundle {
 }
 
 impl MonsterBundle {
-    pub fn new(coordinates: Coordinates, transform: Transform, actions: &[Entity]) -> Self {
+    pub fn new(coordinates: Coordinates, transform: Transform) -> Self {
         MonsterBundle {
             name: Name::new("Monster"),
             monster: Monster,
@@ -34,7 +32,7 @@ impl MonsterBundle {
             health: Health::new(3),
             power: Power(1),
             coordinates,
-            unit: Unit(Vec::from(actions)),
+            unit: Unit(Vec::new()),
             transform: TransformBundle {
                 local: transform,
                 ..Default::default()

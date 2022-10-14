@@ -1,5 +1,6 @@
 pub(crate) mod action;
 pub(crate) mod allegiance;
+pub(crate) mod attacks;
 pub(crate) mod board;
 pub(crate) mod coordinates;
 pub(crate) mod cursor;
