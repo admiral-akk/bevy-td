@@ -24,10 +24,10 @@ pub fn cursor_move(
             continue;
         }
         let coord = Coordinates::new(
-            (pos.x / board.tile_size) as u16,
-            (pos.y / board.tile_size) as u16,
+            (pos.x / board.tile_size) as i16,
+            (pos.y / board.tile_size) as i16,
         );
-        if coord.x >= board.size.0 || coord.y >= board.size.1 {
+        if coord.x >= board.size.0 as i16 || coord.y >= board.size.1 as i16 {
             cursor.0 = None;
             continue;
         }

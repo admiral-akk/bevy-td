@@ -293,7 +293,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
     ) {
         for y in 0..board.height() {
             for x in 0..board.width() {
-                let coordinate = Coordinates::new(x, y);
+                let coordinate = Coordinates::new(x as i16, y as i16);
                 let tile =
                     background
                         .spawn_bundle(TileBundle::new(

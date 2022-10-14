@@ -94,7 +94,7 @@ impl Board {
         } else if coordinates.x == 16 {
             return TileType::None;
         } else {
-            let trainer_index = self.size.1 - coordinates.y - 1;
+            let trainer_index = self.size.1 - coordinates.y as u16 - 1;
             if trainer_index > self.size.1 - 2 {
                 return TileType::None;
             }

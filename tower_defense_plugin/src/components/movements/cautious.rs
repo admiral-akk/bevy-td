@@ -9,9 +9,9 @@ use super::movement::Movement;
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
 #[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
-pub struct Charging(pub u16);
+pub struct Cautious(pub u16, pub i16);
 
-impl Movement for Charging {
+impl Movement for Cautious {
     fn next(
         &self,
         entities: Vec<(Coordinates, Allegiance)>,
@@ -39,7 +39,9 @@ impl Movement for Charging {
             if !distance_field.contains_key(&next) {
                 continue;
             }
-            if distance_field[&next] < distance_field[&current_pos] {
+            if (distance_field[&next] as i16 - self.1).abs()
+                < (distance_field[&current_pos] as i16 - self.1).abs()
+            {
                 current_pos = next;
             }
         }

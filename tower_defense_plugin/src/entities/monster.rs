@@ -6,7 +6,9 @@ use crate::{
         attack_bundle::AttackBundle, monster_bundle::MonsterBundle, movement_bundle::MovementBundle,
     },
     components::{
-        attacks::melee::MeleeAttack, coordinates::Coordinates, movements::charging::Charging,
+        attacks::melee::MeleeAttack,
+        coordinates::Coordinates,
+        movements::{cautious::Cautious, charging::Charging},
     },
     resources::board::Board,
 };
@@ -18,7 +20,7 @@ pub fn add_monster(
     monsters: &Res<MonsterSprites>,
     monster_type: MonsterType,
 ) {
-    let movement = commands.spawn_bundle(MovementBundle::new(Charging(1))).id();
+    let movement = commands.spawn_bundle(MovementBundle::new(Charging(3))).id();
     let attack = commands
         .spawn_bundle(AttackBundle::new(MeleeAttack(1)))
         .id();
@@ -31,5 +33,14 @@ pub fn add_monster(
     commands
         .entity(monster)
         .push_children(&[sprite, movement, attack]);
+    match monster_type {
+        MonsterType::Bat => {
+            let movement = commands
+                .spawn_bundle(MovementBundle::new(Cautious(2, 3)))
+                .id();
+            commands.entity(monster).push_children(&[movement]);
+        }
+        _ => {}
+    }
     commands.entity(board.board.unwrap()).add_child(monster);
 }

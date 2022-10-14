@@ -7,7 +7,7 @@ use bevy::{
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
-#[derive(Hash, Eq, PartialEq, EnumIter, Display)]
+#[derive(Hash, Eq, PartialEq, EnumIter, Display, Copy, Clone)]
 pub enum MonsterType {
     Bat,
     Jelly,
