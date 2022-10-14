@@ -9,7 +9,10 @@ mod systems;
 
 use std::collections::VecDeque;
 
-use assets_plugin::resources::{fonts::Fonts, heroes::HeroSprites};
+use assets_plugin::resources::{
+    fonts::Fonts,
+    heroes::{HeroSprites, HeroType},
+};
 use bevy::{
     ecs::schedule::{ShouldRun, StateData},
     prelude::*,
@@ -21,7 +24,10 @@ use components::{
     coordinates::Coordinates, cursor::Cursor, go::Go, selected::Selected, turn_order::TurnOrder,
 };
 
-use entities::towers::{get_tower, TowerType};
+use entities::{
+    heroes::add_hero,
+    towers::{get_tower},
+};
 use events::{
     ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, Removed, StartWave, TryBuild,
 };
@@ -36,7 +42,7 @@ use systems::{
     coordinates::{added, removed, return_to_start, updated},
     cursor::cursor_move,
     go::{enable, go, grey_out},
-    health::{add_health_bar},
+    health::add_health_bar,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
     turn_order::{add_turn, remove_turn},
@@ -403,14 +409,9 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .id();
         board.board = Some(board_entity);
         let spawn = Coordinates::new(0, 0);
-        get_tower(
-            &mut commands,
-            &board,
-            &spawn,
-            &spritesheets,
-            TowerType::Guard,
-            &hero_sprites,
-        );
         commands.insert_resource(board);
+        let mut board = Board::new((20, 18), 32.);
+        board.board = Some(board_entity);
+        add_hero(&mut commands, spawn, &board, &hero_sprites, HeroType::Rogue);
     }
 }

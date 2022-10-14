@@ -1,5 +1,5 @@
 use assets_plugin::resources::heroes::{HeroSprites, HeroType};
-use bevy::prelude::{BuildChildren, Commands, Res};
+use bevy::prelude::{BuildChildren, Commands};
 
 use crate::{
     bundles::hero_bundles::HeroBundle, components::coordinates::Coordinates,
@@ -7,10 +7,10 @@ use crate::{
 };
 
 pub fn add_hero(
-    mut commands: Commands,
+    commands: &mut Commands,
     coord: Coordinates,
-    board: Res<Board>,
-    heroes: Res<HeroSprites>,
+    board: &Board,
+    heroes: &HeroSprites,
     hero_type: HeroType,
 ) {
     let hero = commands

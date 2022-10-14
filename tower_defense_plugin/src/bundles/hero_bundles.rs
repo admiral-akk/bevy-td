@@ -1,8 +1,6 @@
-use crate::{
-    components::{
-        allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero,
-        movements::charging::Charging, power::Power, unit::Unit,
-    },
+use crate::components::{
+    allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero,
+    movements::charging::Charging, power::Power, start::Start, unit::Unit,
 };
 
 use bevy::{
@@ -17,6 +15,7 @@ pub struct HeroBundle {
     movement: Charging,
     health: Health,
     coordinates: Coordinates,
+    start: Start,
     power: Power,
     allegiance: Allegiance,
     unit: Unit,
@@ -31,9 +30,10 @@ impl HeroBundle {
             name: Name::new("Hero"),
             hero: Hero,
             movement: Charging(1),
-            allegiance: Allegiance(1),
+            allegiance: Allegiance(0),
             health: Health::new(30),
             power: Power(3),
+            start: Start(coordinates),
             coordinates,
             unit: Unit,
             transform: TransformBundle {

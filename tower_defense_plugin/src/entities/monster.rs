@@ -9,7 +9,7 @@ use crate::{
 pub fn add_monster(
     commands: &mut Commands,
     coord: Coordinates,
-    board: &Res<Board>,
+    board: &Board,
     monsters: &Res<MonsterSprites>,
     monster_type: MonsterType,
 ) {

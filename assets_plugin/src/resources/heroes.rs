@@ -46,7 +46,7 @@ impl HeroSprites {
     pub fn fetch_sprite_sheet(&self, hero: HeroType) -> SpriteSheetBundle {
         SpriteSheetBundle {
             texture_atlas: self.handles.get(&hero).unwrap().clone(),
-            transform: Transform::from_scale(Vec3::splat(12.)),
+            transform: Transform::from_scale(Vec3::splat(2.)),
             ..Default::default()
         }
     }
