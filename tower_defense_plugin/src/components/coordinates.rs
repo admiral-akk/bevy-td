@@ -16,21 +16,18 @@ impl Coordinates {
         Coordinates { x, y }
     }
 
-    pub fn orthogonal_neighbours(&self) -> Vec<Coordinates> {
-        let mut neighbours = Vec::new();
-        if self.y > 2 {
-            neighbours.push(Coordinates::new(self.x, self.y - 1));
+    pub fn orthogonal_neighbours(&self, max_dist: i32) -> Vec<Coordinates> {
+        let mut coords = Vec::new();
+        for y in -max_dist..=max_dist {
+            let remain = max_dist - y.abs();
+            for x in -remain..=remain {
+                coords.push(Coordinates::new(
+                    (self.x as i32 + x) as u16,
+                    (self.y as i32 + y) as u16,
+                ));
+            }
         }
-        if self.y < 18 {
-            neighbours.push(Coordinates::new(self.x, self.y + 1));
-        }
-        if self.x > 0 {
-            neighbours.push(Coordinates::new(self.x - 1, self.y));
-        }
-        if self.x < 16 {
-            neighbours.push(Coordinates::new(self.x + 1, self.y));
-        }
-        neighbours
+        coords
     }
 }
 

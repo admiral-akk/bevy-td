@@ -179,7 +179,7 @@ impl Board {
 
     pub fn neighbouring_entities(&self, coord: &Coordinates) -> Vec<Entity> {
         return coord
-            .orthogonal_neighbours()
+            .orthogonal_neighbours(1)
             .into_iter()
             .map(|coord| self.entities.get(&coord))
             .filter(|entity| entity.is_some())
@@ -189,7 +189,7 @@ impl Board {
 
     pub fn neighbouring_paths(&self, coord: &Coordinates) -> Vec<Coordinates> {
         return coord
-            .orthogonal_neighbours()
+            .orthogonal_neighbours(1)
             .into_iter()
             .filter(|coord| self.path.contains(coord))
             .collect();

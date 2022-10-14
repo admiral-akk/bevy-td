@@ -18,7 +18,7 @@ impl Attack for MeleeAttack {
         active: (Coordinates, Allegiance),
         board: &Board,
     ) -> Option<AttackEvent> {
-        for neighbour in active.0.orthogonal_neighbours() {
+        for neighbour in active.0.orthogonal_neighbours(1) {
             if let Some(allegiance) = entities.get(&neighbour) {
                 if !allegiance.eq(&active.1) {
                     if let Some(&entity) = board.entities.get(&neighbour) {

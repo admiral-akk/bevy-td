@@ -402,10 +402,29 @@ impl<T: StateData> TowerDefensePlugin<T> {
             })
             .id();
         board.board = Some(board_entity);
-        let spawn = Coordinates::new(0, 0);
         commands.insert_resource(board);
         let mut board = Board::new((20, 18), 32.);
         board.board = Some(board_entity);
-        add_hero(&mut commands, spawn, &board, &hero_sprites, HeroType::Rogue);
+        add_hero(
+            &mut commands,
+            Coordinates::new(0, 0),
+            &board,
+            &hero_sprites,
+            HeroType::Rogue,
+        );
+        add_hero(
+            &mut commands,
+            Coordinates::new(1, 0),
+            &board,
+            &hero_sprites,
+            HeroType::Barbarian,
+        );
+        add_hero(
+            &mut commands,
+            Coordinates::new(2, 0),
+            &board,
+            &hero_sprites,
+            HeroType::Paladin,
+        );
     }
 }

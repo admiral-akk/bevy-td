@@ -9,6 +9,7 @@ use strum_macros::{Display, EnumIter};
 
 #[derive(Hash, Eq, PartialEq, EnumIter, Display)]
 pub enum MonsterType {
+    Bat,
     Jelly,
     Treant,
     Zombie,

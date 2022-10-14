@@ -5,8 +5,32 @@ use crate::{
     components::coordinates::Coordinates, entities::monster::add_monster, resources::board::Board,
 };
 pub fn monster_spawn(mut commands: Commands, board: Res<Board>, monsters: Res<MonsterSprites>) {
-    for x in 0..5 {
-        let coord = Coordinates::new(x, 12);
-        add_monster(&mut commands, coord, &board, &monsters, MonsterType::Jelly);
-    }
+    add_monster(
+        &mut commands,
+        Coordinates::new(0, 12),
+        &board,
+        &monsters,
+        MonsterType::Jelly,
+    );
+    add_monster(
+        &mut commands,
+        Coordinates::new(1, 12),
+        &board,
+        &monsters,
+        MonsterType::Treant,
+    );
+    add_monster(
+        &mut commands,
+        Coordinates::new(2, 12),
+        &board,
+        &monsters,
+        MonsterType::Zombie,
+    );
+    add_monster(
+        &mut commands,
+        Coordinates::new(3, 12),
+        &board,
+        &monsters,
+        MonsterType::Bat,
+    );
 }

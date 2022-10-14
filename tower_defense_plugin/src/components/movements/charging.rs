@@ -29,7 +29,7 @@ impl Movement for Charging {
             HashSet::from_iter(targets.iter().map(|c| c.clone()));
         let mut queue = VecDeque::from_iter(targets.iter().map(|c| c.clone()));
         while let Some(next) = queue.pop_front() {
-            for neighbour in next.orthogonal_neighbours() {
+            for neighbour in next.orthogonal_neighbours(1) {
                 if neighbour.eq(&active.0) {
                     return Some(next);
                 } else if board.entities.contains_key(&neighbour) {
