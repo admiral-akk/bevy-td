@@ -10,12 +10,14 @@ use crate::{
     components::{
         attacks::melee::MeleeAttack,
         movements::{cautious::Cautious, charging::Charging},
+        on_hits::split::Split,
     },
     systems::{
         attack::try_attack,
         health::{damage, death, update_health_bar},
         life::check_units,
         movement::apply_move,
+        on_hit::on_hit,
         turn_order::tick_active,
     },
 };
@@ -29,16 +31,18 @@ pub enum GameStage {
     Move,
     Attack,
     ResolveAttack,
+    OnHit,
     CheckEnd,
     CleanUp,
 }
 
 impl GameStage {
-    const STAGES: [GameStage; 6] = [
+    const STAGES: [GameStage; 7] = [
         GameStage::Tick,
+        GameStage::Move,
         GameStage::Attack,
         GameStage::ResolveAttack,
-        GameStage::Move,
+        GameStage::OnHit,
         GameStage::CheckEnd,
         GameStage::CleanUp,
     ];
@@ -93,6 +97,10 @@ impl ActionStage {
                     .with_system(damage)
                     .with_system(death.after(damage))
                     .with_system(update_health_bar.after(damage)),
+            )
+            .add_system_set_to_stage(
+                GameStage::OnHit,
+                system_set(active_state.clone()).with_system(on_hit::<Split>),
             )
             .add_system_set_to_stage(
                 GameStage::CheckEnd,

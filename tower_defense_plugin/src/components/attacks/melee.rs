@@ -1,5 +1,8 @@
 use super::attack::Attack;
-use bevy::{prelude::Component, utils::HashMap};
+use bevy::{
+    prelude::{Component, Entity},
+    utils::HashMap,
+};
 
 use crate::{
     components::{allegiance::Allegiance, coordinates::Coordinates},
@@ -15,14 +18,18 @@ impl Attack for MeleeAttack {
     fn target(
         &self,
         entities: HashMap<Coordinates, Allegiance>,
-        active: (Coordinates, Allegiance),
+        active: (Coordinates, Allegiance, Entity),
         board: &Board,
     ) -> Option<AttackEvent> {
         for neighbour in active.0.orthogonal_neighbours(1) {
             if let Some(allegiance) = entities.get(&neighbour) {
                 if !allegiance.eq(&active.1) {
                     if let Some(&entity) = board.entities.get(&neighbour) {
-                        return Some(AttackEvent(entity, self.0));
+                        return Some(AttackEvent {
+                            attacker: active.2,
+                            defender: entity,
+                            damage: self.0,
+                        });
                     }
                 }
             }

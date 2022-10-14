@@ -1,4 +1,4 @@
-use assets_plugin::resources::heroes::{HeroType};
+use assets_plugin::resources::heroes::HeroType;
 use bevy::prelude::{BuildChildren, Commands};
 
 use crate::{

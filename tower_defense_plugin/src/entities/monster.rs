@@ -1,5 +1,5 @@
-use assets_plugin::resources::monsters::{MonsterType};
-use bevy::prelude::{BuildChildren, Commands};
+use assets_plugin::resources::monsters::MonsterType;
+use bevy::prelude::{BuildChildren, Commands, Entity};
 
 use crate::{
     bundles::{
@@ -9,6 +9,7 @@ use crate::{
         attacks::melee::MeleeAttack,
         coordinates::Coordinates,
         movements::{cautious::Cautious, charging::Charging},
+        on_hits::split::Split,
     },
     resources::board::Board,
 };
@@ -18,7 +19,7 @@ pub fn add_monster(
     coord: Coordinates,
     board: &Board,
     monster_type: MonsterType,
-) {
+) -> Entity {
     let movement = commands.spawn_bundle(MovementBundle::new(Charging(3))).id();
     let attack = commands
         .spawn_bundle(AttackBundle::new(MeleeAttack(1)))
@@ -38,7 +39,11 @@ pub fn add_monster(
                 .id();
             commands.entity(monster).push_children(&[movement]);
         }
+        MonsterType::Jelly => {
+            commands.entity(monster).insert(Split);
+        }
         _ => {}
     }
     commands.entity(board.board.unwrap()).add_child(monster);
+    monster
 }

@@ -1,9 +1,7 @@
 use bevy::prelude::{Component, EventReader, EventWriter, Parent, Query, Res};
 
 use crate::{
-    components::{
-        allegiance::Allegiance, attacks::attack::Attack, coordinates::Coordinates,
-    },
+    components::{allegiance::Allegiance, attacks::attack::Attack, coordinates::Coordinates},
     events::{ActiveAction, AttackEvent},
     resources::board::Board,
 };
@@ -21,7 +19,9 @@ pub fn try_attack<T: Attack + Component>(
                     .iter()
                     .map(|(coord, allegiance)| (*coord, *allegiance))
                     .collect();
-                if let Some(attack) = attack.target(targets, (coord, allegiance), &board) {
+                if let Some(attack) =
+                    attack.target(targets, (coord, allegiance, parent.get()), &board)
+                {
                     attack_ewr.send(attack);
                 }
             }

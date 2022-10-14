@@ -1,9 +1,7 @@
-use bevy::prelude::{Commands, Query};
+use bevy::prelude::{Commands};
 
 use crate::{
-    components::{
-        coordinates::Coordinates, health::Health, monster::Monster,
-    },
+    components::{coordinates::Coordinates, health::Health, monster::Monster},
     events::HitEvent,
     resources::board::Board,
 };
@@ -14,6 +12,6 @@ pub trait OnHit {
         commands: &mut Commands,
         event: HitEvent,
         board: &Board,
-        units: Query<(&Coordinates, &Monster, &Health)>,
+        defender: (Coordinates, Monster, Health),
     );
 }

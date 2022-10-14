@@ -1,20 +1,29 @@
 use bevy::{
     prelude::{
         Added, BuildChildren, Changed, Children, Color, Commands, DespawnRecursiveExt, Entity,
-        EventReader, Query, Transform, Vec2, Visibility,
+        EventReader, EventWriter, Query, Transform, Vec2, Visibility,
     },
     sprite::{Anchor, Sprite, SpriteBundle},
 };
 
 use crate::{
     components::{health::Health, health_bar::HealthBar},
-    events::AttackEvent,
+    events::{AttackEvent, HitEvent},
 };
 
-pub fn damage(mut monsters: Query<&mut Health>, mut attack_evr: EventReader<AttackEvent>) {
+pub fn damage(
+    mut monsters: Query<&mut Health>,
+    mut attack_evr: EventReader<AttackEvent>,
+    mut on_hit: EventWriter<HitEvent>,
+) {
     for attack in attack_evr.iter() {
-        if let Ok(mut health) = monsters.get_mut(attack.0) {
-            health.health -= attack.1;
+        if let Ok(mut health) = monsters.get_mut(attack.defender) {
+            health.health -= attack.damage;
+            on_hit.send(HitEvent {
+                attacker: attack.attacker,
+                defender: attack.defender,
+                damage: attack.damage,
+            })
         }
     }
 }

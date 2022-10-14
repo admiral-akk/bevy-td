@@ -9,10 +9,7 @@ mod systems;
 
 use std::collections::VecDeque;
 
-use assets_plugin::resources::{
-    fonts::Fonts,
-    heroes::{HeroType},
-};
+use assets_plugin::resources::{fonts::Fonts, heroes::HeroType};
 use bevy::{
     ecs::schedule::{ShouldRun, StateData},
     prelude::*,

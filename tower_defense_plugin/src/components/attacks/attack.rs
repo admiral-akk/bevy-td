@@ -1,4 +1,4 @@
-use bevy::utils::HashMap;
+use bevy::{prelude::Entity, utils::HashMap};
 
 use crate::{
     components::{allegiance::Allegiance, coordinates::Coordinates},
@@ -10,7 +10,7 @@ pub trait Attack {
     fn target(
         &self,
         entities: HashMap<Coordinates, Allegiance>,
-        active: (Coordinates, Allegiance),
+        active: (Coordinates, Allegiance, Entity),
         board: &Board,
     ) -> Option<AttackEvent>;
 }

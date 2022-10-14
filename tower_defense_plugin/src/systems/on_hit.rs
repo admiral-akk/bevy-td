@@ -1,15 +1,25 @@
-use bevy::prelude::{Component, EventReader, Parent, Query, Res};
+use bevy::prelude::{Commands, Component, EventReader, Query, Res};
 
 use crate::{
-    components::{allegiance::Allegiance, coordinates::Coordinates, on_hits::on_hit::OnHit},
-    events::ActiveAction,
+    components::{
+        coordinates::Coordinates, health::Health, monster::Monster, on_hits::on_hit::OnHit,
+    },
+    events::HitEvent,
     resources::board::Board,
 };
 
 pub fn on_hit<T: OnHit + Component>(
-    _entities: Query<(&mut Coordinates, &Allegiance)>,
-    _action_ewr: EventReader<ActiveAction>,
-    _actions: Query<(&Parent, &T)>,
-    _board: Res<Board>,
+    mut commands: Commands,
+    on_hit: Query<&T>,
+    mut hit_ewr: EventReader<HitEvent>,
+    units: Query<(&Coordinates, &Monster, &Health)>,
+    board: Res<Board>,
 ) {
+    for hit in hit_ewr.iter() {
+        if let Ok(proc) = on_hit.get(hit.defender) {
+            if let Ok((coord, monster, health)) = units.get(hit.defender) {
+                proc.apply_effect(&mut commands, *hit, &board, (*coord, *monster, *health));
+            }
+        }
+    }
 }
