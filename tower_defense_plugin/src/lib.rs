@@ -26,7 +26,8 @@ use components::{
 
 use entities::heroes::add_hero;
 use events::{
-    ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, Removed, StartWave, TryBuild,
+    ActiveAction, ActiveUnit, Attack, EnterBuildTarget, GameOver, HideBuildTarget, Removed,
+    StartWave, TryBuild,
 };
 use plugins::{events::Reward, reward_plugin::RewardPlugin};
 use resources::{
@@ -144,6 +145,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_event::<Attack>()
             .add_event::<GameOver>()
             .add_event::<StartWave>()
+            .add_event::<ActiveAction>()
             .add_event::<ActiveUnit>()
             .add_event::<Removed>();
 
@@ -392,7 +394,7 @@ impl<T: StateData> TowerDefensePlugin<T> {
             .with_children(|parent| {
                 parent.spawn().insert(Cursor(None));
                 parent.spawn().insert(Selected(None));
-                parent.spawn().insert(TurnOrder(VecDeque::new()));
+                parent.spawn().insert(TurnOrder(VecDeque::new(), 0));
                 Self::spawn_ground(parent, &mut board, &spritesheets);
             })
             .id();

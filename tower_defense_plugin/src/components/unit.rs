@@ -1,5 +1,4 @@
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Entity};
 
-#[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
-#[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
-pub struct Unit;
+#[derive(Debug, Default, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
+pub struct Unit(pub Vec<Entity>);

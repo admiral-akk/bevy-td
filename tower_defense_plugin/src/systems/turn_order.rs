@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::{
     components::{turn_order::TurnOrder, unit::Unit},
-    events::{ActiveUnit},
+    events::ActiveAction,
     resources::game_step_timer::GameStepTimer,
 };
 
@@ -19,14 +19,23 @@ pub fn tick_active(
     time: Res<Time>,
     mut tick_timer: ResMut<GameStepTimer>,
     mut turn_order: Query<&mut TurnOrder>,
-    mut active_ewr: EventWriter<ActiveUnit>,
+    units: Query<&Unit>,
+    mut action_ewr: EventWriter<ActiveAction>,
 ) {
     tick_timer.0.tick(time.delta());
     if tick_timer.0.just_finished() {
-        let turn_order = &mut turn_order.single_mut().0;
-        let active = turn_order.pop_front().unwrap();
-        active_ewr.send(ActiveUnit(active));
-        turn_order.push_back(active);
+        let mut turn_order = turn_order.single_mut();
+        let active = *turn_order.0.front().unwrap();
+        if let Ok(Unit(actions)) = units.get(active) {
+            if actions.len() > turn_order.1 {
+                action_ewr.send(ActiveAction(actions[turn_order.1]));
+                turn_order.1 = turn_order.1 + 1;
+            } else {
+                turn_order.0.pop_front();
+                turn_order.0.push_back(active);
+                turn_order.1 = 0;
+            }
+        }
     }
 }
 

@@ -25,3 +25,6 @@ pub struct ActiveUnit(pub Entity);
 
 #[derive(Debug, Copy, Clone)]
 pub struct Removed(pub Entity);
+
+#[derive(Debug, Copy, Clone)]
+pub struct ActiveAction(pub Entity);
