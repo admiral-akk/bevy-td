@@ -1,6 +1,4 @@
-use assets_plugin::resources::{
-    heroes::{HeroSprites, HeroType},
-};
+use assets_plugin::resources::heroes::{HeroType};
 use bevy::prelude::{BuildChildren, Commands};
 
 use crate::{
@@ -13,13 +11,7 @@ use crate::{
     resources::board::Board,
 };
 
-pub fn add_hero(
-    commands: &mut Commands,
-    coord: Coordinates,
-    board: &Board,
-    _heroes: &HeroSprites,
-    hero_type: HeroType,
-) {
+pub fn add_hero(commands: &mut Commands, coord: Coordinates, board: &Board, hero_type: HeroType) {
     let movement = commands.spawn_bundle(MovementBundle::new(Charging(1))).id();
     let attack = commands
         .spawn_bundle(AttackBundle::new(MeleeAttack(1)))

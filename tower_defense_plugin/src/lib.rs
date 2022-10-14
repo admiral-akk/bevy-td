@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 
 use assets_plugin::resources::{
     fonts::Fonts,
-    heroes::{HeroSprites, HeroType},
+    heroes::{HeroType},
 };
 use bevy::{
     ecs::schedule::{ShouldRun, StateData},
@@ -172,13 +172,12 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut reward_evr: EventReader<Reward>,
         mut game_state: ResMut<State<GameState>>,
         board: ResMut<Board>,
-        hero_sprites: Res<HeroSprites>,
     ) {
         for Reward(selected_reward) in reward_evr.iter() {
             game_state.set(GameState::Building).unwrap();
             for hero_type in selected_reward.iter() {
                 let spawn = Coordinates::new(0, 0);
-                add_hero(&mut commands, spawn, &board, &hero_sprites, *hero_type);
+                add_hero(&mut commands, spawn, &board, *hero_type);
             }
         }
     }
@@ -391,7 +390,6 @@ impl<T: StateData> TowerDefensePlugin<T> {
         mut commands: Commands,
         spritesheets: Res<GameSprites>,
         mut game_state: ResMut<State<GameState>>,
-        hero_sprites: Res<HeroSprites>,
     ) {
         game_state.set(GameState::Building).unwrap();
         let mut board = Board::new((20, 18), 32.);
@@ -413,21 +411,18 @@ impl<T: StateData> TowerDefensePlugin<T> {
             &mut commands,
             Coordinates::new(0, 0),
             &board,
-            &hero_sprites,
             HeroType::Rogue,
         );
         add_hero(
             &mut commands,
             Coordinates::new(1, 0),
             &board,
-            &hero_sprites,
             HeroType::Barbarian,
         );
         add_hero(
             &mut commands,
             Coordinates::new(2, 0),
             &board,
-            &hero_sprites,
             HeroType::Paladin,
         );
     }

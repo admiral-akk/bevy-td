@@ -1,7 +1,5 @@
-use assets_plugin::resources::{
-    monsters::{MonsterSprites, MonsterType},
-};
-use bevy::prelude::{BuildChildren, Commands, Res};
+use assets_plugin::resources::monsters::{MonsterType};
+use bevy::prelude::{BuildChildren, Commands};
 
 use crate::{
     bundles::{
@@ -19,7 +17,6 @@ pub fn add_monster(
     commands: &mut Commands,
     coord: Coordinates,
     board: &Board,
-    _monsters: &Res<MonsterSprites>,
     monster_type: MonsterType,
 ) {
     let movement = commands.spawn_bundle(MovementBundle::new(Charging(3))).id();
