@@ -26,8 +26,8 @@ use components::{
 
 use entities::heroes::add_hero;
 use events::{
-    ActiveAction, ActiveUnit, AttackEvent, EnterBuildTarget, GameOver, HideBuildTarget, Removed,
-    StartWave, TryBuild,
+    ActiveAction, ActiveUnit, AttackEvent, EnterBuildTarget, GameOver, HideBuildTarget, HitEvent,
+    Removed, StartWave, TryBuild,
 };
 use plugins::{events::Reward, reward_plugin::RewardPlugin};
 use resources::{
@@ -44,6 +44,7 @@ use systems::{
     health::add_health_bar,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
+    sprites::{hero_added, monster_added},
     turn_order::{add_turn, remove_turn, reset_turn},
 };
 
@@ -118,6 +119,8 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(updated)
                     .with_system(add_health_bar)
                     .with_system(add_action)
+                    .with_system(hero_added)
+                    .with_system(monster_added)
                     .with_system(Self::game_over),
             )
             .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
@@ -146,6 +149,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
             .add_event::<HideBuildTarget>()
             .add_event::<TryBuild>()
             .add_event::<AttackEvent>()
+            .add_event::<HitEvent>()
             .add_event::<GameOver>()
             .add_event::<StartWave>()
             .add_event::<ActiveAction>()

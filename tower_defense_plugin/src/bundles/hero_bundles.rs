@@ -3,6 +3,7 @@ use crate::components::{
     unit::Unit,
 };
 
+use assets_plugin::resources::heroes::HeroType;
 use bevy::{
     prelude::{Bundle, Name, Transform, VisibilityBundle},
     transform::TransformBundle,
@@ -23,10 +24,10 @@ pub struct HeroBundle {
     visibility: VisibilityBundle,
 }
 impl HeroBundle {
-    pub fn new(coordinates: Coordinates, transform: Transform) -> Self {
+    pub fn new(coordinates: Coordinates, transform: Transform, hero_type: HeroType) -> Self {
         HeroBundle {
             name: Name::new("Hero"),
-            hero: Hero,
+            hero: Hero(hero_type),
             allegiance: Allegiance(0),
             health: Health::new(30),
             start: Start(coordinates),

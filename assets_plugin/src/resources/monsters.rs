@@ -7,8 +7,11 @@ use bevy::{
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
-#[derive(Hash, Eq, PartialEq, EnumIter, Display, Copy, Clone)]
+use super::sprites::Sprites;
+
+#[derive(Hash, Eq, PartialEq, EnumIter, Default, Display, Copy, Clone, Debug, Ord, PartialOrd)]
 pub enum MonsterType {
+    #[default]
     Bat,
     Jelly,
     Treant,
@@ -41,8 +44,10 @@ impl MonsterSprites {
         }
         commands.insert_resource(MonsterSprites { handles })
     }
+}
 
-    pub fn fetch_sprite_sheet(&self, monster: MonsterType) -> SpriteSheetBundle {
+impl Sprites<MonsterType> for MonsterSprites {
+    fn fetch_sprite_sheet(&self, monster: MonsterType) -> SpriteSheetBundle {
         SpriteSheetBundle {
             texture_atlas: self.handles.get(&monster).unwrap().clone(),
             transform: Transform::from_scale(Vec3::splat(2.)),

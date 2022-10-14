@@ -6,6 +6,8 @@ pub(crate) mod go;
 pub(crate) mod health;
 pub(crate) mod life;
 pub(crate) mod movement;
+pub(crate) mod on_hit;
 pub(crate) mod selected;
 pub(crate) mod spawn_wave;
+pub(crate) mod sprites;
 pub(crate) mod turn_order;

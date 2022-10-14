@@ -1,3 +1,4 @@
+use assets_plugin::resources::monsters::MonsterType;
 use bevy::{
     prelude::{Bundle, Name, Transform, VisibilityBundle},
     transform::TransformBundle,
@@ -22,10 +23,10 @@ pub struct MonsterBundle {
 }
 
 impl MonsterBundle {
-    pub fn new(coordinates: Coordinates, transform: Transform) -> Self {
+    pub fn new(coordinates: Coordinates, transform: Transform, monster_type: MonsterType) -> Self {
         MonsterBundle {
             name: Name::new("Monster"),
-            monster: Monster,
+            monster: Monster(monster_type),
             allegiance: Allegiance(1),
             health: Health::new(3),
             coordinates,

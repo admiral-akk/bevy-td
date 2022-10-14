@@ -7,8 +7,11 @@ use bevy::{
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
-#[derive(Hash, Eq, PartialEq, EnumIter, Display, Debug, Clone, Copy)]
+use super::sprites::Sprites;
+
+#[derive(Hash, Eq, PartialEq, Default, Copy, Clone, Ord, PartialOrd, EnumIter, Debug, Display)]
 pub enum HeroType {
+    #[default]
     Assassin,
     Barbarian,
     Paladin,
@@ -42,8 +45,10 @@ impl HeroSprites {
         }
         commands.insert_resource(HeroSprites { handles })
     }
+}
 
-    pub fn fetch_sprite_sheet(&self, hero: HeroType) -> SpriteSheetBundle {
+impl Sprites<HeroType> for HeroSprites {
+    fn fetch_sprite_sheet(&self, hero: HeroType) -> SpriteSheetBundle {
         SpriteSheetBundle {
             texture_atlas: self.handles.get(&hero).unwrap().clone(),
             transform: Transform::from_scale(Vec3::splat(2.)),

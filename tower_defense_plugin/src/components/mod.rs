@@ -1,7 +1,6 @@
 pub(crate) mod action;
 pub(crate) mod allegiance;
 pub(crate) mod attacks;
-pub(crate) mod board;
 pub(crate) mod coordinates;
 pub(crate) mod cursor;
 pub(crate) mod go;
@@ -10,6 +9,7 @@ pub(crate) mod health_bar;
 pub(crate) mod hero;
 pub(crate) mod monster;
 pub(crate) mod movements;
+pub(crate) mod on_hits;
 pub(crate) mod selected;
 pub(crate) mod start;
 pub(crate) mod turn_order;

@@ -15,6 +15,9 @@ pub struct TryBuild;
 pub struct AttackEvent(pub Entity, pub i32);
 
 #[derive(Debug, Copy, Clone)]
+pub struct HitEvent(pub Entity, pub Entity, pub i32);
+
+#[derive(Debug, Copy, Clone)]
 pub struct GameOver(pub bool);
 
 #[derive(Debug, Copy, Clone)]

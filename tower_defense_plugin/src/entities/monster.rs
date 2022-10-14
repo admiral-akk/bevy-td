@@ -1,4 +1,6 @@
-use assets_plugin::resources::monsters::{MonsterSprites, MonsterType};
+use assets_plugin::resources::{
+    monsters::{MonsterSprites, MonsterType},
+};
 use bevy::prelude::{BuildChildren, Commands, Res};
 
 use crate::{
@@ -17,7 +19,7 @@ pub fn add_monster(
     commands: &mut Commands,
     coord: Coordinates,
     board: &Board,
-    monsters: &Res<MonsterSprites>,
+    _monsters: &Res<MonsterSprites>,
     monster_type: MonsterType,
 ) {
     let movement = commands.spawn_bundle(MovementBundle::new(Charging(3))).id();
@@ -25,14 +27,13 @@ pub fn add_monster(
         .spawn_bundle(AttackBundle::new(MeleeAttack(1)))
         .id();
     let monster = commands
-        .spawn_bundle(MonsterBundle::new(coord, board.transform(&board.start, 4.)))
+        .spawn_bundle(MonsterBundle::new(
+            coord,
+            board.transform(&board.start, 4.),
+            monster_type,
+        ))
         .id();
-    let sprite = commands
-        .spawn_bundle(monsters.fetch_sprite_sheet(monster_type))
-        .id();
-    commands
-        .entity(monster)
-        .push_children(&[sprite, movement, attack]);
+    commands.entity(monster).push_children(&[movement, attack]);
     match monster_type {
         MonsterType::Bat => {
             let movement = commands
