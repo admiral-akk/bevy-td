@@ -1,6 +1,6 @@
 use crate::components::{
-    allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero, power::Power,
-    start::Start, unit::Unit,
+    allegiance::Allegiance, coordinates::Coordinates, health::Health, hero::Hero, start::Start,
+    unit::Unit,
 };
 
 use bevy::{
@@ -15,7 +15,6 @@ pub struct HeroBundle {
     health: Health,
     coordinates: Coordinates,
     start: Start,
-    power: Power,
     allegiance: Allegiance,
     unit: Unit,
     #[bundle]
@@ -30,7 +29,6 @@ impl HeroBundle {
             hero: Hero,
             allegiance: Allegiance(0),
             health: Health::new(30),
-            power: Power(3),
             start: Start(coordinates),
             coordinates,
             unit: Unit(Vec::new()),
