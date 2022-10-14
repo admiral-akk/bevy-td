@@ -5,7 +5,7 @@ use bevy::{
 
 use crate::components::{
     allegiance::Allegiance, coordinates::Coordinates, health::Health, monster::Monster,
-    movement::Movement, power::Power, unit::Unit,
+    movement::Charging, power::Power, unit::Unit,
 };
 
 #[derive(Bundle, Default)]
@@ -13,7 +13,7 @@ pub struct MonsterBundle {
     name: Name,
     monster: Monster,
     health: Health,
-    movement: Movement,
+    movement: Charging,
     coordinates: Coordinates,
     power: Power,
     allegiance: Allegiance,
@@ -31,7 +31,7 @@ impl MonsterBundle {
             monster: Monster,
             allegiance: Allegiance(1),
             health: Health::new(3),
-            movement: Movement(1),
+            movement: Charging(1),
             power: Power(1),
             coordinates,
             unit: Unit,

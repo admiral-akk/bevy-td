@@ -4,6 +4,7 @@ mod entities;
 mod events;
 mod plugins;
 pub mod resources;
+mod stages;
 mod systems;
 
 use std::collections::VecDeque;
@@ -30,17 +31,15 @@ use resources::{
     game_sprites::GameSprites,
     game_step_timer::GameStepTimer,
 };
+use stages::action::ActionStage;
 use systems::{
-    attack::attack,
     coordinates::{added, removed, return_to_start, updated},
     cursor::cursor_move,
     go::{enable, go, grey_out},
-    health::{add_health_bar, damage, death, update_health_bar},
-    life::check_units,
-    movement::movement,
+    health::{add_health_bar},
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
-    turn_order::{add_turn, remove_turn, tick_active},
+    turn_order::{add_turn, remove_turn},
 };
 
 pub struct TowerDefensePlugin<T> {
@@ -56,45 +55,6 @@ pub enum GameState {
     Building,
     Fighting,
     Reward,
-}
-
-#[derive(Copy, Clone, StageLabel)]
-pub enum GameStage {
-    Tick,
-    Move,
-    Attack,
-    ResolveAttack,
-    CheckEnd,
-    CleanUp,
-}
-
-impl GameStage {
-    const STAGES: [GameStage; 6] = [
-        GameStage::Tick,
-        GameStage::Attack,
-        GameStage::ResolveAttack,
-        GameStage::Move,
-        GameStage::CheckEnd,
-        GameStage::CleanUp,
-    ];
-
-    pub fn add_stages(app: &mut App) {
-        for i in 0..GameStage::STAGES.len() {
-            if i == 0 {
-                app.add_stage_after(
-                    CoreStage::Update,
-                    GameStage::STAGES[i],
-                    SystemStage::single_threaded(),
-                );
-            } else {
-                app.add_stage_after(
-                    GameStage::STAGES[i - 1],
-                    GameStage::STAGES[i],
-                    SystemStage::single_threaded(),
-                );
-            }
-        }
-    }
 }
 
 fn is_fighting(state: Res<State<GameState>>) -> ShouldRun {
@@ -117,7 +77,6 @@ fn in_game_system_set() -> SystemSet {
 
 impl<T: StateData> Plugin for TowerDefensePlugin<T> {
     fn build(&self, app: &mut App) {
-        GameStage::add_stages(app);
         app.add_plugin(RewardPlugin::new(GameState::Reward));
         app.add_state(GameState::None)
             .insert_resource(EndMenuState(self.end_menu_state.clone()))
@@ -132,6 +91,11 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                 CoreStage::PostUpdate,
                 in_game_system_set().with_system(Self::handle_reward),
             )
+            .add_stage_after(
+                CoreStage::Update,
+                "Action",
+                ActionStage::new(GameState::Fighting),
+            )
             .add_system_set(
                 SystemSet::on_update(GameState::Building)
                     .with_system(select_tower)
@@ -139,42 +103,19 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(go)
                     .with_system(Self::start_wave),
             )
-            .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
-            // Fighting systems
             .add_system_set_to_stage(
-                GameStage::Tick,
-                fighting_system_set().with_system(tick_active),
-            )
-            .add_system_set_to_stage(
-                GameStage::Move,
-                SystemSet::new()
-                    .with_run_criteria(is_fighting)
-                    .with_system(movement),
-            )
-            .add_system_set_to_stage(GameStage::Attack, fighting_system_set().with_system(attack))
-            .add_system_set_to_stage(
-                GameStage::ResolveAttack,
-                fighting_system_set()
-                    .with_system(damage)
-                    .with_system(death.after(damage))
-                    .with_system(update_health_bar.after(damage)),
-            )
-            .add_system_set_to_stage(
-                GameStage::CleanUp,
+                CoreStage::PostUpdate,
                 in_game_system_set()
                     .with_system(add_turn)
                     .with_system(remove_turn)
                     .with_system(removed)
                     .with_system(added)
                     .with_system(updated)
-                    .with_system(add_health_bar),
+                    .with_system(add_health_bar)
+                    .with_system(Self::game_over),
             )
-            .add_system_set_to_stage(
-                GameStage::CheckEnd,
-                fighting_system_set()
-                    .with_system(check_units)
-                    .with_system(Self::game_over.after(check_units)),
-            )
+            .add_system_set(SystemSet::on_exit(GameState::Building).with_system(grey_out))
+            // Fighting systems
             .add_system_set(
                 SystemSet::on_exit(GameState::Fighting)
                     .with_system(enable)
