@@ -1,4 +1,4 @@
-use bevy::prelude::{Entity, Res};
+use bevy::prelude::Res;
 
 use crate::{
     components::{allegiance::Allegiance, coordinates::Coordinates},
@@ -12,9 +12,4 @@ pub trait Movement {
         active: (Coordinates, Allegiance),
         board: &Res<Board>,
     ) -> Option<Coordinates>;
-}
-
-pub struct MovementPlan {
-    pub mover: Entity,
-    pub plan: Vec<Coordinates>,
 }

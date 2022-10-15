@@ -1,6 +1,8 @@
 use bevy::prelude::{Entity, Transform, Vec2, Vec3};
 
-use crate::components::coordinates::Coordinates;
+use crate::components::{
+    coordinates::Coordinates,
+};
 
 use super::bimap::BiMap;
 

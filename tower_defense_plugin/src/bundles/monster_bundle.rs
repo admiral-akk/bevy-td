@@ -28,7 +28,7 @@ impl MonsterBundle {
             name: Name::new("Monster"),
             monster: Monster(monster_type),
             allegiance: Allegiance(1),
-            health: Health::new(3),
+            health: Health::new(5),
             coordinates,
             unit: Unit(Vec::new()),
             transform: TransformBundle {

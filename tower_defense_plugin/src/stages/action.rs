@@ -8,7 +8,7 @@ use bevy::{
 
 use crate::{
     components::{
-        attacks::melee::MeleeAttack,
+        attacks::{backstab::Backstab, melee::MeleeAttack},
         movements::{cautious::Cautious, charging::Charging},
         on_hits::split::Split,
     },
@@ -89,7 +89,9 @@ impl ActionStage {
             )
             .add_system_set_to_stage(
                 GameStage::Attack,
-                system_set(active_state.clone()).with_system(try_attack::<MeleeAttack>),
+                system_set(active_state.clone())
+                    .with_system(try_attack::<MeleeAttack>)
+                    .with_system(try_attack::<Backstab>),
             )
             .add_system_set_to_stage(
                 GameStage::ResolveAttack,
