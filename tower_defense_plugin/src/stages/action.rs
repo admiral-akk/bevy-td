@@ -16,7 +16,7 @@ use crate::{
         attack::try_attack,
         health::{damage, death, update_health_bar},
         life::check_units,
-        movement::apply_move,
+        movement::{apply_move, propose_move},
         on_hit::on_hit,
         turn_order::tick_active,
     },
@@ -28,7 +28,8 @@ pub struct ActionStage {
 #[derive(Copy, Clone, StageLabel)]
 pub enum GameStage {
     Tick,
-    Move,
+    ProposeMove,
+    ApplyMove,
     Attack,
     ResolveAttack,
     OnHit,
@@ -37,9 +38,10 @@ pub enum GameStage {
 }
 
 impl GameStage {
-    const STAGES: [GameStage; 7] = [
+    const STAGES: [GameStage; 8] = [
         GameStage::Tick,
-        GameStage::Move,
+        GameStage::ProposeMove,
+        GameStage::ApplyMove,
         GameStage::Attack,
         GameStage::ResolveAttack,
         GameStage::OnHit,
@@ -82,11 +84,15 @@ impl ActionStage {
                 system_set(active_state.clone()).with_system(tick_active),
             )
             .add_system_set_to_stage(
-                GameStage::Move,
+                GameStage::ProposeMove,
                 system_set(active_state.clone())
-                    .with_system(apply_move::<Charging>)
-                    .with_system(apply_move::<Cautious>)
-                    .with_system(apply_move::<Cowardly>),
+                    .with_system(propose_move::<Charging>)
+                    .with_system(propose_move::<Cautious>)
+                    .with_system(propose_move::<Cowardly>),
+            )
+            .add_system_set_to_stage(
+                GameStage::ApplyMove,
+                system_set(active_state.clone()).with_system(apply_move),
             )
             .add_system_set_to_stage(
                 GameStage::Attack,
