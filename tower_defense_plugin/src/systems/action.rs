@@ -1,6 +1,4 @@
-use bevy::prelude::{
-    Added, Entity, Parent, Query,
-};
+use bevy::prelude::{Added, Entity, Parent, Query};
 
 use crate::components::{action::Action, unit::Unit};
 
@@ -10,7 +8,7 @@ pub fn add_action(
 ) {
     for (action, parent) in new_actions.iter() {
         if let Ok(mut unit) = unit.get_mut(parent.get()) {
-            unit.0.push(action);
+            unit.actions.push(action);
         }
     }
 }

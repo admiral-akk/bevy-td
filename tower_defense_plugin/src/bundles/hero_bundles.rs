@@ -32,7 +32,9 @@ impl HeroBundle {
             health: Health::new(30),
             start: Start(coordinates),
             coordinates,
-            unit: Unit(Vec::new()),
+            unit: Unit {
+                actions: Vec::new(),
+            },
             transform: TransformBundle {
                 local: transform,
                 ..Default::default()

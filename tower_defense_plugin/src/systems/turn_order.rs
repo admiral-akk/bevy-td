@@ -26,7 +26,8 @@ pub fn tick_active(
     if tick_timer.0.just_finished() {
         let mut turn_order = turn_order.single_mut();
         let active = *turn_order.0.front().unwrap();
-        if let Ok(Unit(actions)) = units.get(active) {
+        if let Ok(unit) = units.get(active) {
+            let actions = &unit.actions;
             if actions.len() > turn_order.1 {
                 action_ewr.send(ActiveAction(actions[turn_order.1]));
                 turn_order.1 = turn_order.1 + 1;

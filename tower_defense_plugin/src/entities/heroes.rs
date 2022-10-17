@@ -8,13 +8,16 @@ use crate::{
     components::{
         attacks::{backstab::Backstab, melee::MeleeAttack},
         coordinates::Coordinates,
-        movements::charging::Charging,
+        movements::{charging::Charging, cowardly::Cowardly},
     },
     resources::board::Board,
 };
 
 pub fn add_hero(commands: &mut Commands, coord: Coordinates, board: &Board, hero_type: HeroType) {
-    let movement = commands.spawn_bundle(MovementBundle::new(Charging(1))).id();
+    let movement = match hero_type {
+        HeroType::Rogue => commands.spawn_bundle(MovementBundle::new(Cowardly(1))).id(),
+        _ => commands.spawn_bundle(MovementBundle::new(Charging(1))).id(),
+    };
     let attack = match hero_type {
         HeroType::Rogue => commands
             .spawn_bundle(AttackBundle::new(Backstab::new(1, 5)))

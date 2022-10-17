@@ -30,7 +30,9 @@ impl MonsterBundle {
             allegiance: Allegiance(1),
             health: Health::new(5),
             coordinates,
-            unit: Unit(Vec::new()),
+            unit: Unit {
+                actions: Vec::new(),
+            },
             transform: TransformBundle {
                 local: transform,
                 ..Default::default()
