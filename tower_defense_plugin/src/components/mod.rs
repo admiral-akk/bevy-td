@@ -1,8 +1,10 @@
 pub(crate) mod action;
 pub(crate) mod allegiance;
 pub(crate) mod attacks;
+pub(crate) mod auras;
 pub(crate) mod coordinates;
 pub(crate) mod cursor;
+pub(crate) mod debuffs;
 pub(crate) mod go;
 pub(crate) mod health;
 pub(crate) mod health_bar;

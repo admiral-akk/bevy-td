@@ -1,5 +1,6 @@
 pub(crate) mod action;
 pub(crate) mod attack;
+pub(crate) mod aura;
 pub(crate) mod coordinates;
 pub(crate) mod cursor;
 pub(crate) mod go;
@@ -7,6 +8,7 @@ pub(crate) mod health;
 pub(crate) mod life;
 pub(crate) mod movement;
 pub(crate) mod on_hit;
+pub(crate) mod root;
 pub(crate) mod selected;
 pub(crate) mod spawn_wave;
 pub(crate) mod sprites;

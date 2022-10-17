@@ -1,0 +1,32 @@
+use std::collections::HashSet;
+
+use bevy::prelude::Component;
+
+use crate::components::{allegiance::Allegiance, coordinates::Coordinates, debuffs::root::Root};
+
+use super::aura::Aura;
+
+#[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
+#[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
+pub struct RootAura(pub u32);
+
+impl Aura<Root> for RootAura {
+    fn targets(
+        &self,
+        entities: &Vec<(Coordinates, Allegiance)>,
+        active: (Coordinates, Allegiance),
+    ) -> (Root, Vec<Coordinates>) {
+        let enemies: HashSet<Coordinates> = entities
+            .iter()
+            .filter(|(_, allegiance)| !allegiance.eq(&active.1))
+            .map(|(coord, _)| *coord)
+            .collect();
+        let mut ret = Vec::new();
+        for neighbour in active.0.orthogonal_neighbours(self.0 as i16) {
+            if enemies.contains(&neighbour) {
+                ret.push(neighbour);
+            }
+        }
+        (Root(1), ret)
+    }
+}

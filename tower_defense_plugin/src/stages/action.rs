@@ -9,15 +9,19 @@ use bevy::{
 use crate::{
     components::{
         attacks::{backstab::Backstab, melee::MeleeAttack},
+        auras::root::RootAura,
+        debuffs::root::Root,
         movements::{cautious::Cautious, charging::Charging, cowardly::Cowardly},
         on_hits::split::Split,
     },
     systems::{
         attack::try_attack,
+        aura::apply_aura,
         health::{damage, death, update_health_bar},
         life::check_units,
         movement::{apply_move, propose_move},
         on_hit::on_hit,
+        root::rooted,
         turn_order::tick_active,
     },
 };
@@ -29,7 +33,9 @@ pub struct ActionStage {
 pub enum GameStage {
     Tick,
     ProposeMove,
+    ModifyMove,
     ApplyMove,
+    PostMove,
     Attack,
     ResolveAttack,
     OnHit,
@@ -38,10 +44,12 @@ pub enum GameStage {
 }
 
 impl GameStage {
-    const STAGES: [GameStage; 8] = [
+    const STAGES: [GameStage; 10] = [
         GameStage::Tick,
         GameStage::ProposeMove,
+        GameStage::ModifyMove,
         GameStage::ApplyMove,
+        GameStage::PostMove,
         GameStage::Attack,
         GameStage::ResolveAttack,
         GameStage::OnHit,
@@ -91,8 +99,16 @@ impl ActionStage {
                     .with_system(propose_move::<Cowardly>),
             )
             .add_system_set_to_stage(
+                GameStage::ModifyMove,
+                system_set(active_state.clone()).with_system(rooted),
+            )
+            .add_system_set_to_stage(
                 GameStage::ApplyMove,
                 system_set(active_state.clone()).with_system(apply_move),
+            )
+            .add_system_set_to_stage(
+                GameStage::PostMove,
+                system_set(active_state.clone()).with_system(apply_aura::<Root, RootAura>),
             )
             .add_system_set_to_stage(
                 GameStage::Attack,

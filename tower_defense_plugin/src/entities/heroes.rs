@@ -7,6 +7,7 @@ use crate::{
     },
     components::{
         attacks::{backstab::Backstab, melee::MeleeAttack},
+        auras::root::RootAura,
         coordinates::Coordinates,
         movements::{charging::Charging, cowardly::Cowardly},
     },
@@ -34,5 +35,12 @@ pub fn add_hero(commands: &mut Commands, coord: Coordinates, board: &Board, hero
         ))
         .id();
     commands.entity(hero).push_children(&[movement, attack]);
+
+    match hero_type {
+        HeroType::Paladin => {
+            commands.entity(hero).insert(RootAura(5));
+        }
+        _ => {}
+    };
     commands.entity(board.board.unwrap()).add_child(hero);
 }
