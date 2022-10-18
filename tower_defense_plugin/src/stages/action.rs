@@ -26,6 +26,7 @@ use crate::{
         on_hit::on_hit,
         root::rooted,
         target::try_target,
+        taunt::taunted,
         turn_order::tick_active,
     },
 };
@@ -114,7 +115,10 @@ impl ActionStage {
                     .with_system(try_attack::<Normal>)
                     .with_system(try_attack::<Backstab>),
             )
-            .add_system_set_to_stage(GameStage::FilterAttacks, system_set(active_state.clone()))
+            .add_system_set_to_stage(
+                GameStage::FilterAttacks,
+                system_set(active_state.clone()).with_system(taunted),
+            )
             .add_system_set_to_stage(
                 GameStage::ResolveAttack,
                 system_set(active_state.clone())

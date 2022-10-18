@@ -7,7 +7,7 @@ use crate::{
     },
     components::{
         attacks::{melee::Normal, normal::Backstab},
-        auras::root::RootAura,
+        auras::{taunt::TauntAura},
         coordinates::Coordinates,
         movements::{charging::Charging, cowardly::Cowardly},
         targetting::melee::MeleeTarget,
@@ -39,7 +39,7 @@ pub fn add_hero(commands: &mut Commands, coord: Coordinates, board: &Board, hero
 
     match hero_type {
         HeroType::Paladin => {
-            commands.entity(hero).insert(RootAura(5));
+            commands.entity(hero).insert(TauntAura(1));
         }
         _ => {}
     };
