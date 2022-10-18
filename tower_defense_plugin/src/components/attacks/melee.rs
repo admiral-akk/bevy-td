@@ -1,4 +1,4 @@
-use super::attack::Attack;
+use super::{attack::Attack, priority::ProposedAttack};
 use bevy::{
     prelude::{Component, Entity},
     utils::HashMap,
@@ -6,7 +6,6 @@ use bevy::{
 
 use crate::{
     components::{allegiance::Allegiance, coordinates::Coordinates},
-    events::AttackEvent,
     resources::board::Board,
 };
 
@@ -15,25 +14,26 @@ use crate::{
 pub struct MeleeAttack(pub i32);
 
 impl Attack for MeleeAttack {
-    fn target(
+    fn priority(
         &self,
         entities: HashMap<Coordinates, Allegiance>,
         active: (Coordinates, Allegiance, Entity),
         board: &Board,
-    ) -> Option<AttackEvent> {
+    ) -> Vec<ProposedAttack> {
+        let mut priority = Vec::new();
         for neighbour in active.0.orthogonal_neighbours(1) {
             if let Some(allegiance) = entities.get(&neighbour) {
                 if !allegiance.eq(&active.1) {
                     if let Some(&entity) = board.entities.get(&neighbour) {
-                        return Some(AttackEvent {
+                        priority.push(ProposedAttack {
+                            damage: self.0,
                             attacker: active.2,
                             defender: entity,
-                            damage: self.0,
                         });
                     }
                 }
             }
         }
-        return None;
+        priority
     }
 }

@@ -5,6 +5,7 @@ mod events;
 mod plugins;
 pub mod resources;
 mod stages;
+mod structs;
 mod systems;
 
 use std::collections::VecDeque;

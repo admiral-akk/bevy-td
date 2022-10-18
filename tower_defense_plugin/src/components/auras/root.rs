@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use bevy::prelude::Component;
+use bevy::prelude::{Component, Entity};
 
 use crate::components::{allegiance::Allegiance, coordinates::Coordinates, debuffs::root::Root};
 
@@ -14,15 +14,15 @@ impl Aura<Root> for RootAura {
     fn targets(
         &self,
         entities: &Vec<(Coordinates, Allegiance)>,
-        active: (Coordinates, Allegiance),
+        active: (Entity, Coordinates, Allegiance),
     ) -> (Root, Vec<Coordinates>) {
         let enemies: HashSet<Coordinates> = entities
             .iter()
-            .filter(|(_, allegiance)| !allegiance.eq(&active.1))
+            .filter(|(_, allegiance)| !allegiance.eq(&active.2))
             .map(|(coord, _)| *coord)
             .collect();
         let mut ret = Vec::new();
-        for neighbour in active.0.orthogonal_neighbours(self.0 as i16) {
+        for neighbour in active.1.orthogonal_neighbours(self.0 as i16) {
             if enemies.contains(&neighbour) {
                 ret.push(neighbour);
             }

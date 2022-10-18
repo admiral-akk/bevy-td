@@ -5,12 +5,14 @@ use bevy::{
         SystemStage,
     },
 };
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 use crate::{
     components::{
         attacks::{backstab::Backstab, melee::MeleeAttack},
-        auras::root::RootAura,
-        debuffs::root::Root,
+        auras::{root::RootAura, taunt::TauntAura},
+        debuffs::{root::Root, taunt::Taunt},
         movements::{cautious::Cautious, charging::Charging, cowardly::Cowardly},
         on_hits::split::Split,
     },
@@ -29,14 +31,16 @@ pub struct ActionStage {
     schedule: Schedule,
 }
 
-#[derive(Copy, Clone, StageLabel)]
+#[derive(Copy, Clone, EnumIter, StageLabel)]
 pub enum GameStage {
     Tick,
     ProposeMove,
     ModifyMove,
     ApplyMove,
     PostMove,
-    Attack,
+    ProposeAttack,
+    ModifyAttack,
+    SendAttack,
     ResolveAttack,
     OnHit,
     CheckEnd,
@@ -44,30 +48,16 @@ pub enum GameStage {
 }
 
 impl GameStage {
-    const STAGES: [GameStage; 10] = [
-        GameStage::Tick,
-        GameStage::ProposeMove,
-        GameStage::ModifyMove,
-        GameStage::ApplyMove,
-        GameStage::PostMove,
-        GameStage::Attack,
-        GameStage::ResolveAttack,
-        GameStage::OnHit,
-        GameStage::CheckEnd,
-        GameStage::CleanUp,
-    ];
-
     pub fn add_stages(schedule: &mut Schedule) {
-        for i in 0..GameStage::STAGES.len() {
-            if i == 0 {
-                schedule.add_stage(GameStage::STAGES[i], SystemStage::single_threaded());
-            } else {
-                schedule.add_stage_after(
-                    GameStage::STAGES[i - 1],
-                    GameStage::STAGES[i],
-                    SystemStage::single_threaded(),
-                );
-            }
+        let mut prev_stage = None;
+        for stage in GameStage::iter() {
+            match prev_stage {
+                None => schedule.add_stage(stage, SystemStage::single_threaded()),
+                Some(prev_stage) => {
+                    schedule.add_stage_after(prev_stage, stage, SystemStage::single_threaded())
+                }
+            };
+            prev_stage = Some(stage);
         }
     }
 }
@@ -108,14 +98,18 @@ impl ActionStage {
             )
             .add_system_set_to_stage(
                 GameStage::PostMove,
-                system_set(active_state.clone()).with_system(apply_aura::<Root, RootAura>),
+                system_set(active_state.clone())
+                    .with_system(apply_aura::<Root, RootAura>)
+                    .with_system(apply_aura::<Taunt, TauntAura>),
             )
             .add_system_set_to_stage(
-                GameStage::Attack,
+                GameStage::ProposeAttack,
                 system_set(active_state.clone())
                     .with_system(try_attack::<MeleeAttack>)
                     .with_system(try_attack::<Backstab>),
             )
+            .add_system_set_to_stage(GameStage::ModifyAttack, system_set(active_state.clone()))
+            .add_system_set_to_stage(GameStage::SendAttack, system_set(active_state.clone()))
             .add_system_set_to_stage(
                 GameStage::ResolveAttack,
                 system_set(active_state.clone())

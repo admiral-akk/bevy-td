@@ -2,15 +2,16 @@ use bevy::{prelude::Entity, utils::HashMap};
 
 use crate::{
     components::{allegiance::Allegiance, coordinates::Coordinates},
-    events::AttackEvent,
     resources::board::Board,
 };
 
+use super::priority::ProposedAttack;
+
 pub trait Attack {
-    fn target(
+    fn priority(
         &self,
         entities: HashMap<Coordinates, Allegiance>,
         active: (Coordinates, Allegiance, Entity),
         board: &Board,
-    ) -> Option<AttackEvent>;
+    ) -> Vec<ProposedAttack>;
 }

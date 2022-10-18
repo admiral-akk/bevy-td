@@ -16,6 +16,8 @@ assets_plugin = {path = "../assets_plugin"}
 
 # Serialization
 serde = "1.0"
+strum = "0.24"
+strum_macros = "0.24"
 
 # Random
 rand = "0.8"

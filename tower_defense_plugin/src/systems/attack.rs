@@ -19,10 +19,13 @@ pub fn try_attack<T: Attack + Component>(
                     .iter()
                     .map(|(coord, allegiance)| (*coord, *allegiance))
                     .collect();
-                if let Some(attack) =
-                    attack.target(targets, (coord, allegiance, parent.get()), &board)
-                {
-                    attack_ewr.send(attack);
+                let priority = attack.priority(targets, (coord, allegiance, parent.get()), &board);
+                if let Some(attack) = priority.get(0) {
+                    attack_ewr.send(AttackEvent {
+                        attacker: attack.attacker,
+                        defender: attack.defender,
+                        damage: attack.damage,
+                    });
                 }
             }
         }

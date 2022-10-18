@@ -1,15 +1,14 @@
-use super::attack::Attack;
+use super::{
+    attack::Attack,
+    priority::{ProposedAttack},
+};
 use bevy::{
     prelude::{Component, Entity},
     utils::HashMap,
 };
 
 use crate::{
-    components::{
-        allegiance::{Allegiance},
-        coordinates::Coordinates,
-    },
-    events::AttackEvent,
+    components::{allegiance::Allegiance, coordinates::Coordinates},
     resources::board::Board,
 };
 
@@ -56,37 +55,30 @@ fn get_neighbouring_enemies(
 }
 
 impl Attack for Backstab {
-    fn target(
+    fn priority(
         &self,
         entities: HashMap<Coordinates, Allegiance>,
         active: (Coordinates, Allegiance, Entity),
         board: &Board,
-    ) -> Option<AttackEvent> {
-        let mut target = None;
-        let mut is_backstab = false;
+    ) -> Vec<ProposedAttack> {
+        let mut priority = Vec::new();
         for enemy in get_neighbouring_enemies(&entities, (active.0, active.1)) {
-            for ally in get_neighbouring_allies(&entities, (enemy, active.1)) {
-                if ally.eq(&active.0) {
-                    continue;
-                }
-                target = Some(enemy);
-                is_backstab = true;
-            }
-            if target.is_none() {
-                target = Some(enemy);
-            }
-        }
-        if target.is_some() {
-            let damage = match is_backstab {
+            let has_adjacent_ally = get_neighbouring_allies(&entities, (enemy, active.1))
+                .iter()
+                .filter(|coord| !(*coord).eq(&active.0))
+                .count()
+                > 0;
+            let damage = match has_adjacent_ally {
                 true => self.base_damage * self.multiplier,
                 false => self.base_damage,
             };
-            return Some(AttackEvent {
-                attacker: *board.entities.get(&active.0).unwrap(),
-                defender: *board.entities.get(&target.unwrap()).unwrap(),
-                damage,
+            priority.push(ProposedAttack {
+                damage: damage,
+                attacker: active.2,
+                defender: *board.entities.get(&enemy).unwrap(),
             });
         }
-        return None;
+        priority.sort_by(|a, b| a.damage.cmp(&b.damage));
+        priority
     }
 }
