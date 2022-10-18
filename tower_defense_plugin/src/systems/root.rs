@@ -6,6 +6,5 @@ pub fn rooted(mut commands: Commands, rooted_units: Query<Entity, (With<Root>, W
     for entity in rooted_units.iter() {
         commands.entity(entity).remove::<Plan>();
         commands.entity(entity).remove::<Root>();
-        bevy::log::error!("Removing root!");
     }
 }

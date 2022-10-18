@@ -60,17 +60,6 @@ pub enum GameState {
     Reward,
 }
 
-fn is_fighting(state: Res<State<GameState>>) -> ShouldRun {
-    match state.current() {
-        GameState::Fighting => ShouldRun::Yes,
-        _ => ShouldRun::No,
-    }
-}
-
-fn fighting_system_set() -> SystemSet {
-    SystemSet::new().with_run_criteria(is_fighting)
-}
-
 fn in_game_system_set() -> SystemSet {
     SystemSet::new().with_run_criteria(|state: Res<State<GameState>>| match state.current() {
         GameState::None => ShouldRun::No,

@@ -18,7 +18,6 @@ pub fn apply_aura<Buff: Component + Clone, T: Component + Aura<Buff>>(
         .map(|(entity, coord, _)| (*coord, entity))
         .collect::<HashMap<Coordinates, Entity>>();
     for (aura, coord, allegiance) in auras.iter() {
-        bevy::log::error!("Attemptin aura!");
         let (buff, targets) = aura.targets(&all, (*coord, *allegiance));
         for target in targets {
             commands
