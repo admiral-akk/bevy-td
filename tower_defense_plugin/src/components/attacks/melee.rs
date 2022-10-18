@@ -1,18 +1,16 @@
 use super::{attack::Attack, priority::ProposedAttack};
-use bevy::{
-    prelude::{Component},
-};
+use bevy::prelude::Component;
 
 use crate::{
-    components::{targetting::target::Targets},
+    components::targetting::target::Targets,
     structs::board_state::{BoardState, Character},
 };
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
 #[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
-pub struct MeleeAttack(pub i32);
+pub struct Normal(pub i32);
 
-impl Attack for MeleeAttack {
+impl Attack for Normal {
     fn priority(
         &self,
         attacker: Character,

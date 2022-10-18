@@ -10,7 +10,7 @@ use strum_macros::EnumIter;
 
 use crate::{
     components::{
-        attacks::{backstab::Backstab, melee::MeleeAttack},
+        attacks::{melee::Normal, normal::Backstab},
         auras::{root::RootAura, taunt::TauntAura},
         debuffs::{root::Root, taunt::Taunt},
         movements::{cautious::Cautious, charging::Charging, cowardly::Cowardly},
@@ -111,7 +111,7 @@ impl ActionStage {
             .add_system_set_to_stage(
                 GameStage::GenerateAttacks,
                 system_set(active_state.clone())
-                    .with_system(try_attack::<MeleeAttack>)
+                    .with_system(try_attack::<Normal>)
                     .with_system(try_attack::<Backstab>),
             )
             .add_system_set_to_stage(GameStage::FilterAttacks, system_set(active_state.clone()))

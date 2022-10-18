@@ -6,7 +6,7 @@ use crate::{
         attack_bundle::AttackBundle, monster_bundle::MonsterBundle, movement_bundle::MovementBundle,
     },
     components::{
-        attacks::melee::MeleeAttack,
+        attacks::melee::Normal,
         coordinates::Coordinates,
         movements::{cautious::Cautious, charging::Charging},
         on_hits::split::Split,
@@ -23,7 +23,7 @@ pub fn add_monster(
 ) -> Entity {
     let movement = commands.spawn_bundle(MovementBundle::new(Charging(3))).id();
     let attack = commands
-        .spawn_bundle(AttackBundle::new(MeleeAttack(1), MeleeTarget))
+        .spawn_bundle(AttackBundle::new(Normal(1), MeleeTarget))
         .id();
     let monster = commands
         .spawn_bundle(MonsterBundle::new(

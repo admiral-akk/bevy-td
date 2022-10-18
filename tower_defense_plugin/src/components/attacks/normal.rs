@@ -1,10 +1,8 @@
 use super::{attack::Attack, priority::ProposedAttack};
-use bevy::{
-    prelude::{Component},
-};
+use bevy::prelude::Component;
 
 use crate::{
-    components::{targetting::target::Targets},
+    components::targetting::target::Targets,
     structs::board_state::{BoardState, Character},
 };
 

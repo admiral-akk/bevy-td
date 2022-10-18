@@ -6,7 +6,7 @@ use crate::{
         attack_bundle::AttackBundle, hero_bundles::HeroBundle, movement_bundle::MovementBundle,
     },
     components::{
-        attacks::{backstab::Backstab, melee::MeleeAttack},
+        attacks::{melee::Normal, normal::Backstab},
         auras::root::RootAura,
         coordinates::Coordinates,
         movements::{charging::Charging, cowardly::Cowardly},
@@ -25,7 +25,7 @@ pub fn add_hero(commands: &mut Commands, coord: Coordinates, board: &Board, hero
             .spawn_bundle(AttackBundle::new(Backstab::new(1, 5), MeleeTarget))
             .id(),
         _ => commands
-            .spawn_bundle(AttackBundle::new(MeleeAttack(1), MeleeTarget))
+            .spawn_bundle(AttackBundle::new(Normal(1), MeleeTarget))
             .id(),
     };
     let hero = commands
