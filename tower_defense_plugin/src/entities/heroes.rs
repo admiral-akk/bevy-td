@@ -6,8 +6,8 @@ use crate::{
         attack_bundle::AttackBundle, hero_bundles::HeroBundle, movement_bundle::MovementBundle,
     },
     components::{
-        attacks::{melee::Normal, normal::Backstab},
-        auras::{taunt::TauntAura},
+        attacks::{backstab::Backstab, normal::Normal, rage::Rage},
+        auras::taunt::TauntAura,
         coordinates::Coordinates,
         movements::{charging::Charging, cowardly::Cowardly},
         targetting::melee::MeleeTarget,
@@ -23,6 +23,9 @@ pub fn add_hero(commands: &mut Commands, coord: Coordinates, board: &Board, hero
     let attack = match hero_type {
         HeroType::Rogue => commands
             .spawn_bundle(AttackBundle::new(Backstab::new(1, 5), MeleeTarget))
+            .id(),
+        HeroType::Barbarian => commands
+            .spawn_bundle(AttackBundle::new(Rage(1), MeleeTarget))
             .id(),
         _ => commands
             .spawn_bundle(AttackBundle::new(Normal(1), MeleeTarget))

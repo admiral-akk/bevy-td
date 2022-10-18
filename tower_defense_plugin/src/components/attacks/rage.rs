@@ -8,9 +8,9 @@ use crate::{
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
 #[derive(Debug, Default, Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Hash, Component)]
-pub struct Normal(pub i32);
+pub struct Rage(pub i32);
 
-impl Attack for Normal {
+impl Attack for Rage {
     fn priority(
         &self,
         attacker: Character,
@@ -21,7 +21,7 @@ impl Attack for Normal {
 
         for target in &targets.0 {
             priority.push(ProposedAttack {
-                damage: self.0,
+                damage: self.0 + (attacker.health.max - attacker.health.health),
                 attacker,
                 defender: *target,
             });

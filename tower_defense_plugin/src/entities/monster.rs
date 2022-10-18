@@ -6,7 +6,7 @@ use crate::{
         attack_bundle::AttackBundle, monster_bundle::MonsterBundle, movement_bundle::MovementBundle,
     },
     components::{
-        attacks::melee::Normal,
+        attacks::normal::Normal,
         coordinates::Coordinates,
         movements::{cautious::Cautious, charging::Charging},
         on_hits::split::Split,
