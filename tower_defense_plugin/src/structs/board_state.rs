@@ -1,4 +1,4 @@
-use bevy::prelude::Entity;
+use bevy::prelude::{Entity, Query};
 
 use crate::components::{allegiance::Allegiance, coordinates::Coordinates, health::Health};
 
@@ -11,13 +11,13 @@ pub struct Character {
 
 impl Character {
     pub fn new(
-        id: &Entity,
+        id: Entity,
         allegiance: &Allegiance,
         health: &Health,
         position: &Coordinates,
     ) -> Self {
         Self {
-            id: *id,
+            id,
             allegiance: *allegiance,
             health: *health,
             position: *position,
@@ -26,13 +26,16 @@ impl Character {
 }
 
 pub struct BoardState {
-    pub characters: Vec<Character>,
+    characters: Vec<Character>,
 }
 
 impl BoardState {
-    pub fn new() -> Self {
+    pub fn new(entities: Query<(Entity, &Allegiance, &Health, &Coordinates)>) -> Self {
         Self {
-            characters: Vec::new(),
+            characters: entities
+                .iter()
+                .map(|character| Character::new(character.0, character.1, character.2, character.3))
+                .collect(),
         }
     }
 }
