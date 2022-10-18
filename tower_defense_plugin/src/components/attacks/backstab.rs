@@ -1,15 +1,11 @@
-use super::{
-    attack::Attack,
-    priority::{ProposedAttack},
-};
+use super::{attack::Attack, priority::ProposedAttack};
 use bevy::{
-    prelude::{Component, Entity},
-    utils::HashMap,
+    prelude::{Component},
 };
 
 use crate::{
-    components::{allegiance::Allegiance, coordinates::Coordinates},
-    resources::board::Board,
+    components::{targetting::target::Targets},
+    structs::board_state::{BoardState, Character},
 };
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
@@ -28,54 +24,32 @@ impl Backstab {
     }
 }
 
-fn get_neighbouring_allies(
-    board: &HashMap<Coordinates, Allegiance>,
-    entity: (Coordinates, Allegiance),
-) -> Vec<Coordinates> {
-    entity
-        .0
-        .orthogonal_neighbours(1)
-        .iter()
-        .filter(|coord| board.contains_key(coord) && board[coord].eq(&entity.1))
-        .map(|coord| *coord)
-        .collect()
-}
-
-fn get_neighbouring_enemies(
-    board: &HashMap<Coordinates, Allegiance>,
-    entity: (Coordinates, Allegiance),
-) -> Vec<Coordinates> {
-    entity
-        .0
-        .orthogonal_neighbours(1)
-        .iter()
-        .filter(|coord| board.contains_key(coord) && !board[coord].eq(&entity.1))
-        .map(|coord| *coord)
-        .collect()
-}
-
 impl Attack for Backstab {
     fn priority(
         &self,
-        entities: HashMap<Coordinates, Allegiance>,
-        active: (Coordinates, Allegiance, Entity),
-        board: &Board,
+        attacker: Character,
+        board_state: &BoardState,
+        targets: &Targets,
     ) -> Vec<ProposedAttack> {
         let mut priority = Vec::new();
-        for enemy in get_neighbouring_enemies(&entities, (active.0, active.1)) {
-            let has_adjacent_ally = get_neighbouring_allies(&entities, (enemy, active.1))
+
+        for target in &targets.0 {
+            let damage = match board_state
+                .get_neighbours(target.position)
                 .iter()
-                .filter(|coord| !(*coord).eq(&active.0))
+                .filter(|c| {
+                    c.allegiance.eq(&attacker.allegiance) && !c.position.eq(&attacker.position)
+                })
                 .count()
-                > 0;
-            let damage = match has_adjacent_ally {
+                > 0
+            {
                 true => self.base_damage * self.multiplier,
                 false => self.base_damage,
             };
             priority.push(ProposedAttack {
                 damage: damage,
-                attacker: active.2,
-                defender: *board.entities.get(&enemy).unwrap(),
+                attacker,
+                defender: *target,
             });
         }
         priority.sort_by(|a, b| a.damage.cmp(&b.damage));

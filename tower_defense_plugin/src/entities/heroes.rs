@@ -10,6 +10,7 @@ use crate::{
         auras::root::RootAura,
         coordinates::Coordinates,
         movements::{charging::Charging, cowardly::Cowardly},
+        targetting::melee::MeleeTarget,
     },
     resources::board::Board,
 };
@@ -21,10 +22,10 @@ pub fn add_hero(commands: &mut Commands, coord: Coordinates, board: &Board, hero
     };
     let attack = match hero_type {
         HeroType::Rogue => commands
-            .spawn_bundle(AttackBundle::new(Backstab::new(1, 5)))
+            .spawn_bundle(AttackBundle::new(Backstab::new(1, 5), MeleeTarget))
             .id(),
         _ => commands
-            .spawn_bundle(AttackBundle::new(MeleeAttack(1)))
+            .spawn_bundle(AttackBundle::new(MeleeAttack(1), MeleeTarget))
             .id(),
     };
     let hero = commands

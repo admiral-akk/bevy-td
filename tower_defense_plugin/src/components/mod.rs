@@ -14,5 +14,6 @@ pub(crate) mod movements;
 pub(crate) mod on_hits;
 pub(crate) mod selected;
 pub(crate) mod start;
+pub(crate) mod targetting;
 pub(crate) mod turn_order;
 pub(crate) mod unit;

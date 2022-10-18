@@ -12,4 +12,5 @@ pub(crate) mod root;
 pub(crate) mod selected;
 pub(crate) mod spawn_wave;
 pub(crate) mod sprites;
+pub(crate) mod target;
 pub(crate) mod turn_order;

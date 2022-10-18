@@ -1,12 +1,11 @@
 use super::{attack::Attack, priority::ProposedAttack};
 use bevy::{
-    prelude::{Component, Entity},
-    utils::HashMap,
+    prelude::{Component},
 };
 
 use crate::{
-    components::{allegiance::Allegiance, coordinates::Coordinates},
-    resources::board::Board,
+    components::{targetting::target::Targets},
+    structs::board_state::{BoardState, Character},
 };
 
 #[cfg_attr(feature = "debug", derive(bevy_inspector_egui::Inspectable))]
@@ -16,24 +15,20 @@ pub struct MeleeAttack(pub i32);
 impl Attack for MeleeAttack {
     fn priority(
         &self,
-        entities: HashMap<Coordinates, Allegiance>,
-        active: (Coordinates, Allegiance, Entity),
-        board: &Board,
+        attacker: Character,
+        _board_state: &BoardState,
+        targets: &Targets,
     ) -> Vec<ProposedAttack> {
         let mut priority = Vec::new();
-        for neighbour in active.0.orthogonal_neighbours(1) {
-            if let Some(allegiance) = entities.get(&neighbour) {
-                if !allegiance.eq(&active.1) {
-                    if let Some(&entity) = board.entities.get(&neighbour) {
-                        priority.push(ProposedAttack {
-                            damage: self.0,
-                            attacker: active.2,
-                            defender: entity,
-                        });
-                    }
-                }
-            }
+
+        for target in &targets.0 {
+            priority.push(ProposedAttack {
+                damage: self.0,
+                attacker,
+                defender: *target,
+            });
         }
+        priority.sort_by(|a, b| a.damage.cmp(&b.damage));
         priority
     }
 }

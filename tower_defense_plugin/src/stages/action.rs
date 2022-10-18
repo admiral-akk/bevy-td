@@ -15,6 +15,7 @@ use crate::{
         debuffs::{root::Root, taunt::Taunt},
         movements::{cautious::Cautious, charging::Charging, cowardly::Cowardly},
         on_hits::split::Split,
+        targetting::melee::MeleeTarget,
     },
     systems::{
         attack::try_attack,
@@ -24,6 +25,7 @@ use crate::{
         movement::{apply_move, propose_move},
         on_hit::on_hit,
         root::rooted,
+        target::try_target,
         turn_order::tick_active,
     },
 };
@@ -38,9 +40,9 @@ pub enum GameStage {
     ModifyMove,
     ApplyMove,
     PostMove,
-    ProposeAttack,
-    ModifyAttack,
-    SendAttack,
+    GenerateTargets,
+    GenerateAttacks,
+    FilterAttacks,
     ResolveAttack,
     OnHit,
     CheckEnd,
@@ -103,13 +105,16 @@ impl ActionStage {
                     .with_system(apply_aura::<Taunt, TauntAura>),
             )
             .add_system_set_to_stage(
-                GameStage::ProposeAttack,
+                GameStage::GenerateTargets,
+                system_set(active_state.clone()).with_system(try_target::<MeleeTarget>),
+            )
+            .add_system_set_to_stage(
+                GameStage::GenerateAttacks,
                 system_set(active_state.clone())
                     .with_system(try_attack::<MeleeAttack>)
                     .with_system(try_attack::<Backstab>),
             )
-            .add_system_set_to_stage(GameStage::ModifyAttack, system_set(active_state.clone()))
-            .add_system_set_to_stage(GameStage::SendAttack, system_set(active_state.clone()))
+            .add_system_set_to_stage(GameStage::FilterAttacks, system_set(active_state.clone()))
             .add_system_set_to_stage(
                 GameStage::ResolveAttack,
                 system_set(active_state.clone())

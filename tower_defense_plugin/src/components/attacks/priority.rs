@@ -1,11 +1,12 @@
-use bevy::prelude::Entity;
+use bevy::prelude::{Component};
+
+use crate::structs::board_state::Character;
 
 pub struct ProposedAttack {
     pub damage: i32,
-    pub attacker: Entity,
-    pub defender: Entity,
+    pub attacker: Character,
+    pub defender: Character,
 }
 
-pub struct AttackPriority {
-    pub priority: Vec<ProposedAttack>,
-}
+#[derive(Component)]
+pub struct Attacks(pub Vec<ProposedAttack>);
