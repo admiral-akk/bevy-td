@@ -18,7 +18,7 @@ use crate::{
         targetting::melee::MeleeTarget,
     },
     systems::{
-        attack::try_attack,
+        attack::{animate_attack, try_attack},
         aura::apply_aura,
         health::{damage, death, update_health_bar},
         life::check_units,
@@ -124,6 +124,7 @@ impl ActionStage {
                 GameStage::ResolveAttack,
                 system_set(active_state.clone())
                     .with_system(damage)
+                    .with_system(animate_attack)
                     .with_system(death.after(damage))
                     .with_system(update_health_bar.after(damage)),
             )

@@ -1,4 +1,10 @@
-use bevy::prelude::{Commands, Component, Entity, EventReader, EventWriter, Parent, Query};
+use bevy::{
+    prelude::{
+        Children, Commands, Component, Entity, EventReader, EventWriter, Parent, Query, Res,
+        Transform, With,
+    },
+    sprite::TextureAtlasSprite,
+};
 
 use crate::{
     components::{
@@ -6,6 +12,7 @@ use crate::{
         targetting::target::Targets,
     },
     events::{ActiveAction, AttackEvent},
+    resources::board::Board,
     structs::board_state::BoardState,
 };
 pub fn try_attack<T: Attack + Component>(
@@ -30,6 +37,25 @@ pub fn try_attack<T: Attack + Component>(
                 }
             }
             commands.entity(attacking_entity).remove::<Targets>();
+        }
+    }
+}
+
+pub fn animate_attack(
+    mut attack_ewr: EventReader<AttackEvent>,
+    entities: Query<(&Coordinates, &Children)>,
+    mut sprites: Query<&mut Transform, With<TextureAtlasSprite>>,
+    board: Res<Board>,
+) {
+    for attack in attack_ewr.iter() {
+        let attacker = entities.get(attack.attacker).unwrap();
+        let defender = entities.get(attack.defender).unwrap();
+        let offset = board.transform(defender.0, 0.).translation
+            - board.transform(attacker.0, 0.).translation;
+        for child in attacker.1 {
+            if let Ok(mut transform) = sprites.get_mut(*child) {
+                *transform = transform.with_translation(offset);
+            }
         }
     }
 }
