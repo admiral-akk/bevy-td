@@ -54,7 +54,7 @@ pub fn animate_attack(
             - board.transform(attacker.0, 0.).translation;
         for child in attacker.1 {
             if let Ok(mut transform) = sprites.get_mut(*child) {
-                *transform = transform.with_translation(offset);
+                *transform = transform.with_translation(offset / 2.);
             }
         }
     }
