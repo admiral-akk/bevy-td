@@ -42,7 +42,7 @@ use systems::{
     health::add_health_bar,
     selected::{place_tower, select_tower},
     spawn_wave::monster_spawn,
-    sprites::{hero_added, monster_added},
+    sprites::{hero_added, monster_added, move_sprite_back},
     turn_order::{add_turn, remove_turn, reset_turn},
 };
 
@@ -107,6 +107,7 @@ impl<T: StateData> Plugin for TowerDefensePlugin<T> {
                     .with_system(add_health_bar)
                     .with_system(add_action)
                     .with_system(hero_added)
+                    .with_system(move_sprite_back)
                     .with_system(monster_added)
                     .with_system(Self::game_over),
             )

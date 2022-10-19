@@ -1,7 +1,13 @@
-use bevy::prelude::{Added, Changed, Entity, Query, RemovedComponents, ResMut, Transform};
+use bevy::{
+    prelude::{
+        Added, Changed, Children, Entity, Query, RemovedComponents, ResMut, Transform,
+        With, Without,
+    },
+    sprite::{TextureAtlasSprite},
+};
 
 use crate::{
-    components::{coordinates::Coordinates, start::Start},
+    components::{coordinates::Coordinates, health_bar::HealthBar, start::Start},
     resources::board::Board,
 };
 
@@ -17,11 +23,22 @@ pub fn added(
 }
 
 pub fn updated(
-    mut updated: Query<(Entity, &Coordinates, &mut Transform), Changed<Coordinates>>,
+    mut updated: Query<
+        (Entity, &Coordinates, &mut Transform, &Children),
+        (Changed<Coordinates>, Without<TextureAtlasSprite>),
+    >,
+    mut sprites: Query<&mut Transform, (With<TextureAtlasSprite>, Without<HealthBar>)>,
     mut board: ResMut<Board>,
 ) {
-    for (entity, coord, mut transform) in updated.iter_mut() {
+    for (entity, coord, mut transform, children) in updated.iter_mut() {
         let tran = board.transform(coord, transform.translation.z);
+        if let Some(entity) = children.iter().find(|c| sprites.contains(**c)) {
+            if let Ok(mut sprite_transform) = sprites.get_mut(*entity) {
+                *sprite_transform = sprite_transform.with_translation(
+                    sprite_transform.translation - (tran.translation - transform.translation),
+                );
+            }
+        }
         *transform = transform.with_translation(tran.translation);
         board.entities.update_key(&entity, *coord);
     }

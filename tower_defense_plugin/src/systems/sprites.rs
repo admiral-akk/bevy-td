@@ -1,5 +1,8 @@
 use assets_plugin::resources::{heroes::HeroSprites, monsters::MonsterSprites, sprites::Sprites};
-use bevy::prelude::{Added, BuildChildren, Commands, Entity, Query, Res};
+use bevy::{
+    prelude::{Added, BuildChildren, Commands, Entity, Query, Res, Transform, Vec3, With},
+    sprite::{TextureAtlasSprite},
+};
 
 use crate::components::{hero::Hero, monster::Monster};
 
@@ -26,5 +29,18 @@ pub fn hero_added(
             .spawn_bundle(sprites.fetch_sprite_sheet(hero.0))
             .id();
         commands.entity(entity).add_child(sprite);
+    }
+}
+
+const STEP_SIZE: f32 = 5.;
+
+pub fn move_sprite_back(mut sprites: Query<&mut Transform, With<TextureAtlasSprite>>) {
+    for mut transform in sprites.iter_mut() {
+        let pos = transform.translation;
+        if pos.length() < STEP_SIZE {
+            *transform = transform.with_translation(Vec3::ZERO);
+        } else {
+            *transform = transform.with_translation(pos - pos.normalize() * STEP_SIZE);
+        }
     }
 }
